@@ -159,6 +159,11 @@ if [[ -f "$ROOT/pi/agent/patches/subagents-ui.py" ]]; then
   python3 "$ROOT/pi/agent/patches/subagents-ui.py"
 fi
 
+# Jev decisions go directly to TypeSafe; GPT generation stays on Codex auth.
+if [[ -f "$ROOT/pi/agent/patches/jev-direct.py" ]]; then
+  python3 "$ROOT/pi/agent/patches/jev-direct.py"
+fi
+
 # npm restores its bundled bin on update; our host patches need the unbundled CLI.
 # Preserve config-only installation on machines that do not have Pi yet.
 if command -v pi >/dev/null 2>&1; then

@@ -104,6 +104,7 @@ gate for extreme window sizes.
 | rpiv-todo UI | `@juicesharp/rpiv-todo` `2.9.0`, after legacy tweaks | `rpiv-todo-ui.py` |
 | Subagents UI | `@tintinweb/pi-subagents` `0.19.0` | `subagents-ui.py` |
 | Intercom messages | `pi-intercom` `0.13.0` | `intercom-ui.py` (with host `pi-transcript.py`) |
+| Jev direct API | `pi-jev-router` `0.4.0` | `jev-direct.py` |
 
 Shared helpers do not decide compatibility. Each guarded patcher validates its
 complete source set before writing. Preserve exact anchors and occurrence counts,
@@ -130,7 +131,8 @@ Do not change persistence as part of a visual cleanup.
 
 `install.sh` owns the serial order: powerline DJ/layout, host inset, editor,
 Markdown code panels, transcript, Intercom UI, dialogs, notices, compact layout,
-editor gap, legacy Todo tweaks, Todo UI, then Subagents UI, then `pi/launcher.py`.
+editor gap, legacy Todo tweaks, Todo UI, Subagents UI, Jev direct API, then
+`pi/launcher.py`.
 The legacy Todo command remains best-effort; the other patch failures propagate.
 Keep pi-pretty before powerline in package settings because both install editors.
 
@@ -210,6 +212,41 @@ Restart Pi for host or bundled-TUI changes. Extension/package source changes use
 `/reload`; a full restart also reloads them. Check the visible UI after runtime
 changes. Commit only explicit owned files or hunks, with related tests, and keep
 independently revertible changes separate.
+
+## Jev routing without Vercel
+
+`pi-jev-router@0.4.0` is pinned and patched to call
+[TypeSafe's direct API](https://docs.typesafe.ai/api) at
+`https://api.typesafe.ai/v1/systemone` using `jev-latest`. It reads the exported
+`JEV_API_KEY` from Pi's environment, not from settings or a shell file. Keep the
+export in `~/.zshrc.local`; restart Pi from a shell that has sourced it when the
+key changes. No Vercel credentials or requests are used by the patched router.
+
+Only the Jev evaluation transport changes, including monitoring and the optional
+skill/adaptive-effort checks. GPT-6 Astra and GPT-5.6 Luna still generate through
+Pi's `openai-codex` subscription login, both fixed at `xhigh`. Timeouts, cancellation,
+session pins and Astra fallback remain package-owned. `/jev` reports direct API
+key presence, not whether the key is valid. Task excerpts still go to TypeSafe,
+and its evaluations are billed separately; this does not make routing local.
+
+After installing or reinstalling the pinned package, replay the guarded patch:
+
+```sh
+python3 -B pi/agent/patches/jev-direct.py
+PI_SDK_ROOT="$(npm root -g)/@earendil-works/pi-coding-agent" \
+  bun test pi/agent/tests/jev-direct.test.ts
+```
+
+Tests use synthetic credentials and mock network calls, including the real
+router's Codex dispatch; no paid requests are made. Without `PI_SDK_ROOT`, the
+transport and patch guards still run, but real-router integration is skipped.
+
+The installer also replays it. Unknown versions, changed transport anchors and
+partial patches are refused before writing. Originals and an added-file manifest
+are saved under the printed `~/.config/theme-backups/jev-direct-*` directory.
+Restore its `index.ts` and remove only the recorded `jev-direct.ts` to roll back.
+Then `/reload` and select `/model auto/jev`; the startup default is unchanged.
+Existing pins survive reload; use `/new` to get a fresh routing decision.
 
 ## Checking a Pi upgrade
 
