@@ -146,6 +146,11 @@ if [[ -f "$ROOT/pi/agent/patches/pi-editor-gap.py" ]]; then
   python3 "$ROOT/pi/agent/patches/pi-editor-gap.py"
 fi
 
+# Resume messages queued while compaction and async input hooks finish.
+if [[ -f "$ROOT/pi/agent/patches/pi-compaction-queue.py" ]]; then
+  python3 "$ROOT/pi/agent/patches/pi-compaction-queue.py"
+fi
+
 # Re-apply local tints on installed pi packages
 if [[ -f "$ROOT/pi/agent/patches/rpiv-todo-gray.py" ]]; then
   python3 "$ROOT/pi/agent/patches/rpiv-todo-gray.py" || true

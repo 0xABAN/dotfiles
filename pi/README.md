@@ -99,7 +99,7 @@ gate for extreme window sizes.
 
 | Target | Supported input | Commands under `agent/patches/` |
 |--------|-----------------|--------------------------------|
-| Pi unbundled host and package-local TUI | Pi `0.85.1` | `pi-horizontal-inset.py`, `pi-markdown-code.py`, `pi-transcript.py`, `pi-extension-dialogs.py`, `pi-activity-notices.py`, `pi-compact-layout.py`, `pi-editor-gap.py` |
+| Pi unbundled host and package-local TUI | Pi `0.85.1` | `pi-horizontal-inset.py`, `pi-markdown-code.py`, `pi-transcript.py`, `pi-extension-dialogs.py`, `pi-activity-notices.py`, `pi-compact-layout.py`, `pi-editor-gap.py`, `pi-compaction-queue.py` |
 | Powerline | Git commit `8c9bda10fdfd2822e89334ec85f3da9f8ca49182` | `powerline-dj.py`, `powerline-layout.py`, `powerline-editor.py` |
 | rpiv-todo UI | `@juicesharp/rpiv-todo` `2.9.0`, after legacy tweaks | `rpiv-todo-ui.py` |
 | Subagents UI | `@tintinweb/pi-subagents` `0.19.0` | `subagents-ui.py` |
@@ -131,7 +131,7 @@ Do not change persistence as part of a visual cleanup.
 
 `install.sh` owns the serial order: powerline DJ/layout, host inset, editor,
 Markdown code panels, transcript, Intercom UI, dialogs, notices, compact layout,
-editor gap, legacy Todo tweaks, Todo UI, Subagents UI, Jev direct API, then
+editor gap, compaction queue, legacy Todo tweaks, Todo UI, Subagents UI, Jev direct API, then
 `pi/launcher.py`.
 The legacy Todo command remains best-effort; the other patch failures propagate.
 Keep pi-pretty before powerline in package settings because both install editors.
@@ -212,6 +212,28 @@ Restart Pi for host or bundled-TUI changes. Extension/package source changes use
 `/reload`; a full restart also reloads them. Check the visible UI after runtime
 changes. Commit only explicit owned files or hunks, with related tests, and keep
 independently revertible changes separate.
+
+## Messages queued during compaction
+
+Pi 0.85.1 can go idle with pending messages when async input hooks finish between
+its post-compaction queue check and run settlement. `pi-compaction-queue.py`
+adds a synchronous queue recheck at that boundary. It preserves steering,
+follow-up, and retry behavior without timers or bypassing input hooks.
+
+The installer and upgrade checker replay this guarded host patch. After a Pi
+reinstall, apply it and **restart Pi**; `/reload` cannot reload the session loop:
+
+```sh
+python3 -B pi/agent/patches/pi-compaction-queue.py
+PI_SDK_ROOT="$(npm root -g)/@earendil-works/pi-coding-agent" \
+  bun test pi/agent/tests/pi-compaction-queue.test.ts
+```
+
+The patch backs up the original `dist/core/agent-session.js` and refuses unknown
+versions or changed settlement code. Tests use an isolated SDK copy and a fake
+provider to exercise the actual session loop and interactive queue flush, with
+async input hooks around the race, both delivery modes, multiple messages, manual
+compaction, and overflow recovery. No model requests are made.
 
 ## Jev routing without Vercel
 
@@ -310,6 +332,7 @@ The patch-contract table above is the version authority. The patch purposes are:
 - Host inset: shared viewport margins; transcript: speaker/tool rows and metrics.
 - Markdown code panels: hidden fences, retained syntax highlighting, and full-width dark rows.
 - Editor gap: idle breathing room without separating active loaders from the editor.
+- Compaction queue: recheck pending messages before the session becomes idle.
 - Dialogs: native selector/input visibility; notices: activity wrapping;
   compact layout: small-window widget and footer budgets.
 - Powerline DJ/layout/editor: mode presentation, footer sizing and editor frame.
