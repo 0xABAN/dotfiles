@@ -29,7 +29,7 @@ class UpgradeTest(unittest.TestCase):
         # Exercise the real filesystem orchestration with controlled subprocesses.
         for failure in (
             None, "install", "config", "clean", "skip", "missing-summary", "source-change",
-            "backup", "no-backup", "cli", "launcher", "cli-assertions", "foreign-launcher", "intercom", "compaction-queue",
+            "backup", "no-backup", "cli", "launcher", "cli-assertions", "foreign-launcher", "intercom", "compaction-queue", "powerline-queue",
         ):
             with self.subTest(failure=failure), tempfile.TemporaryDirectory() as temporary:
                 root = Path(temporary)
@@ -124,6 +124,8 @@ class UpgradeTest(unittest.TestCase):
                                 code = 1 if failure == "intercom" else 0
                             if args[2] == "pi/agent/patches/pi-compaction-queue.py":
                                 code = 1 if failure == "compaction-queue" else 0
+                            if args[2] == "pi/agent/patches/powerline-compaction-queue.py":
+                                code = 1 if failure == "powerline-queue" else 0
                     elif args == ["npm", "root", "-g"]:
                         output = str(global_modules) + "\n"
                         if failure == "backup":
@@ -163,6 +165,7 @@ class UpgradeTest(unittest.TestCase):
                     self.assertTrue((rollback / "intercom/package.json").exists())
                     self.assertIn(["python3", "-B", "pi/agent/patches/intercom-ui.py"], calls)
                     self.assertIn(["python3", "-B", "pi/agent/patches/pi-compaction-queue.py"], calls)
+                    self.assertIn(["python3", "-B", "pi/agent/patches/powerline-compaction-queue.py"], calls)
                     self.assertEqual((rollback / "pi-clean/node_modules/installed.txt").read_text(), "live clean install")
                     self.assertFalse((rollback / "global-pi/alias.txt").is_symlink())
                     self.assertFalse(list(rollback.rglob("auth.json")))

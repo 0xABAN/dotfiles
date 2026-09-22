@@ -100,7 +100,7 @@ gate for extreme window sizes.
 | Target | Supported input | Commands under `agent/patches/` |
 |--------|-----------------|--------------------------------|
 | Pi unbundled host and package-local TUI | Pi `0.85.1` | `pi-horizontal-inset.py`, `pi-markdown-code.py`, `pi-transcript.py`, `pi-extension-dialogs.py`, `pi-activity-notices.py`, `pi-compact-layout.py`, `pi-editor-gap.py`, `pi-compaction-queue.py` |
-| Powerline | Git commit `8c9bda10fdfd2822e89334ec85f3da9f8ca49182` | `powerline-dj.py`, `powerline-layout.py`, `powerline-editor.py` |
+| Powerline | Git commit `8c9bda10fdfd2822e89334ec85f3da9f8ca49182` | `powerline-dj.py`, `powerline-layout.py`, `powerline-editor.py`, `powerline-compaction-queue.py` |
 | rpiv-todo UI | `@juicesharp/rpiv-todo` `2.9.0`, after legacy tweaks | `rpiv-todo-ui.py` |
 | Subagents UI | `@tintinweb/pi-subagents` `0.19.0` | `subagents-ui.py` |
 | Intercom messages | `pi-intercom` `0.13.0` | `intercom-ui.py` (with host `pi-transcript.py`) |
@@ -129,8 +129,8 @@ clear/persistence includes. Its failure policy and sequencing remain distinct.
 The Todo UI patch recognizes only the exact clear-block reinjection it supports.
 Do not change persistence as part of a visual cleanup.
 
-`install.sh` owns the serial order: powerline DJ/layout, host inset, editor,
-Markdown code panels, transcript, Intercom UI, dialogs, notices, compact layout,
+`install.sh` owns the serial order: powerline DJ/layout/compaction queue, host
+inset, editor, Markdown code panels, transcript, Intercom UI, dialogs, notices, compact layout,
 editor gap, compaction queue, legacy Todo tweaks, Todo UI, Subagents UI, Jev direct API, then
 `pi/launcher.py`.
 The legacy Todo command remains best-effort; the other patch failures propagate.
@@ -220,20 +220,33 @@ its post-compaction queue check and run settlement. `pi-compaction-queue.py`
 adds a synchronous queue recheck at that boundary. It preserves steering,
 follow-up, and retry behavior without timers or bypassing input hooks.
 
-The installer and upgrade checker replay this guarded host patch. After a Pi
-reinstall, apply it and **restart Pi**; `/reload` cannot reload the session loop:
+Powerline's custom editor uses a separate persisted queue. Its 50 ms delivery
+timer can run while later `session_compact` hooks are still executing. Pi then
+rejects the prompt, but Powerline has already marked it sent. The host patch above
+does not fix this path. `powerline-compaction-queue.py` keeps the item queued and
+rechecks `ctx.isIdle()` using the existing cancellable timer before sending.
+
+The installer and upgrade checker replay both patches. After a reinstall, apply
+them and **restart Pi**; `/reload` cannot reload the host session loop. For the
+Powerline-only change, `/reload` is sufficient:
 
 ```sh
 python3 -B pi/agent/patches/pi-compaction-queue.py
+python3 -B pi/agent/patches/powerline-compaction-queue.py
 PI_SDK_ROOT="$(npm root -g)/@earendil-works/pi-coding-agent" \
-  bun test pi/agent/tests/pi-compaction-queue.test.ts
+  bun test pi/agent/tests/pi-compaction-queue.test.ts pi/agent/tests/powerline-compaction-queue.test.ts
 ```
 
 The patch backs up the original `dist/core/agent-session.js` and refuses unknown
 versions or changed settlement code. Tests use an isolated SDK copy and a fake
 provider to exercise the actual session loop and interactive queue flush, with
 async input hooks around the race, both delivery modes, multiple messages, manual
-compaction, and overflow recovery. No model requests are made.
+compaction, and overflow recovery. The Powerline test loads its complete extension
+and real editor, queues text during `/compact`, and holds a later completion hook
+past the delivery timer. It checks that messages stay pending until completion,
+reach the fake model exactly once, and still work after a real session reload.
+Both patches back up before writing and refuse changed anchors. No model requests
+are made.
 
 ## Jev routing without Vercel
 
@@ -336,6 +349,7 @@ The patch-contract table above is the version authority. The patch purposes are:
 - Dialogs: native selector/input visibility; notices: activity wrapping;
   compact layout: small-window widget and footer budgets.
 - Powerline DJ/layout/editor: mode presentation, footer sizing and editor frame.
+- Powerline compaction queue: wait for actual idle state, not a 50 ms assumption.
 - Legacy Todo: dependency and persistence tweaks; Todo UI: task presentation.
 - Subagents UI: agent panels, previews and constrained-window layout.
 - Intercom UI: incoming sender/preview and expanded metadata, without delivery changes.

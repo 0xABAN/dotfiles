@@ -101,6 +101,11 @@ if [[ -f "$ROOT/pi/agent/patches/powerline-layout.py" ]]; then
   python3 "$ROOT/pi/agent/patches/powerline-layout.py"
 fi
 
+# Powerline must wait for all compaction hooks before sending its saved prompt.
+if [[ -f "$ROOT/pi/agent/patches/powerline-compaction-queue.py" ]]; then
+  python3 "$ROOT/pi/agent/patches/powerline-compaction-queue.py"
+fi
+
 # Inset the whole Pi viewport before removing the editor's old private gutter.
 if [[ -f "$ROOT/pi/agent/patches/pi-horizontal-inset.py" ]]; then
   python3 "$ROOT/pi/agent/patches/pi-horizontal-inset.py"

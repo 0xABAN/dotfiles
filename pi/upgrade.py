@@ -148,7 +148,7 @@ def check_upgrade(version: str, backup: bool, repo: Path, home: Path, stage: Pat
         )
         # Native tests patch disposable fixtures, not the candidate itself. Replay
         # into this candidate only after the unmodified clean-launcher tests pass.
-        for patcher in ("powerline-dj", "powerline-layout", "pi-horizontal-inset", "powerline-editor",
+        for patcher in ("powerline-dj", "powerline-layout", "powerline-compaction-queue", "pi-horizontal-inset", "powerline-editor",
                         "pi-transcript", "intercom-ui", "pi-extension-dialogs", "pi-activity-notices", "pi-compact-layout",
                         "pi-compaction-queue"):
             run(patcher, ["python3", "-B", f"pi/agent/patches/{patcher}.py"], snapshot)
