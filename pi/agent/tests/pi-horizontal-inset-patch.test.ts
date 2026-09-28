@@ -16,7 +16,7 @@ const { unitTest: test, nativeTest: realTest } = nativeSuite(import.meta.path, !
 function sandbox(name: string) {
   const root = join(temp, name);
   mkdirSync(root, { recursive: true });
-  writeFileSync(join(root, "package.json"), JSON.stringify({ version: "0.85.1" }));
+  writeFileSync(join(root, "package.json"), JSON.stringify({ version: "0.87.1" }));
   for (const [file, replacements] of Object.entries(edits)) {
     mkdirSync(dirname(join(root, file)), { recursive: true });
     writeFileSync(join(root, file), replacements.map(([old]) => old).join("\n") + "\n// unrelated change\n");

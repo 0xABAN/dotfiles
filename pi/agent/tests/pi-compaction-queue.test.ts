@@ -19,7 +19,7 @@ const run = (root: string) => Bun.spawnSync(["python3", "-B", patcher], {
 function fixture(name: string) {
   const root = join(temp, name);
   mkdirSync(dirname(join(root, HOST)), { recursive: true });
-  writeFileSync(join(root, "package.json"), '{"version":"0.85.1"}');
+  writeFileSync(join(root, "package.json"), '{"version":"0.87.1"}');
   writeFileSync(join(root, HOST), ORIGINAL + "\n// unrelated work\n");
   return root;
 }
@@ -58,6 +58,54 @@ test("queue patch refuses unknown, changed, partial and duplicate sources before
   expect(run(join(temp, "absent")).exitCode).toBe(0);
 });
 
+nativeTest("settlement rechecks input without bypassing hooks, abort or context validation", async () => {
+  const root = join(temp, "boundary-sdk");
+  copySdk(sdk!, root);
+  applySdkPatches(root, ["pi-compaction-queue"]);
+  const { AgentSession } = await import(pathToFileURL(join(root, HOST)).href);
+
+  for (const { abort, canContinue } of [
+    { abort: false, canContinue: true },
+    { abort: true, canContinue: true },
+    { abort: false, canContinue: false },
+  ]) {
+    let queued = false;
+    let continued = 0;
+    let boundaries = 0;
+    const session = Object.assign(Object.create(AgentSession.prototype), {
+      agent: {
+        prompt: async () => {},
+        hasQueuedMessages: () => queued,
+        continue: async () => {
+          continued++;
+          queued = false;
+        },
+      },
+      _handlePostAgentRun: async () => false,
+      _buildBoundaryContext: () => ({ canContinue }),
+      _runBeforeSettleBoundary: async () => {
+        if (++boundaries === 1) {
+          // Enqueue in the microtask gap after the boundary computes its result.
+          queueMicrotask(() => {
+            queued = true;
+            session._agentRunAbortRequested = abort;
+          });
+        }
+        return false;
+      },
+      _finishCancelledRetry() {},
+      _flushPendingBashMessages() {},
+      _flushPendingCustomMessages() {},
+      _emitAgentSettled: async () => {},
+    });
+    await session._runAgentPrompt([]);
+    const resumes = !abort && canContinue;
+    expect(continued).toBe(resumes ? 1 : 0);
+    expect(boundaries).toBe(resumes ? 2 : 1);
+    expect(queued).toBe(!resumes);
+  }
+});
+
 nativeTest("compaction delivers queued input across the async run-settlement boundary", async () => {
   const root = join(temp, "sdk");
   copySdk(sdk!, root);
@@ -72,8 +120,8 @@ nativeTest("compaction delivers queued input across the async run-settlement bou
   const { createEventBus } = await load("dist/core/event-bus.js");
   const { InteractiveMode } = await load("dist/modes/interactive/interactive-mode.js");
 
-  // Two async input handlers reproduce the gap between the last queue check and
-  // settlement. Zero and three cover delivery just before and after that gap.
+  // Exercise input hooks around the post-run and agent_before_settle awaits.
+  // Different depths deliver before, during and after the final queue check.
   const cases = [
     { reason: "threshold", inputHandlers: 2, queued: ["Queued request"] },
     { reason: "threshold", inputHandlers: 0, queued: ["Queued request"] },

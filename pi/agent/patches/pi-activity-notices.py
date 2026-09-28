@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Align native extension notifications with the transcript body in Pi 0.85.1.
+"""Align native extension notifications with the transcript body in Pi 0.87.1.
 
 The host owns notification wrapping. Prefixing extension strings with spaces
 only indents their first line, so use a responsive component at that boundary.
@@ -100,8 +100,8 @@ def main() -> None:
     if root is None or not root.exists():
         print("Pi host not installed; skipping activity notices")
         return
-    if json.loads((root / "package.json").read_text()).get("version") != "0.85.1":
-        raise ValueError("activity notices require Pi 0.85.1; review upstream first")
+    if json.loads((root / "package.json").read_text()).get("version") != "0.87.1":
+        raise ValueError("activity notices require Pi 0.87.1; review upstream first")
     sources = {HOST: (root / HOST).read_text()}
     if (root / MODULE).exists():
         sources[MODULE] = (root / MODULE).read_text()

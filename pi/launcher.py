@@ -27,8 +27,8 @@ def select_launcher(sdk: Path, launcher: Path, backup_root: Path) -> Path | None
     # Canonicalize the parent only: macOS /tmp is itself a symlink.
     launcher = launcher.parent.resolve(strict=True) / launcher.name
     package = json.loads((sdk / "package.json").read_text())
-    if package.get("name") != PACKAGE or package.get("version") != "0.85.1" or package.get("bin") != {"pi": STOCK}:
-        raise ValueError("launcher requires the published Pi 0.85.1 bin contract; review upstream first")
+    if package.get("name") != PACKAGE or package.get("version") != "0.87.1" or package.get("bin") != {"pi": STOCK}:
+        raise ValueError("launcher requires the published Pi 0.87.1 bin contract; review upstream first")
     for name, expected in ENTRY_HASHES.items():
         if (sdk / name).is_symlink() or hashlib.sha256((sdk / name).read_bytes()).hexdigest() != expected:
             raise ValueError(f"unrecognized CLI entry: {name}")

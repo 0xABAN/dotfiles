@@ -1,8 +1,9 @@
-import { expect, test } from "bun:test";
+import { expect } from "bun:test";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { copySdk, describePatch, temporaryDirectory } from "./support/patch-fixtures";
+import { applySdkPatches, copySdk, describePatch, temporaryDirectory } from "./support/patch-fixtures";
+import { nativeSuite } from "./support/native-suite";
 
 const patcher = fileURLToPath(new URL("../patches/pi-editor-gap.py", import.meta.url));
 const {
@@ -27,6 +28,7 @@ const {
 );
 const sdk = process.env.PI_SDK_ROOT;
 const temp = temporaryDirectory("pi-editor-gap-");
+const { nativeTest: test } = nativeSuite(import.meta.path, !!sdk);
 
 function run(root: string) {
   return Bun.spawnSync(["python3", "-B", patcher], {
@@ -38,6 +40,7 @@ function fixture(name: string, legacy = false) {
   if (!sdk) throw new Error("PI_SDK_ROOT is required");
   const root = join(temp, name);
   copySdk(sdk, root);
+  applySdkPatches(root, ["pi-compact-layout"]);
   const path = join(root, HOST);
   let source = readFileSync(path, "utf8");
   source = source.replace(SOURCE, WIDGET_ORIGINAL).replace(LEGACY_SOURCE, EDITOR_ORIGINAL);

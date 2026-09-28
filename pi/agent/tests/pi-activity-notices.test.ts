@@ -21,7 +21,7 @@ const contents = (root: string) => [HOST, MODULE].map(file => existsSync(join(ro
 function fixture(name: string) {
   const root = join(temp, name);
   mkdirSync(dirname(join(root, MODULE)), { recursive: true });
-  writeFileSync(join(root, "package.json"), '{"version":"0.85.1","type":"module"}');
+  writeFileSync(join(root, "package.json"), '{"version":"0.87.1","type":"module"}');
   writeFileSync(join(root, HOST), EDITS.map(([old]) => old).join("\n") + "\n// unrelated host work\n");
   return root;
 }

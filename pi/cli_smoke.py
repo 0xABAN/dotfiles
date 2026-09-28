@@ -44,7 +44,7 @@ def smoke(sdk: Path, launcher: Path, config: Path, home: Path, output: Path) -> 
     agent.mkdir()
     settings = json.loads((config / "pi/agent/settings.json").read_text())
     settings = {key: settings[key] for key in ("powerline", "theme")}
-    settings.update(quietStartup=True, lastChangelogVersion="0.85.1", packages=[
+    settings.update(quietStartup=True, lastChangelogVersion="0.87.1", packages=[
         "npm:pi-intercom", "npm:pi-web-access", "npm:pi-mcp-adapter",
     ])
     # Preserve canonical npm owner metadata without loading the broker runtime.

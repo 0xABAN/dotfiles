@@ -19,7 +19,7 @@ const run = (root: string) => Bun.spawnSync(["python3", "-B", patcher], { env: {
 function sandbox(name: string) {
   const root = join(temp, name);
   mkdirSync(root, { recursive: true });
-  writeFileSync(join(root, "package.json"), '{"version":"0.85.1","type":"module"}');
+  writeFileSync(join(root, "package.json"), '{"version":"0.87.1","type":"module"}');
   for (const [file, replacements] of Object.entries(edits)) {
     mkdirSync(dirname(join(root, file)), { recursive: true });
     writeFileSync(join(root, file), replacements.flatMap(([old, , count]) => Array(count).fill(old)).join("\n") + "\n        super();\n// unrelated source edit\n");

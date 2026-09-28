@@ -6,10 +6,10 @@ import { checkProcess, copySdk, describePatch, temporaryDirectory } from "./supp
 import { nativeSuite } from "./support/native-suite";
 
 const patcher = fileURLToPath(new URL("../patches/pi-compact-layout.py", import.meta.url));
-const { HOST, VIEWPORT, VIEWPORT_EDITS, MODULE, EDITS, LEGACY_EDITS } = describePatch<{
+const { HOST, VIEWPORT, VIEWPORT_ANCHOR, MODULE, EDITS, LEGACY_EDITS } = describePatch<{
   HOST: string; VIEWPORT: string; MODULE: string;
-  VIEWPORT_EDITS: [string, string, number][]; EDITS: [string, string, number][]; LEGACY_EDITS: [string, string, number][];
-}>(patcher, "{k:m[k] for k in ['HOST','VIEWPORT','VIEWPORT_EDITS','MODULE','EDITS','LEGACY_EDITS']}");
+  VIEWPORT_ANCHOR: string; EDITS: [string, string, number][]; LEGACY_EDITS: [string, string, number][];
+}>(patcher, "{k:m[k] for k in ['HOST','VIEWPORT','VIEWPORT_ANCHOR','MODULE','EDITS','LEGACY_EDITS']}");
 const temp = temporaryDirectory("pi-compact-layout-");
 const sdk = process.env.PI_SDK_ROOT;
 const { unitTest: test, nativeTest: realTest } = nativeSuite(import.meta.path, !!sdk);
@@ -22,9 +22,9 @@ const contents = (root: string) => [HOST, MODULE, VIEWPORT].map(file =>
 function fixture(name: string) {
   const root = join(temp, name);
   mkdirSync(dirname(join(root, MODULE)), { recursive: true });
-  writeFileSync(join(root, "package.json"), '{"version":"0.85.1","type":"module"}');
+  writeFileSync(join(root, "package.json"), '{"version":"0.87.1","type":"module"}');
   writeFileSync(join(root, HOST), EDITS.flatMap(([old, , count]) => Array(count).fill(old)).join("\n"));
-  writeFileSync(join(root, VIEWPORT), VIEWPORT_EDITS[0][0]);
+  writeFileSync(join(root, VIEWPORT), VIEWPORT_ANCHOR);
   return root;
 }
 
@@ -33,6 +33,7 @@ test("compact layout backs up exact sources and reapplies without writes", () =>
   const before = contents(root);
   checkProcess(run(root));
   const after = contents(root);
+  expect(after[2]).toBe(before[2]); // Upstream already allows the footer to collapse.
   const backups = join(root, ".config/theme-backups");
   const names = readdirSync(backups);
   expect(names).toHaveLength(1);
@@ -45,16 +46,14 @@ test("compact layout backs up exact sources and reapplies without writes", () =>
 });
 
 test("compact layout refuses partial, duplicate and modified installations before writes", () => {
-  for (const state of ["version", "duplicate", "partial-import", "partial-budget", "modified", "missing", "unexpected", "changed-viewport", "duplicate-viewport", "partial-viewport", "residual-viewport"]) {
+  for (const state of ["version", "duplicate", "partial-import", "partial-budget", "modified", "missing", "unexpected", "changed-viewport", "duplicate-viewport", "old-viewport"]) {
     const root = fixture(state);
     if (state === "version") writeFileSync(join(root, "package.json"), '{"version":"0.85.0"}');
     else if (state === "duplicate") writeFileSync(join(root, HOST), contents(root)[0] + EDITS[0][0]);
     else if (state.endsWith("viewport")) {
-      const [old, patched] = VIEWPORT_EDITS[0];
-      if (state === "residual-viewport") checkProcess(run(root));
       writeFileSync(join(root, VIEWPORT), state === "changed-viewport" ? "changed source"
-        : state === "duplicate-viewport" ? old + old
-        : state === "partial-viewport" ? patched : patched + old);
+        : state === "duplicate-viewport" ? VIEWPORT_ANCHOR + VIEWPORT_ANCHOR
+        : VIEWPORT_ANCHOR.replace("minSize: 0", "minSize: 1"));
     } else if (state.startsWith("partial")) {
       const [old, next] = EDITS[state === "partial-import" ? 0 : 1];
       writeFileSync(join(root, HOST), contents(root)[0]!.replace(old, next));

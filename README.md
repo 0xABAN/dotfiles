@@ -228,7 +228,7 @@ navigation reset it; no timings are inferred from history or persisted. The
 badge is display-only, not a clickable control. Run `/reload` after updating
 these local extensions and the guarded powerline editor patch.
 
-The host patch targets **Pi 0.85.1**; review it before upgrading Pi. To replay
+The host patch targets **Pi 0.87.1**; review it before upgrading Pi. To replay
 the host and editor patches, run the following, then **restart Pi**;
 `/reload` alone cannot reload the host renderer:
 
@@ -249,7 +249,7 @@ PI_SDK_ROOT="$(npm root -g)/@earendil-works/pi-coding-agent" \
 
 ### Transcript preview
 
-The Pi 0.85.1 transcript patch adds `◆ You` / `● Pi` headers and compact
+The Pi 0.87.1 transcript patch adds `◆ You` / `● Pi` headers and compact
 geometric action trees. Pi's `●` uses sage (`#5fa876`); `◆ You` and
 action icons keep the teal accent. Speaker names retain the normal text color.
 Single tools have no count heading or tree connector. Two or more
@@ -334,7 +334,7 @@ an action tree and show `⇄ Chat intercom(action="send", to=…)` plus timing.
 Expanding restores Intercom's native call/result renderers. Delivery, reply
 tracking, stored messages and model-visible content are unchanged.
 
-The guarded package patch targets **pi-intercom 0.13.0**, alongside the Pi 0.85.1
+The guarded package patch targets **pi-intercom 0.13.0**, alongside the Pi 0.87.1
 transcript patch. After reinstalling the package, replay both and restart Pi:
 
 ```sh
@@ -361,7 +361,7 @@ remains a notification, not a new panel.
 
 The guarded patches target **rpiv-todo 2.9.0** and **pi-subagents 0.19.0**. The
 installer runs them after the older todo tweaks. Native notifications, pickers,
-confirmations, and editors share **Pi 0.85.1** host patches, so wrapped lines
+confirmations, and editors share **Pi 0.87.1** host patches, so wrapped lines
 align and open dialogs refresh their theme too. These shared components also
 style the same dialogs used by other extensions. Apply once and **restart Pi**:
 

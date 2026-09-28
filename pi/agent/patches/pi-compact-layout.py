@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Give our activity widgets a shared short-window budget in Pi 0.85.1.
+"""Give our activity widgets a shared short-window budget in Pi 0.87.1.
 
 The host supplies available rows; each package retains semantic rendering and
 state ownership. Validate the complete patch before backing up or writing.
@@ -16,11 +16,8 @@ from patch_support import (
 
 HOST = "dist/modes/interactive/interactive-mode.js"
 VIEWPORT = "dist/modes/interactive/chat-viewport.js"
-# Pi 0.85.1 moved dock sizing out of InteractiveMode; validate it with the host.
-VIEWPORT_EDITS = [
-    ('        { component: options.footer, shrink: 1, minSize: 1 },',
-     '        { component: options.footer, shrink: 1, minSize: 0 },', 1),
-]
+# Pi now permits the native footer to collapse; validate, but do not patch it.
+VIEWPORT_ANCHOR = '        { component: options.footer, shrink: 1, minSize: 0 },'
 MODULE = "dist/modes/interactive/components/compact-layout.js"
 SOURCE = read_payload("host/compact-layout.js.inc")
 LEGACY_SOURCE = read_payload("host/legacy/compact-layout-v1.js.inc")
@@ -53,6 +50,8 @@ LEGACY_EDITS = [PRE_FOOTER_EDITS[0], LEGACY_HOOK, PRE_FOOTER_EDITS[2]]
 
 
 def patch_sources(sources: dict[str, str]) -> dict[str, str]:
+    if sources[VIEWPORT].count(VIEWPORT_ANCHOR) != 1:
+        raise ValueError("compact viewport anchor changed or duplicated")
     source = sources[HOST]
     if MARKER in source:
         if source.count(MARKER) != 1 or sources.get(MODULE) not in (SOURCE, LEGACY_SOURCE):
@@ -68,20 +67,14 @@ def patch_sources(sources: dict[str, str]) -> dict[str, str]:
         original = replace_counted(source, edits, "compact layout anchor", reverse=True)
         if replace_counted(original, edits, "compact layout anchor") != source:
             raise ValueError("inconsistent compact layout patch")
-        viewport = sources[VIEWPORT]
-        if edits is EDITS:
-            viewport = replace_counted(viewport, VIEWPORT_EDITS, "compact viewport anchor", reverse=True)
-        return {
-            **sources, HOST: replace_counted(original, EDITS, "compact layout anchor"),
-            VIEWPORT: replace_counted(viewport, VIEWPORT_EDITS, "compact viewport anchor"), MODULE: SOURCE,
-        }
+        return {**sources, HOST: replace_counted(original, EDITS, "compact layout anchor"), MODULE: SOURCE}
     if MODULE in sources:
         raise ValueError("unexpected compact layout helper alongside original host")
     if LEGACY_HOOK[1] in source or any(new in source for _, new, _ in EDITS):
         raise ValueError("partial compact layout patch")
     return {
         **sources, HOST: replace_counted(source, EDITS, "compact layout anchor"),
-        VIEWPORT: replace_counted(sources[VIEWPORT], VIEWPORT_EDITS, "compact viewport anchor"), MODULE: SOURCE,
+        MODULE: SOURCE,
     }
 
 
@@ -90,8 +83,8 @@ def main() -> None:
     if root is None or not root.exists():
         print("Pi host not installed; skipping compact layout")
         return
-    if json.loads((root / "package.json").read_text()).get("version") != "0.85.1":
-        raise ValueError("compact layout requires Pi 0.85.1; review upstream first")
+    if json.loads((root / "package.json").read_text()).get("version") != "0.87.1":
+        raise ValueError("compact layout requires Pi 0.87.1; review upstream first")
     sources = {name: (root / name).read_text() for name in (HOST, VIEWPORT)}
     if (root / MODULE).exists():
         sources[MODULE] = (root / MODULE).read_text()

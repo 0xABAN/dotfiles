@@ -41,7 +41,7 @@ class LauncherTest(unittest.TestCase):
         self.root = Path(self.temp.name).resolve()
         self.sdk = self.root / "sdk"
         for name, content in {
-            "package.json": json.dumps({"name": launcher.PACKAGE, "version": "0.85.1", "bin": {"pi": launcher.STOCK}}),
+            "package.json": json.dumps({"name": launcher.PACKAGE, "version": "0.87.1", "bin": {"pi": launcher.STOCK}}),
             launcher.CUSTOM: CLI, "dist/cli/setup.js": SETUP, launcher.STOCK: "stock bundle",
             "dist/main.js": "main", "dist/modes/interactive/interactive-mode.js": "host",
         }.items():

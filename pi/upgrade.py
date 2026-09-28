@@ -23,7 +23,7 @@ EXCLUDED = {"auth.json", ".npmrc", ".git", "__pycache__", ".DS_Store"}
 def exact_version(value: str) -> str:
     """Accept stable numeric releases only, not npm ranges, tags, paths or options."""
     if not re.fullmatch(r"(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)", value):
-        raise argparse.ArgumentTypeError("use an exact stable version, for example 0.85.1")
+        raise argparse.ArgumentTypeError("use an exact stable version, for example 0.87.1")
     return value
 
 
@@ -149,8 +149,8 @@ def check_upgrade(version: str, backup: bool, repo: Path, home: Path, stage: Pat
         # Native tests patch disposable fixtures, not the candidate itself. Replay
         # into this candidate only after the unmodified clean-launcher tests pass.
         for patcher in ("powerline-dj", "powerline-layout", "powerline-compaction-queue", "pi-horizontal-inset", "powerline-editor",
-                        "pi-transcript", "intercom-ui", "pi-extension-dialogs", "pi-activity-notices", "pi-compact-layout",
-                        "pi-compaction-queue"):
+                        "pi-markdown-code", "pi-transcript", "intercom-ui", "pi-extension-dialogs", "pi-activity-notices",
+                        "pi-compact-layout", "pi-editor-gap", "pi-compaction-queue"):
             run(patcher, ["python3", "-B", f"pi/agent/patches/{patcher}.py"], snapshot)
         candidate_launcher = clean / "node_modules/.bin/pi"
         run("select-launcher", ["python3", "-B", "pi/launcher.py", "--sdk", str(sdk),
@@ -209,7 +209,7 @@ def check_upgrade(version: str, backup: bool, repo: Path, home: Path, stage: Pat
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("version", type=exact_version, help="exact stable release, e.g. 0.85.1")
+    parser.add_argument("version", type=exact_version, help="exact stable release, e.g. 0.87.1")
     parser.add_argument("--backup", action="store_true", help="after green checks, copy rollback material; never activate")
     args = parser.parse_args()
     # Ignore inherited TMPDIR; private stage lives outside configured projects.

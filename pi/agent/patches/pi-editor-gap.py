@@ -53,8 +53,8 @@ def main() -> None:
     if root is None or not root.exists():
         print("Pi SDK not installed; skipping editor gap")
         return
-    if json.loads((root / "package.json").read_text()).get("version") != "0.85.1":
-        raise ValueError("editor gap requires Pi 0.85.1; review upstream first")
+    if json.loads((root / "package.json").read_text()).get("version") != "0.87.1":
+        raise ValueError("editor gap requires Pi 0.87.1; review upstream first")
     if not (root / HOST).exists():
         raise ValueError("editor gap source is missing")
     sources = {HOST: (root / HOST).read_text()}

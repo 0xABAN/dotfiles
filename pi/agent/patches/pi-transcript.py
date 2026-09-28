@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install the transcript and UI-only tool metrics into Pi 0.85.1; restart to apply.
+"""Install the transcript and UI-only tool metrics into Pi 0.87.1; restart to apply.
 
 Preserve native tool execution and model-visible output. Timings share the
 existing result-entry write, outside its message. Refuse partial/unknown hosts
@@ -220,7 +220,7 @@ EDITS[BASE + "interactive-mode.js"][2] = (old_lookup, '''    getRegisteredToolDe
         return { ...definition, configsTranscriptSource: source };
     }''')
 
-# Keep the supported layout/helper migrations, but require 0.85.1's renderer
+# Keep the supported layout/helper migrations, but require the native renderer
 # lookup in every revision. An old host method must not drop built-in renderers.
 for previous_edits in (PRE_METRICS_EDITS, LEGACY_EDITS):
     previous_edits[BASE + "interactive-mode.js"][2] = EDITS[BASE + "interactive-mode.js"][2]
@@ -325,8 +325,8 @@ def main() -> None:
         print("Pi host not installed; skipping transcript preview")
         return
     version = json.loads((root / "package.json").read_text())["version"]
-    if version != "0.85.1":
-        raise ValueError(f"transcript patch requires Pi 0.85.1, found {version}; review upstream first")
+    if version != "0.87.1":
+        raise ValueError(f"transcript patch requires Pi 0.87.1, found {version}; review upstream first")
     sources = {name: (root / name).read_text() for name in EDITS}
     if (root / MODULE).exists():
         sources[MODULE] = (root / MODULE).read_text()

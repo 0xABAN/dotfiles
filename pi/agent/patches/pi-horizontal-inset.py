@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Give Pi 0.85.1 one horizontal viewport boundary in both renderer modes.
+"""Give Pi 0.87.1 one horizontal viewport boundary in both renderer modes.
 
 Patch the private Pi-bundled TUI, never terminal dimensions or terminal writes.
 Regular output is inset before overlays/cursor extraction. Fullscreen paints its
@@ -84,8 +84,8 @@ def main() -> None:
         print("Pi host not installed; skipping horizontal inset patch")
         return
     version = json.loads((root / "package.json").read_text())["version"]
-    if version != "0.85.1":
-        raise ValueError(f"horizontal inset patch requires Pi 0.85.1, found {version}; review upstream first")
+    if version != "0.87.1":
+        raise ValueError(f"horizontal inset patch requires Pi 0.87.1, found {version}; review upstream first")
     sources = {name: (root / name).read_text() for name in EDITS}
     patched = patch_sources(sources)
     if patched != sources:

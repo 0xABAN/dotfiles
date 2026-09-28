@@ -99,7 +99,7 @@ gate for extreme window sizes.
 
 | Target | Supported input | Commands under `agent/patches/` |
 |--------|-----------------|--------------------------------|
-| Pi unbundled host and package-local TUI | Pi `0.85.1` | `pi-horizontal-inset.py`, `pi-markdown-code.py`, `pi-transcript.py`, `pi-extension-dialogs.py`, `pi-activity-notices.py`, `pi-compact-layout.py`, `pi-editor-gap.py`, `pi-compaction-queue.py` |
+| Pi unbundled host and package-local TUI | Pi `0.87.1` | `pi-horizontal-inset.py`, `pi-markdown-code.py`, `pi-transcript.py`, `pi-extension-dialogs.py`, `pi-activity-notices.py`, `pi-compact-layout.py`, `pi-editor-gap.py`, `pi-compaction-queue.py` |
 | Powerline | Git commit `8c9bda10fdfd2822e89334ec85f3da9f8ca49182` | `powerline-dj.py`, `powerline-layout.py`, `powerline-editor.py`, `powerline-compaction-queue.py` |
 | rpiv-todo UI | `@juicesharp/rpiv-todo` `2.9.0`, after legacy tweaks | `rpiv-todo-ui.py` |
 | Subagents UI | `@tintinweb/pi-subagents` `0.19.0` | `subagents-ui.py` |
@@ -138,7 +138,7 @@ Keep pi-pretty before powerline in package settings because both install editors
 
 ### Which CLI runs the patches?
 
-Pi 0.85.1 declares `dist/bundle/cli.js` as its npm `pi` command. That bundled
+Pi 0.87.1 declares `dist/bundle/cli.js` as its npm `pi` command. That bundled
 program contains its own host implementation; patching `dist/modes/...` does not
 change it. A successful import test or `pi --version` cannot prove the customized
 host is running.
@@ -215,9 +215,10 @@ independently revertible changes separate.
 
 ## Messages queued during compaction
 
-Pi 0.85.1 can go idle with pending messages when async input hooks finish between
-its post-compaction queue check and run settlement. `pi-compaction-queue.py`
-adds a synchronous queue recheck at that boundary. It preserves steering,
+Pi 0.87.1 can still go idle with pending messages when async input hooks finish
+between its final queue check and run settlement. `pi-compaction-queue.py` adds
+a synchronous queue recheck after the new `agent_before_settle` boundary. It
+preserves native boundary hooks, context validation, abort guards, steering,
 follow-up, and retry behavior without timers or bypassing input hooks.
 
 Powerline's custom editor uses a separate persisted queue. Its 50 ms delivery
@@ -238,8 +239,10 @@ PI_SDK_ROOT="$(npm root -g)/@earendil-works/pi-coding-agent" \
 ```
 
 The patch backs up the original `dist/core/agent-session.js` and refuses unknown
-versions or changed settlement code. Tests use an isolated SDK copy and a fake
-provider to exercise the actual session loop and interactive queue flush, with
+versions or changed settlement code. A deterministic boundary test checks that
+late input resumes without overriding abort or invalid context. Tests use an
+isolated SDK copy and a fake provider to exercise the actual session loop and
+interactive queue flush, with
 async input hooks around the race, both delivery modes, multiple messages, manual
 compaction, and overflow recovery. The Powerline test loads its complete extension
 and real editor, queues text during `/compact`, and holds a later completion hook
@@ -288,9 +291,9 @@ Existing pins survive reload; use `/new` to get a fresh routing decision.
 Keep the existing editor. Stage a candidate before changing either live install:
 
 ```sh
-python3 -B pi/upgrade.py 0.85.1
+python3 -B pi/upgrade.py 0.87.1
 # After successful checks, also retain rollback copies (still no activation):
-python3 -B pi/upgrade.py 0.85.1 --backup
+python3 -B pi/upgrade.py 0.87.1 --backup
 ```
 
 Requires Python 3.10+, Git, npm/Node, Bun, tmux, and the installed Powerline, Todo,

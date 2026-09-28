@@ -223,8 +223,8 @@ def main() -> None:
     if not package_path.exists():
         print("Pi TUI not installed; skipping Markdown code panels")
         return
-    if json.loads(package_path.read_text()).get("version") != "0.85.1":
-        raise ValueError("Markdown code panels require pi-tui 0.85.1; review upstream first")
+    if json.loads(package_path.read_text()).get("version") != "0.87.1":
+        raise ValueError("Markdown code panels require pi-tui 0.87.1; review upstream first")
 
     names = tuple(EDITS)
     if any(not (root / name).exists() for name in names):
