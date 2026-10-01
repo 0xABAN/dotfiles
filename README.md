@@ -62,6 +62,16 @@ Checks: `nvim --headless -u nvim/init.lua -l nvim/tests/everforest.lua`,
 `ghostty +validate-config`, and `PI_SDK_ROOT=/path/to/pi-coding-agent bun test
 pi/agent/tests/everforest.test.ts pi/agent/tests/rose-pine.test.ts`.
 
+### Neovim footer
+
+[Lightline](https://github.com/itchyny/lightline.vim) renders the bottom bar with
+Everforest's upstream palette and angled separators. Heirline still provides
+buffer tabs, breadcrumbs, the gutter, and buffer-picker shortcuts; Lightline's
+own tabline is disabled. The configuration is `nvim/lua/plugins/lightline.lua`.
+Restart Neovim and open a file to see it (the dashboard hides the footer).
+
+Check: `nvim --headless -u nvim/init.lua -l nvim/tests/lightline.lua`.
+
 ### Rosé Pine (saved)
 
 **Rosé Pine Main** remains installed and selectable. Its theme/plugin files have
