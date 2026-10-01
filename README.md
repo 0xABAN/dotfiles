@@ -62,6 +62,36 @@ Checks: `nvim --headless -u nvim/init.lua -l nvim/tests/everforest.lua`,
 `ghostty +validate-config`, and `PI_SDK_ROOT=/path/to/pi-coding-agent bun test
 pi/agent/tests/everforest.test.ts pi/agent/tests/rose-pine.test.ts`.
 
+### Neovim background
+
+The [user-provided image](https://d2h7xmz5gqybh9.cloudfront.net/predictions/c14edec9b58d4d6a9cde105633d39b2a/1.png)
+is one continuous backdrop across Neovim: homepage, editing, splits, menus,
+and footer. `nvim/assets/background.png` is prepared at 640×360 (16:9),
+with 10% image opacity and no added blur. Text stays
+sharp; the theme's base backgrounds and terminal window remain opaque.
+
+On startup, the image scales uniformly to cover the whole Neovim viewport.
+Resizing smaller crops the edges rather than shrinking the image; resizing
+larger can increase its scale. That scale never decreases until Neovim exits.
+Other aspect ratios crop without stretching or letterboxing.
+
+`nvim/plugin/background.lua` uses the existing Snacks Kitty-protocol transport
+and keeps the image behind text across buffer and tab changes. It hides the
+image on suspension or exit, and restores it on resume. Local Ghostty/Kitty
+sessions support it; unsupported terminals, SSH, and headless sessions keep
+the ordinary theme. If a full-screen clear or cache eviction discards the
+image, its missing-image response triggers a fresh upload automatically.
+Ghostty/Pi settings are unchanged. Restart Neovim to apply.
+
+Checks: `nvim --headless -u nvim/init.lua -l nvim/tests/background.lua` and
+`python3 nvim/tests/background-pty.py`. The PTY test exercises real TUI startup,
+redraw, terminal resizes, idle behavior, and exit. It simulates capability
+responses and Ghostty's image-cache deletion on screen clears; it is not a
+visual rendering test.
+
+Regenerate the PNG from the original source with ImageMagick:
+`magick source.png -strip -resize '640x360^' -gravity center -extent 640x360 -alpha set -channel A -evaluate multiply 0.10 +channel PNG32:nvim/assets/background.png`.
+
 ### Neovim footer
 
 [Lightline](https://github.com/itchyny/lightline.vim) renders the bottom bar with
