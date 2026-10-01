@@ -3,6 +3,7 @@
 
 The host owns notification wrapping. Prefixing extension strings with spaces
 only indents their first line, so use a responsive component at that boundary.
+Skip automatic package-update checks without disabling other network activity.
 """
 import json
 from pathlib import Path
@@ -38,6 +39,27 @@ PACKAGE_UPDATE_NOTICE_NEW = r'''    showPackageUpdateNotification(packages) {
         this.chatContainer.addChild(new Text(`${theme.bold(theme.fg("toolOutput", "Package Updates Available"))}\n${updateInstruction}\n${theme.fg("muted", "Packages:")}\n${packageLines}`, 1, 1, (text) => theme.bg("userMessageBg", text)));
         this.ui.requestRender();
     }'''
+PACKAGE_UPDATE_CHECK = '''    async checkForPackageUpdates() {
+        if (process.env.PI_OFFLINE) {
+            return [];
+        }
+        try {
+            const packageManager = new DefaultPackageManager({
+                cwd: this.sessionManager.getCwd(),
+                agentDir: getAgentDir(),
+                settingsManager: this.settingsManager,
+            });
+            const updates = await packageManager.checkForAvailableUpdates();
+            return updates.map((update) => update.displayName);
+        }
+        catch {
+            return [];
+        }
+    }'''
+PACKAGE_UPDATE_CHECK_DISABLED = '''    async checkForPackageUpdates() {
+        // configs: skip startup package reminders; manual updates remain available.
+        return [];
+    }'''
 EDITS = [
     ('import { CustomEntryComponent } from "./components/custom-entry.js";',
      'import { CustomEntryComponent } from "./components/custom-entry.js";\n'
@@ -54,6 +76,11 @@ EDITS = [
 
 def patch_sources(sources: dict[str, str]) -> dict[str, str]:
     source = sources[HOST]
+    if source.count(PACKAGE_UPDATE_CHECK) == 1 and PACKAGE_UPDATE_CHECK_DISABLED not in source:
+        source = source.replace(PACKAGE_UPDATE_CHECK, PACKAGE_UPDATE_CHECK_DISABLED, 1)
+    elif source.count(PACKAGE_UPDATE_CHECK_DISABLED) != 1 or PACKAGE_UPDATE_CHECK in source:
+        raise ValueError("package update check changed or duplicated")
+
     remainder = source
     for _, new in EDITS:
         if source.count(new) == 1:
@@ -87,7 +114,7 @@ def patch_sources(sources: dict[str, str]) -> dict[str, str]:
     if states[0] == "patched":
         if sources.get(MODULE) not in (SOURCE, LEGACY_SOURCE):
             raise ValueError("notification helper changed or missing")
-        return {**sources, MODULE: SOURCE}
+        return {**sources, HOST: source, MODULE: SOURCE}
     if MODULE in sources:
         raise ValueError("unexpected notification helper alongside original host")
     for old, new in EDITS:

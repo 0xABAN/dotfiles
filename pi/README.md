@@ -212,6 +212,16 @@ Restart Pi for host or bundled-TUI changes. Extension/package source changes use
 changes. Commit only explicit owned files or hunks, with related tests, and keep
 independently revertible changes separate.
 
+## Package-update reminders
+
+The activity-notices patch disables automatic extension-package update checks
+at startup, removing the package-update reminder and its background lookups.
+Manual `pi update --extensions`, Pi release notices, model-catalog refreshes and
+real warnings/errors remain unchanged. This does not enable offline mode.
+
+Apply with `python3 -B pi/agent/patches/pi-activity-notices.py`, then restart Pi.
+The installer and upgrade checker already replay this patch.
+
 ## Messages queued during compaction
 
 Pi 0.87.1 can still go idle with pending messages when async input hooks finish

@@ -1,4 +1,4 @@
-import { expect } from "bun:test";
+import { expect, spyOn } from "bun:test";
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { copySdk, describePatch, temporaryDirectory } from "./support/patch-fixtures";
 import { nativeSuite } from "./support/native-suite";
@@ -6,13 +6,15 @@ import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const patcher = fileURLToPath(new URL("../patches/pi-activity-notices.py", import.meta.url));
-const { HOST, MODULE, EDITS, LEGACY_PACKAGE_UPDATE_NOTICE, LEGACY_GRAY_PACKAGE_UPDATE_NOTICE } = describePatch<{
+const { HOST, MODULE, EDITS, PACKAGE_UPDATE_CHECK, PACKAGE_UPDATE_CHECK_DISABLED, LEGACY_PACKAGE_UPDATE_NOTICE, LEGACY_GRAY_PACKAGE_UPDATE_NOTICE } = describePatch<{
   HOST: string;
   MODULE: string;
   EDITS: [string, string][];
+  PACKAGE_UPDATE_CHECK: string;
+  PACKAGE_UPDATE_CHECK_DISABLED: string;
   LEGACY_PACKAGE_UPDATE_NOTICE: string;
   LEGACY_GRAY_PACKAGE_UPDATE_NOTICE: string;
-}>(patcher, "{'HOST':m['HOST'],'MODULE':m['MODULE'],'EDITS':m['EDITS'],'LEGACY_PACKAGE_UPDATE_NOTICE':m['LEGACY_PACKAGE_UPDATE_NOTICE'],'LEGACY_GRAY_PACKAGE_UPDATE_NOTICE':m['LEGACY_GRAY_PACKAGE_UPDATE_NOTICE']}");
+}>(patcher, "{k:m[k] for k in ('HOST','MODULE','EDITS','PACKAGE_UPDATE_CHECK','PACKAGE_UPDATE_CHECK_DISABLED','LEGACY_PACKAGE_UPDATE_NOTICE','LEGACY_GRAY_PACKAGE_UPDATE_NOTICE')}");
 const temp = temporaryDirectory("pi-activity-notices-");
 const sdk = process.env.PI_SDK_ROOT;
 const { unitTest: test, nativeTest: realTest } = nativeSuite(import.meta.path, !!sdk);
@@ -22,7 +24,7 @@ function fixture(name: string) {
   const root = join(temp, name);
   mkdirSync(dirname(join(root, MODULE)), { recursive: true });
   writeFileSync(join(root, "package.json"), '{"version":"0.87.1","type":"module"}');
-  writeFileSync(join(root, HOST), EDITS.map(([old]) => old).join("\n") + "\n// unrelated host work\n");
+  writeFileSync(join(root, HOST), PACKAGE_UPDATE_CHECK + "\n" + EDITS.map(([old]) => old).join("\n") + "\n// unrelated host work\n");
   return root;
 }
 
@@ -59,6 +61,23 @@ test("notices reject partial, duplicate and changed sources without writes", () 
     expect(contents(root)).toEqual(before);
   }
   expect(run(join(temp, "absent")).exitCode).toBe(0);
+});
+
+test("existing notices disable package checks and refuse changed check methods", () => {
+  const root = fixture("existing-notices");
+  expect(run(root).exitCode).toBe(0);
+  const path = join(root, HOST);
+  const patched = readFileSync(path, "utf8");
+  writeFileSync(path, patched.replace(PACKAGE_UPDATE_CHECK_DISABLED, PACKAGE_UPDATE_CHECK));
+  expect(run(root).exitCode).toBe(0);
+  expect(readFileSync(path, "utf8")).toBe(patched);
+
+  for (const check of [PACKAGE_UPDATE_CHECK + PACKAGE_UPDATE_CHECK, PACKAGE_UPDATE_CHECK.replace("PI_OFFLINE", "CUSTOM_OFFLINE"), PACKAGE_UPDATE_CHECK + PACKAGE_UPDATE_CHECK_DISABLED]) {
+    writeFileSync(path, patched.replace(PACKAGE_UPDATE_CHECK_DISABLED, check));
+    const before = contents(root);
+    expect(run(root).exitCode).not.toBe(0);
+    expect(contents(root)).toEqual(before);
+  }
 });
 
 test("the exact previous notice helper upgrades without marking it as newly added", () => {
@@ -113,6 +132,24 @@ realTest("native notices align every wrapped line and preserve coalescing, warni
   const colors = await import(pathToFileURL(join(root, "dist/modes/interactive/theme/theme.js")).href);
   colors.setThemeInstance(colors.loadThemeFromPath(fileURLToPath(new URL("../themes/osaka-jade.json", import.meta.url)), "truecolor"));
   const app = Object.create(InteractiveMode.prototype);
+
+  // No startup network lookup, even online; the package manager remains usable
+  // by the explicit update command. Restore the stub before other native checks.
+  const { DefaultPackageManager } = await import(pathToFileURL(join(root, "dist/core/package-manager.js")).href);
+  const lookup = spyOn(DefaultPackageManager.prototype, "checkForAvailableUpdates")
+    .mockResolvedValue([{ displayName: "fixture-package" }]);
+  const offline = process.env.PI_OFFLINE;
+  delete process.env.PI_OFFLINE;
+  app.runtimeHost = { session: { sessionManager: { getCwd: () => root } } };
+  try {
+    expect(await app.checkForPackageUpdates()).toEqual([]);
+    expect(lookup).not.toHaveBeenCalled();
+  } finally {
+    lookup.mockRestore();
+    if (offline === undefined) delete process.env.PI_OFFLINE;
+    else process.env.PI_OFFLINE = offline;
+  }
+
   app.chatContainer = new tui.Container();
   app.ui = { requestRender() {} };
   app.outputPad = 1;
