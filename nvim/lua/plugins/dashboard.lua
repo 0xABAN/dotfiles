@@ -6,6 +6,10 @@ return {
   opts = {
     words = { enabled = false },
     dashboard = {
+      sections = {
+        { section = "header", padding = 5 },
+        { section = "keys", gap = 1, padding = 3 },
+      },
       preset = {
         header = table.concat({
           " █████  ██████   █████  ███    ███",
