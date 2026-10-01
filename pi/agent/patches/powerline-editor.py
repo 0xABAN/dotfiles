@@ -6,7 +6,7 @@ visible input rows (40% of terminal height, minimum five), then completion rows.
 """
 from pathlib import Path
 
-from patch_support import read_payload
+from patch_support import read_payload, replace_counted
 
 
 EDITS = {
@@ -292,6 +292,31 @@ GIT_LABEL_EDIT = (
 )
 
 
+# A small Rosé Pine overlay, not a second editor. Normalize these exact fragments
+# before the existing frame guards, then reapply after the whole patch validates.
+ROSE_PINE_EDITS = [
+    (
+        'const whiteOutline = (s: string) => ansi.getFgAnsi(255, 255, 255) + s + ansi.reset;',
+        'const whiteOutline = (s: string) => ctx?.ui?.theme?.name === "rose-pine"\n'
+        '        ? ctx.ui.theme.fg("text", s) : ansi.getFgAnsi(255, 255, 255) + s + ansi.reset;',
+        1,
+    ),
+    (
+        'captureDraft ? getFgAnsiCode("queue") : ansi.getFgAnsi(67, 145, 135);',
+        'ctx?.ui?.theme?.name === "rose-pine" ? ctx.ui.theme.getFgAnsi("accent")\n'
+        '          : captureDraft ? getFgAnsiCode("queue") : ansi.getFgAnsi(67, 145, 135);',
+        1,
+    ),
+    (
+        '? ansi.getBgAnsi(95, 168, 118) + ansi.getFgAnsi(18, 19, 25) + ` ${responseTime} ` + ansi.reset',
+        '? ctx?.ui?.theme?.name === "rose-pine"\n'
+        '            ? ctx.ui.theme.inverse(ctx.ui.theme.fg("accent", ` ${responseTime} `))\n'
+        '            : ansi.getBgAnsi(95, 168, 118) + ansi.getFgAnsi(18, 19, 25) + ` ${responseTime} ` + ansi.reset',
+        1,
+    ),
+]
+
+
 def canonicalize_badge_budget(index: str) -> str:
     """Normalize the badge budget while migrating the top border."""
     old, new = BADGE_BUDGET_EDIT
@@ -429,7 +454,11 @@ def patch_sources(sources: dict[str, str]) -> dict[str, str]:
     # Canonicalize the optional border upgrade before validating the base frame.
     # The final result restores it below, so replay leaves installed bytes intact.
     old_border, new_border = BORDER_EDIT
-    index = canonicalize_white_outline(sources["index.ts"])
+    index = sources["index.ts"]
+    for edit in ROSE_PINE_EDITS:
+        if edit[1] in index:
+            index = replace_counted(index, [edit], "Rosé Pine editor colors changed:", reverse=True)
+    index = canonicalize_white_outline(index)
     index = canonicalize_badge_budget(index)
     index = canonicalize_badge_fit(index)
     index = canonicalize_git_label(index)
@@ -539,6 +568,7 @@ def patch_sources(sources: dict[str, str]) -> dict[str, str]:
         if result["index.ts"].count(old) != 1 or new in result["index.ts"]:
             raise ValueError("editor white outline anchor missing or duplicated")
         result["index.ts"] = result["index.ts"].replace(old, new, 1)
+    result["index.ts"] = replace_counted(result["index.ts"], ROSE_PINE_EDITS, "Rosé Pine editor colors missing:")
     return result
 
 

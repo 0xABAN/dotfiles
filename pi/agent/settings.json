@@ -1,6 +1,6 @@
 {
   "lastChangelogVersion": "0.84.2",
-  "theme": "osaka-jade",
+  "theme": "rose-pine",
   "quietStartup": true,
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-6-astra",

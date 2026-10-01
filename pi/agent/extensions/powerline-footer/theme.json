@@ -1,21 +1,21 @@
 {
   "colors": {
-    "model": "#D8DAD8",
-    "shellMode": "#5FA876",
-    "path": "#dedec5",
-    "gitDirty": "#dedec5",
-    "gitClean": "#dedec5",
-    "thinking": "#62656a",
-    "thinkingMinimal": "#85877e",
-    "thinkingLow": "#439187",
-    "thinkingMedium": "#439187",
-    "context": "#439187",
-    "contextWarn": "#5FA876",
-    "contextError": "#c7837c",
-    "cost": "#85877e",
-    "tokens": "#85877e",
-    "queue": "#439187",
-    "separator": "#62656a",
-    "border": "#326d65"
+    "model": "text",
+    "shellMode": "bashMode",
+    "path": "mdHeading",
+    "gitDirty": "mdHeading",
+    "gitClean": "mdHeading",
+    "thinking": "dim",
+    "thinkingMinimal": "muted",
+    "thinkingLow": "accent",
+    "thinkingMedium": "accent",
+    "context": "accent",
+    "contextWarn": "warning",
+    "contextError": "error",
+    "cost": "muted",
+    "tokens": "muted",
+    "queue": "accent",
+    "separator": "dim",
+    "border": "borderMuted"
   }
 }

@@ -25,6 +25,8 @@ nativeTest("native discovery loads entrypoints only; whimsical keeps loader and 
   for (const name of ["plan-mode", "whimsical", "whimsical.ts"]) {
     cpSync(fileURLToPath(new URL(`../extensions/${name}`, import.meta.url)), join(extensions, name), { recursive: true });
   }
+  // Plan-mode imports its shared palette rather than keeping another hex copy.
+  cpSync(fileURLToPath(new URL("../themes", import.meta.url)), join(agent, "themes"), { recursive: true });
   const { discoverAndLoadExtensions } = await import(pathToFileURL(join(sdk!, "dist/core/extensions/loader.js")).href);
   const tui = await import(pathToFileURL(join(sdk!, "node_modules/@earendil-works/pi-tui/dist/index.js")).href);
   const loaded = await discoverAndLoadExtensions([], temp, agent);

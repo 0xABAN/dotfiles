@@ -1,10 +1,7 @@
-/** White → mid → light beige. Build uses pale teal; plan uses purple. */
-function shine(text: string, mid: [number, number, number]): string {
-	const stops: [number, number, number][] = [
-		[255, 255, 255], // white
-		mid,
-		[243, 238, 223], // light beige (#f3eedf)
-	];
+import rosePine from "../../themes/rose-pine.json";
+
+/** Interpolate the label without painting its spaces. */
+function shine(text: string, stops: [number, number, number][]): string {
 	const chars = [...text];
 	const paint = chars.filter((c) => c !== " ");
 	const n = Math.max(paint.length - 1, 1);
@@ -38,13 +35,24 @@ function thinkingLabel(level: string): string {
 }
 
 /** Pure presentation: lifecycle code owns status keys, tool state and persistence. */
-export function formatPlanStatus(enabled: boolean, thinkingLevel?: string): { mode: string; thinking: string } {
+export function formatPlanStatus(enabled: boolean, thinkingLevel?: string, themeName?: string): { mode: string; thinking: string } {
 	const mid: [number, number, number] = enabled
 		? [196, 160, 230] // pastel purple (plan)
 		: [173, 210, 203]; // pale teal (build, #add2cb)
 
+	// Keep the existing gradient for older themes; reuse the imported port's
+	// palette for Rosé Pine instead of introducing another set of hex colors.
+	const palette = rosePine.vars;
+	const stops: [number, number, number][] = themeName === "rose-pine"
+		? [palette.text, enabled ? palette.iris : palette.foam, palette.rose].map((hex) => [
+			Number.parseInt(hex.slice(1, 3), 16),
+			Number.parseInt(hex.slice(3, 5), 16),
+			Number.parseInt(hex.slice(5, 7), 16),
+		])
+		: [[255, 255, 255], mid, [243, 238, 223]];
+
 	return {
-		mode: shine(enabled ? "\uF022  plan mode" : "\uF121  build mode", mid),
-		thinking: shine(thinkingLabel(thinkingLevel || "off"), mid),
+		mode: shine(enabled ? "\uF022  plan mode" : "\uF121  build mode", stops),
+		thinking: shine(thinkingLabel(thinkingLevel || "off"), stops),
 	};
 }

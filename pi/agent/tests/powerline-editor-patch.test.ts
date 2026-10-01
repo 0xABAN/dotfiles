@@ -7,7 +7,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const patcher = fileURLToPath(new URL("../patches/powerline-editor.py", import.meta.url));
-const { edits, border, legacyBorder, badgeImport, legacyPrompt, preVisibleRows, gitLabel, badgeBudget, renderHeight, previousDouble, previousPadded, whiteOutline } = describePatch<{
+const { edits, border, legacyBorder, badgeImport, legacyPrompt, preVisibleRows, gitLabel, badgeBudget, renderHeight, previousDouble, previousPadded, whiteOutline, roseEdits } = describePatch<{
   edits: Record<string, [string, string][]>;
   border: [string, string];
   legacyBorder: [string, string];
@@ -20,8 +20,17 @@ const { edits, border, legacyBorder, badgeImport, legacyPrompt, preVisibleRows, 
   previousDouble: string;
   previousPadded: string;
   whiteOutline: [string, string][];
-}>(patcher, "{'edits':m['EDITS'],'border':m['BORDER_EDIT'],'legacyBorder':m['LEGACY_BORDER_EDIT'],'badgeImport':m['BADGE_IMPORT'],'legacyPrompt':m['LEGACY_PROMPT'],'preVisibleRows':m['PRE_VISIBLE_ROWS'],'gitLabel':m['GIT_LABEL_EDIT'],'badgeBudget':m['BADGE_BUDGET_EDIT'],'renderHeight':m['RENDER_HEIGHT_EDIT'],'previousDouble':m['PREVIOUS_DOUBLE_PADDING_RENDER_HEIGHT'],'previousPadded':m['PREVIOUS_PADDED_INPUT_ROW'],'whiteOutline':m['WHITE_OUTLINE_EDITS']}",
+  roseEdits: [string, string, number][];
+}>(patcher, "{'edits':m['EDITS'],'border':m['BORDER_EDIT'],'legacyBorder':m['LEGACY_BORDER_EDIT'],'badgeImport':m['BADGE_IMPORT'],'legacyPrompt':m['LEGACY_PROMPT'],'preVisibleRows':m['PRE_VISIBLE_ROWS'],'gitLabel':m['GIT_LABEL_EDIT'],'badgeBudget':m['BADGE_BUDGET_EDIT'],'renderHeight':m['RENDER_HEIGHT_EDIT'],'previousDouble':m['PREVIOUS_DOUBLE_PADDING_RENDER_HEIGHT'],'previousPadded':m['PREVIOUS_PADDED_INPUT_ROW'],'whiteOutline':m['WHITE_OUTLINE_EDITS'],'roseEdits':m['ROSE_PINE_EDITS']}",
   "m['EDITS']['index.ts'].append(m['PROMPT_EDIT'])");
+const withRosePine = (source: string) => roseEdits.reduce((text, [old, next]) => text.replace(old, next), source);
+const withoutRosePine = (source: string) => roseEdits.reduce((text, [old, next]) => text.replace(next, old), source);
+// The frame migrations still use their exact old anchors; assertions inspect
+// the final color overlay that runs after those guards.
+border[1] = withRosePine(border[1]);
+whiteOutline[0][1] = withRosePine(whiteOutline[0][1]);
+edits["index.ts"].at(-1)![1] = withRosePine(edits["index.ts"].at(-1)![1]);
+
 const root = temporaryDirectory("powerline-editor-");
 const sdk = process.env.PI_SDK_ROOT;
 const installed = process.env.PI_POWERLINE_ROOT ?? join(homedir(), ".pi/agent/git/github.com/nicobailon/pi-powerline-footer");
@@ -93,6 +102,20 @@ test("legacy outline migrates exactly and incomplete white outlines refuse write
   }
 });
 
+test("pre-Rosé Pine editor migrates exactly and modified color overlays refuse writes", () => {
+  const app = sandbox("rose-pine-colors");
+  expect(app.run().exitCode).toBe(0);
+  const current = app.contents();
+  writeFileSync(join(app.dir, "index.ts"), withoutRosePine(current["index.ts"]));
+  expect(app.run().exitCode).toBe(0);
+  expect(app.contents()).toEqual(current);
+
+  writeFileSync(join(app.dir, "index.ts"), current["index.ts"].replace('ctx.ui.theme.fg("text", s)', 'ctx.ui.theme.fg("error", s)'));
+  const before = app.contents();
+  expect(app.run().exitCode).not.toBe(0);
+  expect(app.contents()).toEqual(before);
+});
+
 test("existing editor height migrates from 30% to 40%", () => {
   const app = sandbox("legacy-height");
   expect(app.run().exitCode).toBe(0);
@@ -138,7 +161,7 @@ test("existing framed prompt upgrades to a diamond and rejects unknown prompts",
   expect(app.run().exitCode).toBe(0);
   const current = app.contents();
   const [oldPrompt, newPrompt] = edits["index.ts"].at(-1)!;
-  const previousTeal = newPrompt.replace("ansi.getFgAnsi(67, 145, 135)", "ansi.getFgAnsi(94, 158, 128)");
+  const previousTeal = withoutRosePine(newPrompt).replace("ansi.getFgAnsi(67, 145, 135)", "ansi.getFgAnsi(94, 158, 128)");
   for (const previous of [oldPrompt, legacyPrompt, previousTeal]) {
     writeFileSync(join(app.dir, "index.ts"), current["index.ts"].replace(newPrompt, previous));
     expect(app.run().exitCode).toBe(0);
@@ -306,6 +329,7 @@ realTest("real editor fills the shared viewport through wrapping, scrolling, com
   const buildSegmentContext = () => ({});
   const tui = { terminal: { rows: 30 }, requestRender() {} };
   const hostBorder = (s: string) => `\x1b[38;2;67;145;135m${s}\x1b[0m`;
+  const uiContext = { ui: { theme: {} } };
   const editor = wrap(new Editor(tui, { borderColor: hostBorder, selectList: {} }, { paddingX: 1 }),
     tui, () => "\x1b[38;2;95;168;118m",
     {
@@ -313,7 +337,7 @@ realTest("real editor fills the shared viewport through wrapping, scrolling, com
       getFgAnsi: (r: number, g: number, b: number) => `\x1b[38;2;${r};${g};${b}m`,
       getBgAnsi: (r: number, g: number, b: number) => `\x1b[48;2;${r};${g};${b}m`,
     },
-    false, () => false, () => "+", footer, currentCtx, { ui: { theme: {} } }, visibleWidth, truncateToWidth, sliceByColumn,
+    false, () => false, () => "+", footer, currentCtx, uiContext, visibleWidth, truncateToWidth, sliceByColumn,
     renderSegment, buildSegmentContext);
   editor.focused = true;
   const nativeTopBorder = editor.renderTopBorder.bind(editor);
@@ -467,6 +491,22 @@ realTest("real editor fills the shared viewport through wrapping, scrolling, com
     expect(editor.borderColor).toBe(hostBorder);
   }
   editor.layoutText = layoutText;
+
+  // The same editor reads the selected theme live, without changing its geometry.
+  const colors = await import(pathToFileURL(join(sdk!, "dist/modes/interactive/theme/theme.js")).href);
+  const rose = colors.loadThemeFromPath(fileURLToPath(new URL("../themes/rose-pine.json", import.meta.url)), "truecolor");
+  uiContext.ui.theme = rose;
+  editor.setText("");
+  statuses.set("agent-response-time", "1.2s");
+  statuses.set("agent-mode", formatPlanStatus(false, "medium", "rose-pine").mode);
+  const roseRows = editor.render(100);
+  expect(roseRows[0]).toContain(rose.fg("text", "╭───"));
+  expect(roseRows[0]).toContain(rose.inverse(rose.fg("accent", " 1.2s ")));
+  expect(roseRows[1]).toContain(rose.getFgAnsi("accent") + "◆");
+  expect(roseRows.join("\n")).not.toContain("\x1b[48;2;95;168;118m");
+  expect(roseRows.every((row: string) => visibleWidth(row) <= 100)).toBe(true);
+  uiContext.ui.theme = {};
+  expectWhiteOutline(editor.render(100));
 });
 
 realTest("bash ghost text preserves padded cursor and avoids overwriting wrapped input", async () => {

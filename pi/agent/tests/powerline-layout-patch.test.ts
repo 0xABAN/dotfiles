@@ -223,7 +223,7 @@ realTest("patched unstaged count uses sage without changing its label", () => {
   new Function("indicators", "applyColor", "ctx", "gitStatus", count)(
     indicators, (_theme: unknown, color: string, text: string) => `${color}:${text}`, { theme: {} }, { unstaged: 3 },
   );
-  expect(indicators).toEqual(["#85877e:*3"]);
+  expect(indicators).toEqual(["muted:*3"]);
 });
 realTest("patched layout preserves right alignment with a single compact row", async () => {
   const text = source("index.ts");

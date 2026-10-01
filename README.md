@@ -6,8 +6,8 @@ Neovim + Pi coding-agent configs. Clone on a new machine and run `./install.sh`.
 
 ```
 zsh/.zshrc            → ~/.zshrc  (no secrets; source ~/.zshrc.local)
-nvim/                 → ~/.config/nvim  (AstroNvim v6 + osaka-jade)
-ghostty/themes/       → ~/.config/ghostty/themes/ (osaka-jade for cmux)
+nvim/                 → ~/.config/nvim  (AstroNvim v6 + Rosé Pine)
+ghostty/themes/       → ~/.config/ghostty/themes/ (retained osaka-jade)
 ghostty/shaders/      → ~/.config/ghostty/shaders/ (static grain)
 pi/agent/             → ~/.pi/agent/* (selected paths)
   AGENTS.md           → ~/.pi/agent/AGENTS.md + ~/.codex/AGENTS.md
@@ -31,6 +31,50 @@ Existing checkouts can stay at `~/dev/configs` to preserve installed symlinks; u
 Existing files are renamed `*.bak.<timestamp>` before linking. The installer also removes `~/AGENTS.md` (backing up a regular file first) so Pi loads only the shared global file and repository instructions.
 
 ## Colors
+
+**Rosé Pine Main** is the default in Pi and Neovim. This reuses existing themes
+rather than introducing a theme generator:
+
+- Neovim: [rose-pine/neovim](https://github.com/rose-pine/neovim), pinned in
+  `nvim/lazy-lock.json`, with its native transparency option enabled.
+- Pi: [tranquil-tr0/pi-rose-pine](https://github.com/tranquil-tr0/pi-rose-pine),
+  vendored from commit `d6278a91e996eb82e6ec0cd74390d1bedeed8bc1` into
+  `pi/agent/themes/rose-pine.json`; its MIT license is alongside it.
+  Local changes update the schema URL, keep custom/tool surfaces transparent,
+  and use readable muted/subtle colors for borders and punctuation.
+- Ghostty/cmux: the bundled **Rose Pine** theme. No theme download is needed.
+
+Use these settings in `~/.config/ghostty/config` for an opaque background,
+preserving shader and keybinding settings:
+
+```ini
+theme = Rose Pine
+background-opacity = 1
+background-blur = 0
+```
+
+Pi and Neovim still inherit the terminal background; they are not see-through
+when the terminal is opaque. If cmux has its own override, use
+`cmux themes clear` to inherit Ghostty. Merge `selectionColor: "#403d52"` and
+`notificationBadgeColor: "#ebbcba"` into `workspaceColors` in
+`~/.config/cmux/cmux.json`; leave unrelated settings intact. Run
+`cmux reload-config` to apply terminal changes without restarting sessions.
+The previous live terminal/Pi settings and patched Powerline sources on this
+machine are backed up under `~/.config/theme-backups/rose-pine-q721q5n_/`.
+
+Pi's Powerline colors follow the selected theme's native roles. Under Rosé Pine,
+its input border uses the theme text color, the diamond/timer use rose, and mode
+labels use text → foam (build) / iris (plan) → rose gradients. Layout and spacing
+are unchanged. `/reload` after selecting a Pi theme refreshes the stored mode
+labels immediately; they also refresh on the next turn or mode/effort change.
+Restart Neovim to load its plugin, or select it with `:colorscheme rose-pine`.
+
+Checks: `nvim --headless -u NONE -l nvim/tests/rose-pine.lua` after installing
+plugins, `ghostty +validate-config`, and
+`PI_SDK_ROOT=/path/to/pi-coding-agent bun test pi/agent/tests/rose-pine.test.ts`.
+Osaka Jade and Woody remain selectable; their theme files are unchanged.
+
+### Osaka Jade (retained)
 
 `osaka-jade` keeps the reference's charcoal surfaces, with **`#439187`** as
 the shared teal accent across Neovim, Pi, and cmux/Ghostty. Its darker
@@ -67,8 +111,8 @@ Outside selections, large surfaces never use green fills.
 Supporting neutrals and subdued warning/error colors are chosen to fit;
 ANSI colors use the same restrained treatment. No theme plugins required.
 
-Pi and Neovim select it by default. The installer links the terminal theme and
-grain shader; activate them in `~/.config/ghostty/config` (also used by cmux):
+The installer still links the Osaka Jade terminal theme and grain shader.
+To restore its terminal palette, activate it in `~/.config/ghostty/config` (also used by cmux):
 
 ```ini
 theme = osaka-jade
@@ -184,7 +228,7 @@ live in the input's top border, not duplicated in the footer. The labels read
 `  build mode` and the prefixed effort, such as `think:xhigh`. Mode icons and
 names stay intact
 even in compact panes.
-The build gradient runs white → pale teal (`#daebe8`) → light beige;
+With Osaka Jade, the build gradient runs white → pale teal (`#daebe8`) → light beige;
 plan keeps its purple midpoint.
 The context ball shares
 the meter's color, including warning/critical states, and remains visible when
@@ -207,7 +251,8 @@ The editor patch adds the rounded `╭╮╰╯` frame without a second outer in
 It reserves space before text wrapping and keeps scroll indicators,
 completion rows, paste handling, and hardware cursor markers. Tiny terminals
 fall back to the host editor. Mode/effort labels interrupt the top border near
-the right corner. A charcoal-on-sage (`#121319` on `#5FA876`) response-time badge comes first,
+the right corner. A response-time badge comes first (charcoal-on-sage in Osaka Jade,
+terminal-background-on-rose in Rosé Pine),
 with three spaces before `  build mode ❯ think:xhigh` and no chevron beside
 it. Response time yields first when space is tight, then thinking. If the
 complete mode label still cannot fit, the border keeps the scroll hint without
@@ -250,7 +295,8 @@ PI_SDK_ROOT="$(npm root -g)/@earendil-works/pi-coding-agent" \
 ### Transcript preview
 
 The Pi 0.87.1 transcript patch adds `◆ You` / `● Pi` headers and compact
-geometric action trees. Pi's `●` uses sage (`#5fa876`); `◆ You` and
+geometric action trees. The following colors describe Osaka Jade; Rosé Pine
+uses its corresponding theme roles. Pi's `●` uses sage (`#5fa876`); `◆ You` and
 action icons keep the teal accent. Speaker names retain the normal text color.
 Single tools have no count heading or tree connector. Two or more
 consecutive visible tool rows share a counted action tree, with status and action

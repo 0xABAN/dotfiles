@@ -64,7 +64,7 @@ test("real activity factories preserve the input cursor and both summaries in a 
   checkProcess(Bun.spawnSync(["python3", "-B", patcher("powerline-editor")], { env: { ...process.env, HOME: home } }));
   const editorSource = readFileSync(join(powerline, "index.ts"), "utf8");
   const frame = editorSource.slice(editorSource.indexOf("      // configs:powerline-editor-v1"), editorSource.indexOf("\n      return editor;", editorSource.indexOf("      // configs:powerline-editor-v1")));
-  const wrapEditor = new Function("editor", "tui", "getFgAnsiCode", "ansi", "bashModeActive", "isSigilIdeaDraft", "captureSigilGlyph", "footerDataRef", "visibleWidth", "truncateToWidth", "sliceByColumn", "currentCtx",
+  const wrapEditor = new Function("editor", "tui", "getFgAnsiCode", "ansi", "bashModeActive", "isSigilIdeaDraft", "captureSigilGlyph", "footerDataRef", "visibleWidth", "truncateToWidth", "sliceByColumn", "currentCtx", "ctx",
     new Bun.Transpiler({ loader: "ts" }).transformSync(frame) + "\nreturn editor;");
   const status = formatPlanStatus(false, "medium");
   const footerData = { getExtensionStatuses: () => new Map([["agent-mode", status.mode], ["agent-thinking", status.thinking]]) };
@@ -84,7 +84,7 @@ test("real activity factories preserve the input cursor and both summaries in a 
   app.statusContainer.addChild(new tui.Text("Working", 0, 0));
   app.editor = wrapEditor(new tui.Editor(app.ui, { borderColor: (s: string) => s, selectList: {} }, { paddingX: 1 }),
     app.ui, () => "\x1b[38;2;67;145;135m", { reset: "\x1b[0m", getFgAnsi: () => "\x1b[38;2;67;145;135m" }, false, () => false, () => "+", footerData,
-    tui.visibleWidth, tui.truncateToWidth, tui.sliceByColumn, { model: { name: "Fixture Model" } });
+    tui.visibleWidth, tui.truncateToWidth, tui.sliceByColumn, { model: { name: "Fixture Model" } }, { ui: { theme: colors.theme } });
   app.editor.focused = true;
   app.editorContainer.addChild(app.editor);
   // The real powerline factories have their own integration suite. Represent

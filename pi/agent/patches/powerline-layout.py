@@ -60,7 +60,7 @@ EDITS = {
 
 UNSTAGED_EDIT = (
     'indicators.push(applyColor(ctx.theme, "warning", `*${gitStatus.unstaged}`));',
-    'indicators.push(applyColor(ctx.theme, "#85877e", `*${gitStatus.unstaged}`));',
+    'indicators.push(applyColor(ctx.theme, "muted", `*${gitStatus.unstaged}`));',
 )
 
 
@@ -172,7 +172,10 @@ def patch_layout_sources(sources: dict[str, str]) -> dict[str, str]:
             f'    ansi.getFgAnsi({previous_color}) + "●" + ansi.reset);',
         )
         sources["index.ts"] = sources["index.ts"].replace(previous_align, ALIGN)
-    sources["segments.ts"] = sources["segments.ts"].replace(LEGACY_METER, METER)
+    sources["segments.ts"] = sources["segments.ts"].replace(LEGACY_METER, METER).replace(
+        'indicators.push(applyColor(ctx.theme, "#85877e", `*${gitStatus.unstaged}`));',
+        UNSTAGED_EDIT[1],
+    )
     sources["index.ts"] = (sources["index.ts"]
         .replace(LEGACY_ALIGN, ALIGN)
         .replace(LEGACY_SEPARATOR, SEPARATOR_EDIT[1]))

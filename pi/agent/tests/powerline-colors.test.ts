@@ -33,7 +33,12 @@ test("mode and thinking share softened build and purple plan gradients", async (
 		check("agent-thinking", `think:${level === "minimal" ? "min" : level}`, "255;255;255", "243;238;223");
 	}
 
-	const { colors } = JSON.parse(readFileSync(new URL("../extensions/powerline-footer/theme.json", import.meta.url), "utf8"));
+	const footer = JSON.parse(readFileSync(new URL("../extensions/powerline-footer/theme.json", import.meta.url), "utf8"));
+	const osaka = JSON.parse(readFileSync(new URL("../themes/osaka-jade.json", import.meta.url), "utf8"));
+	const colors = Object.fromEntries(Object.entries(footer.colors).map(([key, role]) => {
+		const value = osaka.colors[role as string];
+		return [key, osaka.vars[value] ?? value];
+	}));
 	expect(colors.model).toBe("#D8DAD8");
 	expect(colors.shellMode).toBe("#5FA876");
 	expect(colors.gitClean).toBe("#dedec5");
@@ -45,4 +50,11 @@ test("mode and thinking share softened build and purple plan gradients", async (
 	expect(colors.border).toBe("#326d65");
 	expect(colors.path).toBe("#dedec5");
 	expect(colors.contextError).toBe("#c7837c");
+
+	Object.assign(ctx.ui, { theme: { name: "rose-pine" } });
+	await app.event("before_agent_start");
+	check("agent-mode", "\uF022  plan mode", "224;222;244", "235;188;186");
+	Object.assign(ctx.ui, { theme: { name: "osaka-jade" } });
+	await app.event("before_agent_start");
+	check("agent-mode", "\uF022  plan mode", "255;255;255", "243;238;223");
 });

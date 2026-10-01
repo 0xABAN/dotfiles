@@ -3,7 +3,7 @@ return {
   "sphamba/smear-cursor.nvim",
   event = "VeryLazy",
   opts = {
-    cursor_color = "#F2F3F0",
+    -- Use the active colorscheme's Cursor highlight (the plugin default).
     never_draw_over_target = true,
     smear_insert_mode = false,
     min_vertical_distance_smear = 2,

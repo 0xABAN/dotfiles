@@ -50,7 +50,7 @@ export default function planModeExtension(pi: ExtensionAPI): void {
 	});
 
 	function updateStatus(ctx: ExtensionContext): void {
-		const status = formatPlanStatus(planModeEnabled, ctx.thinkingLevel);
+		const status = formatPlanStatus(planModeEnabled, ctx.thinkingLevel, ctx.ui.theme?.name);
 		ctx.ui.setStatus("agent-mode", status.mode);
 		ctx.ui.setStatus("agent-thinking", status.thinking);
 	}
@@ -157,7 +157,9 @@ export default function planModeExtension(pi: ExtensionAPI): void {
 		};
 	});
 
-	pi.on("before_agent_start", async (_event, _ctx) => {
+	pi.on("before_agent_start", async (_event, ctx) => {
+		// Status strings contain ANSI colors; refresh after a theme selection.
+		if (ctx.hasUI) updateStatus(ctx);
 		if (!planModeEnabled) return;
 		return {
 			message: {
