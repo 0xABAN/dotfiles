@@ -1,5 +1,5 @@
 import { afterAll, expect, test } from "bun:test";
-import { chmodSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readlinkSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -49,8 +49,11 @@ exit "\${FAIL_DEPENDENCIES:-0}"
 }
 
 test("installer provisions missing extensions and never reclones an existing checkout", () => {
-  const { home, run } = sandbox("fresh");
+  const { cwd, home, run } = sandbox("fresh");
   expect(run().exitCode).toBe(0);
+  for (const theme of ["osaka-jade", "everforest-dark-medium"]) {
+    expect(readlinkSync(join(home, ".config/ghostty/themes", theme))).toBe(join(realpathSync(cwd), "ghostty/themes", theme));
+  }
   const checkout = join(home, "dev/pi-extensions");
   expect(existsSync(join(checkout, "inline-skills/package.json"))).toBe(true);
   expect(existsSync(join(checkout, "dj/package.json"))).toBe(true);

@@ -1,6 +1,6 @@
 {
   "lastChangelogVersion": "0.84.2",
-  "theme": "rose-pine",
+  "theme": "everforest-dark-hard",
   "quietStartup": true,
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-6-astra",

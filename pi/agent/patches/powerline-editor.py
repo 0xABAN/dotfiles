@@ -292,28 +292,47 @@ GIT_LABEL_EDIT = (
 )
 
 
-# A small Rosé Pine overlay, not a second editor. Normalize these exact fragments
-# before the existing frame guards, then reapply after the whole patch validates.
-ROSE_PINE_EDITS = [
+# Color overlays for the imported palettes, not a second editor. Normalize these
+# exact fragments before the frame guards; reapply only after full validation.
+MEDIUM_THEME_COLOR_EDITS = [
     (
         'const whiteOutline = (s: string) => ansi.getFgAnsi(255, 255, 255) + s + ansi.reset;',
-        'const whiteOutline = (s: string) => ctx?.ui?.theme?.name === "rose-pine"\n'
+        'const whiteOutline = (s: string) => ["rose-pine", "everforest-dark-medium"].includes(ctx?.ui?.theme?.name ?? "")\n'
         '        ? ctx.ui.theme.fg("text", s) : ansi.getFgAnsi(255, 255, 255) + s + ansi.reset;',
         1,
     ),
     (
         'captureDraft ? getFgAnsiCode("queue") : ansi.getFgAnsi(67, 145, 135);',
-        'ctx?.ui?.theme?.name === "rose-pine" ? ctx.ui.theme.getFgAnsi("accent")\n'
+        '["rose-pine", "everforest-dark-medium"].includes(ctx?.ui?.theme?.name ?? "") ? ctx.ui.theme.getFgAnsi("accent")\n'
         '          : captureDraft ? getFgAnsiCode("queue") : ansi.getFgAnsi(67, 145, 135);',
         1,
     ),
     (
         '? ansi.getBgAnsi(95, 168, 118) + ansi.getFgAnsi(18, 19, 25) + ` ${responseTime} ` + ansi.reset',
-        '? ctx?.ui?.theme?.name === "rose-pine"\n'
+        '? ["rose-pine", "everforest-dark-medium"].includes(ctx?.ui?.theme?.name ?? "")\n'
         '            ? ctx.ui.theme.inverse(ctx.ui.theme.fg("accent", ` ${responseTime} `))\n'
         '            : ansi.getBgAnsi(95, 168, 118) + ansi.getFgAnsi(18, 19, 25) + ` ${responseTime} ` + ansi.reset',
         1,
     ),
+]
+
+
+# Exact migration input from the earlier Rosé Pine-only overlay.
+ROSE_PINE_EDITS = [
+    (old, new.replace(
+        '["rose-pine", "everforest-dark-medium"].includes(ctx?.ui?.theme?.name ?? "")',
+        'ctx?.ui?.theme?.name === "rose-pine"',
+    ), count)
+    for old, new, count in MEDIUM_THEME_COLOR_EDITS
+]
+
+# Extend the exact predecessor without changing older themes' appearance.
+THEME_COLOR_EDITS = [
+    (old, new.replace(
+        '"everforest-dark-medium"',
+        '"everforest-dark-medium", "everforest-dark-hard"',
+    ), count)
+    for old, new, count in MEDIUM_THEME_COLOR_EDITS
 ]
 
 
@@ -455,9 +474,9 @@ def patch_sources(sources: dict[str, str]) -> dict[str, str]:
     # The final result restores it below, so replay leaves installed bytes intact.
     old_border, new_border = BORDER_EDIT
     index = sources["index.ts"]
-    for edit in ROSE_PINE_EDITS:
+    for edit in [*THEME_COLOR_EDITS, *MEDIUM_THEME_COLOR_EDITS, *ROSE_PINE_EDITS]:
         if edit[1] in index:
-            index = replace_counted(index, [edit], "Rosé Pine editor colors changed:", reverse=True)
+            index = replace_counted(index, [edit], "editor theme colors changed:", reverse=True)
     index = canonicalize_white_outline(index)
     index = canonicalize_badge_budget(index)
     index = canonicalize_badge_fit(index)
@@ -568,7 +587,7 @@ def patch_sources(sources: dict[str, str]) -> dict[str, str]:
         if result["index.ts"].count(old) != 1 or new in result["index.ts"]:
             raise ValueError("editor white outline anchor missing or duplicated")
         result["index.ts"] = result["index.ts"].replace(old, new, 1)
-    result["index.ts"] = replace_counted(result["index.ts"], ROSE_PINE_EDITS, "Rosé Pine editor colors missing:")
+    result["index.ts"] = replace_counted(result["index.ts"], THEME_COLOR_EDITS, "editor theme colors missing:")
     return result
 
 

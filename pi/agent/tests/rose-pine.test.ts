@@ -46,10 +46,10 @@ test("mode gradients use the selected palette without changing labels or the leg
   }
 });
 
-nativeTest("both themes validate against Pi 0.87.1 and supply every footer role", async () => {
+nativeTest("current and saved themes validate against Pi and supply every footer role", async () => {
   const colors = await import(pathToFileURL(join(sdk!, "dist/modes/interactive/theme/theme.js")).href);
   const { validateThemeJson } = await import(pathToFileURL(join(sdk!, "dist/modes/interactive/theme/theme-json.js")).href);
-  for (const name of ["rose-pine", "osaka-jade"]) {
+  for (const name of ["rose-pine", "osaka-jade", "everforest-dark-medium", "everforest-dark-hard"]) {
     const path = fileURLToPath(new URL(`../themes/${name}.json`, import.meta.url));
     validateThemeJson(name, JSON.parse(readFileSync(path, "utf8")));
     const theme = colors.loadThemeFromPath(path, "truecolor");

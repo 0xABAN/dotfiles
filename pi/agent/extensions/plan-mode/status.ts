@@ -1,4 +1,5 @@
 import rosePine from "../../themes/rose-pine.json";
+import everforest from "../../themes/everforest-dark-hard.json";
 
 /** Interpolate the label without painting its spaces. */
 function shine(text: string, stops: [number, number, number][]): string {
@@ -40,11 +41,17 @@ export function formatPlanStatus(enabled: boolean, thinkingLevel?: string, theme
 		? [196, 160, 230] // pastel purple (plan)
 		: [173, 210, 203]; // pale teal (build, #add2cb)
 
-	// Keep the existing gradient for older themes; reuse the imported port's
-	// palette for Rosé Pine instead of introducing another set of hex colors.
-	const palette = rosePine.vars;
-	const stops: [number, number, number][] = themeName === "rose-pine"
-		? [palette.text, enabled ? palette.iris : palette.foam, palette.rose].map((hex) => [
+	// Reuse each imported palette while preserving the older themes' gradient.
+	const rose = rosePine.vars;
+	// Hard and Medium share their foreground/accent colors.
+	const forest = everforest.vars;
+	const hexStops = themeName === "rose-pine"
+		? [rose.text, enabled ? rose.iris : rose.foam, rose.rose]
+		: themeName === "everforest-dark-medium" || themeName === "everforest-dark-hard"
+			? [forest.fg, enabled ? forest.purple : forest.green, forest.yellow]
+			: undefined;
+	const stops: [number, number, number][] = hexStops
+		? hexStops.map((hex) => [
 			Number.parseInt(hex.slice(1, 3), 16),
 			Number.parseInt(hex.slice(3, 5), 16),
 			Number.parseInt(hex.slice(5, 7), 16),

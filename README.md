@@ -6,8 +6,8 @@ Neovim + Pi coding-agent configs. Clone on a new machine and run `./install.sh`.
 
 ```
 zsh/.zshrc            → ~/.zshrc  (no secrets; source ~/.zshrc.local)
-nvim/                 → ~/.config/nvim  (AstroNvim v6 + Rosé Pine)
-ghostty/themes/       → ~/.config/ghostty/themes/ (retained osaka-jade)
+nvim/                 → ~/.config/nvim  (AstroNvim v6 + Everforest)
+ghostty/themes/       → ~/.config/ghostty/themes/ (Everforest + retained Osaka Jade)
 ghostty/shaders/      → ~/.config/ghostty/shaders/ (static grain)
 pi/agent/             → ~/.pi/agent/* (selected paths)
   AGENTS.md           → ~/.pi/agent/AGENTS.md + ~/.codex/AGENTS.md
@@ -32,8 +32,52 @@ Existing files are renamed `*.bak.<timestamp>` before linking. The installer als
 
 ## Colors
 
-**Rosé Pine Main** is the default in Pi and Neovim. This reuses existing themes
-rather than introducing a theme generator:
+**Everforest Dark Hard** is the current default, using the existing upstream
+palettes without overrides:
+
+- Neovim: [sainnhe/everforest](https://github.com/sainnhe/everforest), pinned in
+  `nvim/lazy-lock.json`. Only dark mode and `everforest_background = "hard"`
+  are configured; the upstream palette, highlights and opaque backgrounds are
+  unchanged.
+- Pi: [angribot/pi-everforest](https://github.com/angribot/pi-everforest), copied
+  unchanged from commit `44b52a24253385f43c222439353879c4d0010602` into
+  `pi/agent/themes/everforest-dark-hard.json`, with its MIT license alongside.
+- Ghostty/cmux: the bundled **Everforest Dark Hard** theme. No download needed.
+  It uses Hard's dim background (`#1E2326`); Neovim uses its normal background
+  (`#272E33`). Both are native choices, not custom palette overrides.
+
+Medium remains available in Pi and as `ghostty/themes/everforest-dark-medium`,
+imported unchanged from [jrswab/everforest-themes](https://github.com/jrswab/everforest-themes)
+commit `871c01eb585427ee49742911754fdbb70e8a6988` (see `ghostty/LICENSE.everforest`).
+
+Set `theme = Everforest Dark Hard` in `~/.config/ghostty/config`, keeping
+`background-opacity = 1`, `background-blur = 0`, the shader and keybindings.
+In `~/.config/cmux/cmux.json`, `workspaceColors.selectionColor` uses `#4C3743`
+and `notificationBadgeColor` uses `#83C092`. Run `cmux reload-config` afterward.
+Pi's custom editor/footer follow the imported theme roles; build/plan gradients
+use Everforest's foreground, green/purple, and yellow. Restart Pi and Neovim
+when changing the configured defaults.
+
+Checks: `nvim --headless -u nvim/init.lua -l nvim/tests/everforest.lua`,
+`ghostty +validate-config`, and `PI_SDK_ROOT=/path/to/pi-coding-agent bun test
+pi/agent/tests/everforest.test.ts pi/agent/tests/rose-pine.test.ts`.
+
+### Rosé Pine (saved)
+
+**Rosé Pine Main** remains installed and selectable. Its theme/plugin files have
+not been replaced. The opaque setup and active selections from before the
+Everforest switch are saved under
+`~/.config/theme-backups/rose-pine-saved-1eepi369/` on this machine.
+
+To switch back, select `rose-pine` in Pi's `/settings` and run `/reload`; use
+`:colorscheme rose-pine` in Neovim (also set `colorscheme = "rose-pine"` in
+`nvim/lua/plugins/astroui.lua` to make it persistent). Set `theme = Rose Pine`
+in Ghostty and restore cmux's `selectionColor` to `#403d52` and
+`notificationBadgeColor` to `#ebbcba`, then run `cmux reload-config`.
+Keep opacity at 1. Restore appearance keys only, not whole saved settings files,
+so newer model/keybinding changes are not lost.
+
+The saved theme reuses these existing sources rather than a theme generator:
 
 - Neovim: [rose-pine/neovim](https://github.com/rose-pine/neovim), pinned in
   `nvim/lazy-lock.json`, with its native transparency option enabled.

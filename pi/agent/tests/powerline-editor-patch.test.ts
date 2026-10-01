@@ -21,7 +21,7 @@ const { edits, border, legacyBorder, badgeImport, legacyPrompt, preVisibleRows, 
   previousPadded: string;
   whiteOutline: [string, string][];
   roseEdits: [string, string, number][];
-}>(patcher, "{'edits':m['EDITS'],'border':m['BORDER_EDIT'],'legacyBorder':m['LEGACY_BORDER_EDIT'],'badgeImport':m['BADGE_IMPORT'],'legacyPrompt':m['LEGACY_PROMPT'],'preVisibleRows':m['PRE_VISIBLE_ROWS'],'gitLabel':m['GIT_LABEL_EDIT'],'badgeBudget':m['BADGE_BUDGET_EDIT'],'renderHeight':m['RENDER_HEIGHT_EDIT'],'previousDouble':m['PREVIOUS_DOUBLE_PADDING_RENDER_HEIGHT'],'previousPadded':m['PREVIOUS_PADDED_INPUT_ROW'],'whiteOutline':m['WHITE_OUTLINE_EDITS'],'roseEdits':m['ROSE_PINE_EDITS']}",
+}>(patcher, "{'edits':m['EDITS'],'border':m['BORDER_EDIT'],'legacyBorder':m['LEGACY_BORDER_EDIT'],'badgeImport':m['BADGE_IMPORT'],'legacyPrompt':m['LEGACY_PROMPT'],'preVisibleRows':m['PRE_VISIBLE_ROWS'],'gitLabel':m['GIT_LABEL_EDIT'],'badgeBudget':m['BADGE_BUDGET_EDIT'],'renderHeight':m['RENDER_HEIGHT_EDIT'],'previousDouble':m['PREVIOUS_DOUBLE_PADDING_RENDER_HEIGHT'],'previousPadded':m['PREVIOUS_PADDED_INPUT_ROW'],'whiteOutline':m['WHITE_OUTLINE_EDITS'],'roseEdits':m['THEME_COLOR_EDITS']}",
   "m['EDITS']['index.ts'].append(m['PROMPT_EDIT'])");
 const withRosePine = (source: string) => roseEdits.reduce((text, [old, next]) => text.replace(old, next), source);
 const withoutRosePine = (source: string) => roseEdits.reduce((text, [old, next]) => text.replace(next, old), source);
@@ -102,13 +102,20 @@ test("legacy outline migrates exactly and incomplete white outlines refuse write
   }
 });
 
-test("pre-Rosé Pine editor migrates exactly and modified color overlays refuse writes", () => {
+test("older editor palettes migrate exactly and modified color overlays refuse writes", () => {
   const app = sandbox("rose-pine-colors");
   expect(app.run().exitCode).toBe(0);
   const current = app.contents();
-  writeFileSync(join(app.dir, "index.ts"), withoutRosePine(current["index.ts"]));
-  expect(app.run().exitCode).toBe(0);
-  expect(app.contents()).toEqual(current);
+  const mediumOnly = current["index.ts"].replaceAll(', "everforest-dark-hard"', "");
+  const roseOnly = mediumOnly.replaceAll(
+    '["rose-pine", "everforest-dark-medium"].includes(ctx?.ui?.theme?.name ?? "")',
+    'ctx?.ui?.theme?.name === "rose-pine"',
+  );
+  for (const previous of [withoutRosePine(current["index.ts"]), roseOnly, mediumOnly]) {
+    writeFileSync(join(app.dir, "index.ts"), previous);
+    expect(app.run().exitCode).toBe(0);
+    expect(app.contents()).toEqual(current);
+  }
 
   writeFileSync(join(app.dir, "index.ts"), current["index.ts"].replace('ctx.ui.theme.fg("text", s)', 'ctx.ui.theme.fg("error", s)'));
   const before = app.contents();
@@ -494,17 +501,19 @@ realTest("real editor fills the shared viewport through wrapping, scrolling, com
 
   // The same editor reads the selected theme live, without changing its geometry.
   const colors = await import(pathToFileURL(join(sdk!, "dist/modes/interactive/theme/theme.js")).href);
-  const rose = colors.loadThemeFromPath(fileURLToPath(new URL("../themes/rose-pine.json", import.meta.url)), "truecolor");
-  uiContext.ui.theme = rose;
-  editor.setText("");
-  statuses.set("agent-response-time", "1.2s");
-  statuses.set("agent-mode", formatPlanStatus(false, "medium", "rose-pine").mode);
-  const roseRows = editor.render(100);
-  expect(roseRows[0]).toContain(rose.fg("text", "╭───"));
-  expect(roseRows[0]).toContain(rose.inverse(rose.fg("accent", " 1.2s ")));
-  expect(roseRows[1]).toContain(rose.getFgAnsi("accent") + "◆");
-  expect(roseRows.join("\n")).not.toContain("\x1b[48;2;95;168;118m");
-  expect(roseRows.every((row: string) => visibleWidth(row) <= 100)).toBe(true);
+  for (const name of ["rose-pine", "everforest-dark-medium", "everforest-dark-hard", "rose-pine"]) {
+    const theme = colors.loadThemeFromPath(fileURLToPath(new URL(`../themes/${name}.json`, import.meta.url)), "truecolor");
+    uiContext.ui.theme = theme;
+    editor.setText("");
+    statuses.set("agent-response-time", "1.2s");
+    statuses.set("agent-mode", formatPlanStatus(false, "medium", name).mode);
+    const rows = editor.render(100);
+    expect(rows[0]).toContain(theme.fg("text", "╭───"));
+    expect(rows[0]).toContain(theme.inverse(theme.fg("accent", " 1.2s ")));
+    expect(rows[1]).toContain(theme.getFgAnsi("accent") + "◆");
+    expect(rows.join("\n")).not.toContain("\x1b[48;2;95;168;118m");
+    expect(rows.every((row: string) => visibleWidth(row) <= 100)).toBe(true);
+  }
   uiContext.ui.theme = {};
   expectWhiteOutline(editor.render(100));
 });

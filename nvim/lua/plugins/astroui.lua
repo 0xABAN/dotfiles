@@ -3,6 +3,6 @@
 return {
   "AstroNvim/astroui",
   opts = {
-    colorscheme = "rose-pine",
+    colorscheme = "everforest",
   },
 }

@@ -49,6 +49,7 @@ link "$ROOT/zsh/.zshrc" "$HOME/.zshrc"
 
 echo "== terminal theme =="
 link "$ROOT/ghostty/themes/osaka-jade" "$HOME/.config/ghostty/themes/osaka-jade"
+link "$ROOT/ghostty/themes/everforest-dark-medium" "$HOME/.config/ghostty/themes/everforest-dark-medium"
 link "$ROOT/ghostty/shaders/grain.glsl" "$HOME/.config/ghostty/shaders/grain.glsl"
 
 echo "== nvim =="
