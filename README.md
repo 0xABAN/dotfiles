@@ -73,7 +73,7 @@ plugin itself is not installed.
 
 ### Neovim background
 
-The [user-provided image](https://d2h7xmz5gqybh9.cloudfront.net/predictions/627218de6cfd4f4abf360dc756f5a066/1.png)
+The [user-provided image](https://i.pinimg.com/1200x/c6/06/15/c60615d2ab50b61c99dc73867b149486.jpg)
 is one continuous backdrop across Neovim: homepage, editing, splits, menus,
 and footer. `nvim/assets/background.png` is prepared at 640×360 (16:9),
 in grayscale at 15% opacity, with no added blur. Text stays
