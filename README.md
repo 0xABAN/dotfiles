@@ -36,9 +36,10 @@ Existing files are renamed `*.bak.<timestamp>` before linking. The installer als
 palettes without overrides:
 
 - Neovim: [sainnhe/everforest](https://github.com/sainnhe/everforest), pinned in
-  `nvim/lazy-lock.json`. Only dark mode and `everforest_background = "hard"`
-  are configured; the upstream palette, highlights and opaque backgrounds are
-  unchanged.
+  `nvim/lazy-lock.json`, with dark mode and `everforest_background = "hard"`.
+  The upstream palette and opaque backgrounds are unchanged. Dashboard icons,
+  labels, and shortcut letters use the normal text color via
+  `nvim/lua/plugins/astroui.lua`; the title and syntax colors stay upstream.
 - Pi: [angribot/pi-everforest](https://github.com/angribot/pi-everforest), copied
   unchanged from commit `44b52a24253385f43c222439353879c4d0010602` into
   `pi/agent/themes/everforest-dark-hard.json`, with its MIT license alongside.
