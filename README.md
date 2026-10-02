@@ -63,6 +63,14 @@ Checks: `nvim --headless -u nvim/init.lua -l nvim/tests/everforest.lua`,
 `ghostty +validate-config`, and `PI_SDK_ROOT=/path/to/pi-coding-agent bun test
 pi/agent/tests/everforest.test.ts pi/agent/tests/rose-pine.test.ts`.
 
+### Neovim homepage
+
+Snacks keeps the existing shortcuts, with a dragon header instead of ADAM.
+`nvim/lua/dashboard-header.lua` copies the `hydra_header` artwork from
+[startup.nvim](https://github.com/max397574/startup.nvim/blob/bd835f4fd95dbb30cb4607a8d7a090216fb6d035/lua/startup/headers.lua),
+with its GPL-2.0 license in `nvim/assets/startup-nvim.LICENSE`. The startup.nvim
+plugin itself is not installed.
+
 ### Neovim background
 
 The [user-provided image](https://d2h7xmz5gqybh9.cloudfront.net/predictions/c14edec9b58d4d6a9cde105633d39b2a/1.png)

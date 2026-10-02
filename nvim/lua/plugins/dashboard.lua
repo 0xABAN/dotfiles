@@ -1,4 +1,4 @@
--- Snacks dashboard header (same block font as Astro default)
+-- Reuse the startup.nvim hydra artwork in the existing Snacks dashboard.
 
 ---@type LazySpec
 return {
@@ -11,13 +11,7 @@ return {
         { section = "keys", gap = 1, padding = 3 },
       },
       preset = {
-        header = table.concat({
-          " █████  ██████   █████  ███    ███",
-          "██   ██ ██   ██ ██   ██ ████  ████",
-          "███████ ██   ██ ███████ ██ ████ ██",
-          "██   ██ ██   ██ ██   ██ ██  ██  ██",
-          "██   ██ ██████  ██   ██ ██      ██",
-        }, "\n"),
+        header = require "dashboard-header",
       },
     },
   },

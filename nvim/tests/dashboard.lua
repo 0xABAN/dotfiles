@@ -1,6 +1,12 @@
 -- Run: nvim --headless -u nvim/init.lua -l nvim/tests/dashboard.lua
 local dashboard = Snacks.dashboard.open({ win = 0 })
 assert(dashboard.items[1].header == dashboard.opts.preset.header)
+local header = vim.split(dashboard.opts.preset.header, "\n", { plain = true })
+assert(#header == 11, "use the upstream hydra instead of the ADAM banner")
+for _, line in ipairs(header) do
+  assert(vim.fn.strdisplaywidth(line) == 35, "preserve the hydra's alignment padding")
+end
+
 assert(#dashboard.items == 7 and #dashboard.opts.preset.keys == 6, "retain title and six shortcuts")
 assert(#dashboard.opts.sections == 2, "do not restore startup statistics")
 for _, item in ipairs(dashboard.opts.preset.keys) do
@@ -25,4 +31,4 @@ check_colors() -- AstroUI must reapply the links after a theme reload.
 
 vim.cmd.enew()
 assert(vim.v.errmsg == "", vim.v.errmsg)
-print("dashboard text-colored shortcuts, title, mappings, and theme reload: ok")
+print("dashboard hydra, text-colored shortcuts, mappings, and theme reload: ok")
