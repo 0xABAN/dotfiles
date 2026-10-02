@@ -73,11 +73,11 @@ plugin itself is not installed.
 
 ### Neovim background
 
-The [user-provided image](https://d2h7xmz5gqybh9.cloudfront.net/predictions/c14edec9b58d4d6a9cde105633d39b2a/1.png)
+The [user-provided image](https://d2h7xmz5gqybh9.cloudfront.net/predictions/627218de6cfd4f4abf360dc756f5a066/1.png)
 is one continuous backdrop across Neovim: homepage, editing, splits, menus,
 and footer. `nvim/assets/background.png` is prepared at 640×360 (16:9),
-with 10% image opacity and no added blur. Text stays
-sharp; the theme's base backgrounds and terminal window remain opaque.
+in grayscale at 15% opacity, with no added blur. Text stays
+sharp and retains its theme colors; terminal opacity is unchanged.
 
 On startup, the image scales uniformly to cover the whole Neovim viewport.
 Resizing smaller crops the edges rather than shrinking the image; resizing
@@ -99,7 +99,7 @@ responses and Ghostty's image-cache deletion on screen clears; it is not a
 visual rendering test.
 
 Regenerate the PNG from the original source with ImageMagick:
-`magick source.png -strip -resize '640x360^' -gravity center -extent 640x360 -alpha set -channel A -evaluate multiply 0.10 +channel PNG32:nvim/assets/background.png`.
+`magick source.png -strip -resize '640x360^' -gravity center -extent 640x360 -colorspace Gray -colorspace sRGB -alpha set -channel A -evaluate multiply 0.15 +channel PNG32:nvim/assets/background.png`.
 
 ### Neovim footer
 
