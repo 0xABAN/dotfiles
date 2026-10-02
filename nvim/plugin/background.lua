@@ -1,4 +1,4 @@
--- One blurred image behind the entire Neovim UI, not one image per window.
+-- One image behind the entire Neovim UI, not one image per window.
 -- Reuse Snacks' graphics transport; text and terminal opacity stay unchanged.
 local group = vim.api.nvim_create_augroup("NvimBackground", { clear = true })
 local started = false
