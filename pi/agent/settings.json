@@ -1,10 +1,16 @@
 {
-  "lastChangelogVersion": "0.84.2",
+  "lastChangelogVersion": "0.87.1",
   "theme": "everforest-dark-hard",
   "quietStartup": true,
-  "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-6-astra",
+  "defaultProvider": "xai",
+  "defaultModel": "grok-4.6",
   "defaultThinkingLevel": "xhigh",
+  "enabledModels": [
+    "openai-codex/gpt-6-astra",
+    "openai-codex/gpt-5.6-luna",
+    "openai-codex/gpt-5.6-sol",
+    "openai-codex/gpt-5.6-terra"
+  ],
   "packages": [
     "npm:pi-mcp-adapter",
     "npm:@tintinweb/pi-subagents",
@@ -70,9 +76,18 @@
       }
     ],
     "layout": {
-      "left": ["model", "custom:thinking"],
-      "right": ["cost", "context_pct"],
-      "secondary": ["shell_mode", "queue"]
+      "left": [
+        "model",
+        "custom:thinking"
+      ],
+      "right": [
+        "cost",
+        "context_pct"
+      ],
+      "secondary": [
+        "shell_mode",
+        "queue"
+      ]
     }
   },
   "skills": [
@@ -81,11 +96,5 @@
     "-skills/test-driven-development",
     "-skills/use-railway",
     "-skills/watch"
-  ],
-  "enabledModels": [
-    "openai-codex/gpt-6-astra",
-    "openai-codex/gpt-5.6-luna",
-    "openai-codex/gpt-5.6-sol",
-    "openai-codex/gpt-5.6-terra"
   ]
 }

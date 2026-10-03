@@ -12,4 +12,5 @@ pi/agent/sessions/
 pi/agent/intercom/
 pi/agent/npm/
 pi/agent/bin/
+pi/agent/extensions/.cmux-session.lock
 **/*.bak.*
