@@ -78,7 +78,7 @@ def check_upgrade(version: str, backup: bool, repo: Path, home: Path, stage: Pat
         "version": version, "status": "failed", "activated": False, "backup_complete": False,
         "coverage": {},
         "scope": "Local config/native suites and clean launcher/auth tests with synthetic tokens. "
-                 "Real CLI terminal checks cover pi-pretty, Powerline, the configured theme and real Intercom renderers "
+                 "Real CLI terminal checks cover Powerline, the configured theme and real Intercom renderers "
                  "with synthetic registration/delivery (no broker) in both modes. "
                  "Not every personal extension, upstream suites or authenticated model calls.",
     }
@@ -122,7 +122,7 @@ def check_upgrade(version: str, backup: bool, repo: Path, home: Path, stage: Pat
         for relative in (NPM_PACKAGES, POWERLINE):
             copy_tree(home / relative, isolated_home / relative)
         required = [POWERLINE, *(NPM_PACKAGES / name for name in (
-            "@juicesharp/rpiv-todo", "@tintinweb/pi-subagents", "@heyhuynhgiabuu/pi-pretty", "pi-intercom",
+            "@juicesharp/rpiv-todo", "@tintinweb/pi-subagents", "pi-intercom",
         ))]
         report["package_sources"] = {}
         for relative in required:

@@ -33,7 +33,7 @@ def wait_for_screen(target, timeout, ready, failure):
 
 
 def smoke(sdk: Path, launcher: Path, config: Path, home: Path, output: Path) -> None:
-    """Check host rendering with configured pi-pretty, Powerline and the real theme.
+    """Check host rendering with configured Powerline and the real theme.
 
     Intercom's renderer callbacks are extracted into a synthetic npm package;
     its entrypoint and broker hooks never run. Other personal extensions remain
@@ -80,10 +80,9 @@ def smoke(sdk: Path, launcher: Path, config: Path, home: Path, output: Path) -> 
     work = output / "work"
     work.mkdir()
     (agent / "settings.json").write_text(json.dumps(settings))
-    pretty = home / ".pi/agent/npm/node_modules/@heyhuynhgiabuu/pi-pretty/src/index.ts"
     powerline = home / ".pi/agent/git/github.com/nicobailon/pi-powerline-footer/index.ts"
     theme = config / "pi/agent/themes/osaka-jade.json"
-    for path in (pretty, powerline, theme):
+    for path in (powerline, theme):
         if not path.is_file():
             raise RuntimeError(f"missing configured UI source: {path}")
     faux = sdk / "node_modules/@earendil-works/pi-ai/dist/providers/faux.js"
@@ -134,7 +133,7 @@ export default function (pi) {
         command = ["env", "-i", *(f"{key}={value}" for key, value in env.items()), str(launcher),
                    "--no-session", "--no-skills", "--no-prompt-templates",
                    "--no-context-files", "--no-themes", "--theme", str(theme),
-                   "-e", str(pretty), "-e", str(powerline), "-e", str(extension),
+                   "-e", str(powerline), "-e", str(extension),
                    "--provider", "faux", "--model", "faux-1", "--models", "faux/*",
                    "--tui-mode", mode]
         (run / "command.json").write_text(json.dumps(command, indent=2) + "\n")

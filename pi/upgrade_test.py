@@ -49,7 +49,7 @@ class UpgradeTest(unittest.TestCase):
                     home / ".pi/agent/auth.json": "DO NOT READ OR COPY",
                     global_modules / upgrade.PACKAGE / "original.txt": "live global install",
                 }
-                for name in ("@juicesharp/rpiv-todo", "@tintinweb/pi-subagents", "@heyhuynhgiabuu/pi-pretty", "pi-intercom"):
+                for name in ("@juicesharp/rpiv-todo", "@tintinweb/pi-subagents", "pi-intercom"):
                     files[home / upgrade.NPM_PACKAGES / name / "package.json"] = '{"version":"1.0.0"}'
                 for path, text in files.items():
                     path.parent.mkdir(parents=True, exist_ok=True)

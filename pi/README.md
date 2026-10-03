@@ -165,7 +165,8 @@ inset, editor, Markdown code panels, transcript, Intercom UI, dialogs, notices, 
 editor gap, compaction queue, legacy Todo tweaks, Todo UI, Subagents UI, then
 `pi/launcher.py`.
 The legacy Todo command remains best-effort; the other patch failures propagate.
-Keep pi-pretty before powerline in package settings because both install editors.
+Powerline owns the editor; Whimsical owns the working indicator.
+Pi-pretty is not installed, so its indicator cannot override Whimsical.
 
 ### Which CLI runs the patches?
 
@@ -303,7 +304,7 @@ python3 -B pi/upgrade.py 0.87.1 --backup
 ```
 
 Requires Python 3.10+, Git, npm/Node, Bun, tmux, and the installed Powerline, Todo,
-Subagents, Intercom and pi-pretty sources under `~/.pi/agent/`. Use an exact stable version;
+Subagents and Intercom sources under `~/.pi/agent/`. Use an exact stable version;
 `latest`, ranges, prereleases and arbitrary npm specs are rejected. The command
 installs only inside a private `/tmp/pi-upgrade-<version>-*` directory, using
 `npm install --ignore-scripts --save-exact` against the public npm registry.
@@ -324,8 +325,8 @@ cards. Native confirmation and selection dialogs are exercised independently.
 Captured ANSI/plain screens, executed commands and individual assertions are
 retained under `cli-smoke/`.
 
-The terminal checks load copied pi-pretty and Powerline sources in configured
-order, with the configured theme and Powerline options. They do not load all
+The terminal checks load copied Powerline sources with the configured theme
+and Powerline options. They do not load all
 personal extensions: Intercom's entrypoint, MCP and subagents can contact live
 peers/services. Intercom's exact renderer callbacks and pure formatting helpers
 are extracted into a synthetic npm package with its normal owner metadata;

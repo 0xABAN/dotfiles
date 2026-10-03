@@ -24,7 +24,6 @@
       "extensions": []
     },
     "npm:pi-intercom",
-    "npm:@heyhuynhgiabuu/pi-pretty",
     "https://github.com/nicobailon/pi-powerline-footer@8c9bda10fdfd2822e89334ec85f3da9f8ca49182",
     {
       "source": "npm:@dietrichgebert/ponytail",

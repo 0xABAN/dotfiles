@@ -57,14 +57,14 @@ function sandbox(name: string) {
   };
 }
 
-test("powerline owns the final editor after pi-pretty installs its prompt", () => {
+test("powerline remains configured without pi-pretty", () => {
   const settings = JSON.parse(readFileSync(new URL("../settings.json", import.meta.url), "utf8"));
   const packages = settings.packages.map((entry: string | { source: string }) =>
     typeof entry === "string" ? entry : entry.source);
   const pretty = packages.findIndex((source: string) => source.startsWith("npm:@heyhuynhgiabuu/pi-pretty"));
   const powerline = packages.findIndex((source: string) => source.includes("nicobailon/pi-powerline-footer"));
-  expect(pretty).toBeGreaterThanOrEqual(0);
-  expect(powerline).toBeGreaterThan(pretty);
+  expect(pretty).toBe(-1);
+  expect(powerline).toBeGreaterThanOrEqual(0);
   expect(settings.powerline.layout.left).toEqual(["model", "custom:thinking"]);
   expect(Object.values(settings.powerline.layout).flat()).not.toContain("custom:mode");
 });
@@ -290,13 +290,13 @@ async function host() {
   return import(pathToFileURL(join(sdk!, "node_modules/@earendil-works/pi-tui/dist/index.js")).href);
 }
 
-realTest("real package resolver preserves editor ownership order", async () => {
+realTest("real package resolver loads the configured Powerline editor", async () => {
   const { DefaultPackageManager } = await import(pathToFileURL(join(sdk!, "dist/core/package-manager.js")).href);
   const { SettingsManager } = await import(pathToFileURL(join(sdk!, "dist/core/settings-manager.js")).href);
   const settings = JSON.parse(readFileSync(new URL("../settings.json", import.meta.url), "utf8"));
   const packages = settings.packages.filter((entry: string | { source: string }) => {
     const source = typeof entry === "string" ? entry : entry.source;
-    return source.includes("pi-pretty") || source.includes("pi-powerline-footer");
+    return source.includes("pi-powerline-footer");
   });
   const manager = new DefaultPackageManager({
     cwd: process.cwd(), agentDir: join(homedir(), ".pi/agent"),
@@ -305,11 +305,10 @@ realTest("real package resolver preserves editor ownership order", async () => {
   // Never install or update anything as part of a test.
   const resources = await manager.resolve(async () => "error");
   const paths = resources.extensions.filter((entry: { enabled: boolean; path: string }) =>
-    entry.enabled && (entry.path.includes("pi-pretty") || entry.path.includes("pi-powerline-footer")))
+    entry.enabled && entry.path.includes("pi-powerline-footer"))
     .map((entry: { path: string }) => entry.path);
-  expect(paths).toHaveLength(2);
-  expect(paths[0]).toContain("pi-pretty");
-  expect(paths[1]).toContain("pi-powerline-footer");
+  expect(paths).toHaveLength(1);
+  expect(paths[0]).toContain("pi-powerline-footer");
 });
 
 realTest("real editor fills the shared viewport through wrapping, scrolling, completion and paste", async () => {
