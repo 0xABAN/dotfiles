@@ -3,6 +3,38 @@
 This directory owns Pi configuration, local extensions, and compatibility patches.
 Installation and appearance settings are in the [repository guide](../README.md).
 
+## Computer use
+
+`/use-computer` uses the `cua-driver` MCP server through the existing
+`pi-mcp-adapter` package. Pi supplies the current model and authentication;
+Cua Driver supplies desktop observations and actions. No separate model API
+key is needed.
+
+Install the driver using the [official installer](https://cua.ai/docs/start-here/drive-your-first-app):
+
+```bash
+curl -fsSL https://cua.ai/driver/install.sh -o /tmp/cua-driver-install.sh
+/bin/bash /tmp/cua-driver-install.sh --no-modify-path
+open -n -g -a CuaDriver --args serve
+~/.local/bin/cua-driver permissions grant
+~/.local/bin/cua-driver permissions status
+```
+
+Enable CuaDriver in macOS Accessibility and Screen & System Audio Recording
+settings. Restart the driver if macOS requests it. Permission status must
+reflect CuaDriver's daemon, not a terminal's existing grants.
+
+The tracked `agent/mcp.json.example` launches `cua-driver mcp` from `PATH`;
+ensure `~/.local/bin` is on `PATH`. For an existing installation, merge just
+that server entry into `~/.pi/agent/mcp.json`, using the absolute binary path
+reported by `~/.local/bin/cua-driver mcp-config`. The dotfiles installer
+preserves this machine-local file, including its other servers and secrets.
+
+Run `/reload` in Pi, then `/mcp reconnect cua-driver` and `/use-computer`.
+The adapter discovers tools through its `mcp` proxy and passes screenshots
+to the model as images. A single MCP connection preserves the driver's
+implicit session across observation and action calls.
+
 ## Where changes belong
 
 | Path | Responsibility |

@@ -42,6 +42,12 @@
     },
     "pixellab": {
       "disabled": true
+    },
+    "cua-driver": {
+      "command": "cua-driver",
+      "args": [
+        "mcp"
+      ]
     }
   },
   "imports": [
