@@ -92,6 +92,9 @@ else
 fi
 
 
+# Extensions must use Pi's host modules rather than declare bundled copies.
+python3 -B "$ROOT/pi/agent/patches/host-peer-dependencies.py"
+
 # Keep DJ above powerline's own last-prompt row. Fail visibly if upstream anchors changed.
 if [[ -f "$ROOT/pi/agent/patches/powerline-dj.py" ]]; then
   python3 "$ROOT/pi/agent/patches/powerline-dj.py"

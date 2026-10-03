@@ -245,6 +245,24 @@ Restart Pi for host or bundled-TUI changes. Extension/package source changes use
 changes. Commit only explicit owned files or hunks, with related tests, and keep
 independently revertible changes separate.
 
+## Host-provided extension dependencies
+
+`host-peer-dependencies.py` repairs the installed manifests for Subagents 0.19.0,
+Ask User Question/Todo 2.9.0, and Web Access 0.27.0. TypeBox belongs in wildcard
+`peerDependencies`, alongside Pi's host modules, not in `dependencies`.
+The patch preserves unrelated dependencies, backs up manifests, and refuses
+unreviewed versions. It does not suppress Pi's warnings or prune shared npm
+packages that other dependencies may still need.
+
+The installer replays this repair. After updating or reinstalling packages, run:
+
+```sh
+python3 -B pi/agent/patches/host-peer-dependencies.py
+python3 -B pi/agent/patches/host-peer-dependencies.py --check
+```
+
+Then `/reload` Pi to refresh package diagnostics.
+
 ## Package-update reminders
 
 The activity-notices patch disables automatic extension-package update checks
