@@ -184,6 +184,8 @@ Include only when it affects review:
 - **Review focus:** a decision or risk deserving concentrated attention.
 - **Non-goals:** scope boundaries important to a major change.
 - **Demonstration:** visual or interactive evidence easier to judge than prose.
+- **Video evidence:** upload videos to Catbox and use the direct MP4 URL; treat it as public.
+- **GitHub CLI:** check the installed command's `--help` before relying on its flags.
 - **Related work:** issues, incidents, designs, or dependent changes that reduce
   search cost.
 

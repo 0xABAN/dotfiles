@@ -9,6 +9,7 @@
 - Propose architecture that supports the repository's intended growth in features, contributors, and workload. Explain which concrete requirement justifies each significant boundary.
 - For an application expected to grow in complexity, organize around cohesive features or domains with explicit interfaces. Do not default to a flat collection of files merely because today's implementation is small.
 - Keep small utilities small. Avoid speculative services, empty layers, generic frameworks, and abstractions without a demonstrated need.
+- NEVER add fallback behavior unless the user explicitly requests it. Fallbacks can hide errors and are often unnecessary; surface the failure instead.
 
 ## Human readability
 
@@ -16,6 +17,7 @@
 - Document non-obvious contracts with docstrings or JSDoc; use comments to explain the reasoning behind tricky logic, invariants, and workarounds.
 - Give code breathing room: separate logical steps with blank lines and expand cramped statements. Never sacrifice readability or useful explanations to reduce line count.
 - Before finishing, reread the change from an unfamiliar maintainer's perspective. Simplify anything that requires unnecessary mental bookkeeping; never sacrifice correctness or necessary performance for cosmetic simplicity.
+- Clean up after yourself. Remove temporary test files and code made obsolete by your changes; do not leave unused artifacts behind.
 
 ## Verification
 
@@ -31,10 +33,12 @@
 
 The user's preferred tools for new work. Follow the repository's existing stack unless a change is justified.
 
-- Frontend: TypeScript, Next.js, React, Tailwind CSS.
+- Frontend: TypeScript, Next.js, React, CSS.
 - Backend: Python, FastAPI; PyTorch for ML.
 - Tooling: Bun, uv.
 - Database: PostgreSQL.
 - Hosting: AWS, Vercel, Railway.
+
+# Other notes
 
 DO NOT USE SUBAGENTS WITHOUT PERMISSION OR I WILL KILL YOU

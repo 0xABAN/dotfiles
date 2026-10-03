@@ -81,6 +81,15 @@ After an uncertain result, observe before retrying to avoid duplicate input.
 - Avoid concurrent desktop mutations. Recapture state if the user or another
   agent changes the target.
 
+## Browser session hygiene
+
+When using `playwright-cli` for browser verification:
+
+- Reuse one named session for the task instead of opening many sessions.
+- Close it with `playwright-cli -s=<session> close` as soon as verification is done.
+- Run `playwright-cli close-all` at task cleanup if any session may remain.
+- Never leave browser sessions or Chrome processes running after the task; they can consume substantial memory and CPU.
+
 Finish with the observed outcome and any blocker. For version-specific
 behavior, use the server's discovered instructions and tool schemas, then
 [Cua Driver's documentation](https://cua.ai/docs/cua-driver/concepts/how-cua-driver-works).
