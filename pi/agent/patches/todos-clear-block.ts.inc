@@ -11,15 +11,8 @@
 		const result = applyTaskMutation(getState(sessionId), "clear", {});
 		commitState(sessionId, result.state);
 		const built = buildToolResult("clear", {}, result.state, result.op);
-		(c.sessionManager as { appendMessage?: (m: unknown) => string }).appendMessage?.({
-			role: "toolResult",
-			toolCallId: `todos-clear-${Date.now().toString(36)}`,
-			toolName: TOOL_NAME,
-			content: built.content,
-			details: built.details,
-			isError: false,
-			timestamp: Date.now(),
-		});
+		// Custom entry — never a fake toolResult. Codex rejects orphan call_ids.
+		pi.appendEntry("rpiv-todo", built.details);
 		if (c.hasUI) {
 			todoOverlay?.dispose();
 			todoOverlay = undefined;
@@ -46,4 +39,3 @@
 			await clearAllTodos(ctx);
 		},
 	});
-

@@ -13,6 +13,7 @@ SELECTORS = ROOT / "state/selectors.ts"
 FMT = ROOT / "view/format.ts"
 OV = ROOT / "todo-overlay.ts"
 INDEX = ROOT / "index.ts"
+REPLAY = ROOT / "state/replay.ts"
 HERE = Path(__file__).resolve().parent
 CLEAR_BLOCK = (HERE / "todos-clear-block.ts.inc").read_text()
 CLEAR_MARKER = "/* configs:todos-clear */"
@@ -218,6 +219,62 @@ def patch_index_clear() -> None:
 	print("patched", INDEX, "clear command + todo nudge")
 
 
+def patch_replay() -> None:
+	"""Replay custom rpiv-todo clear entries; never require orphan toolResults."""
+	if not REPLAY.exists():
+		return
+	t = REPLAY.read_text()
+	if 'customType === "rpiv-todo"' in t:
+		return
+	old = '''export function replayFromBranch(ctx: { sessionManager: { getBranch(): Iterable<unknown> } }): TaskState {
+	let result: TaskState = { tasks: [...EMPTY_STATE.tasks], nextId: EMPTY_STATE.nextId };
+	for (const entry of ctx.sessionManager.getBranch()) {
+		const e = entry as { type?: string; message?: { role?: string; toolName?: string; details?: unknown } };
+		if (e.type !== "message") continue;
+		const msg = e.message;
+		if (msg?.role !== "toolResult" || msg.toolName !== "todo") continue;
+		if (!isTaskDetails(msg.details)) continue;
+		result = {
+			tasks: msg.details.tasks.map((t) => ({ ...t })),
+			nextId: msg.details.nextId,
+		};
+	}
+	return result;
+}'''
+	new = '''export function replayFromBranch(ctx: { sessionManager: { getBranch(): Iterable<unknown> } }): TaskState {
+	let result: TaskState = { tasks: [...EMPTY_STATE.tasks], nextId: EMPTY_STATE.nextId };
+	for (const entry of ctx.sessionManager.getBranch()) {
+		const e = entry as {
+			type?: string;
+			customType?: string;
+			data?: unknown;
+			message?: { role?: string; toolName?: string; details?: unknown };
+		};
+		if (e.type === "custom" && e.customType === "rpiv-todo" && isTaskDetails(e.data)) {
+			result = {
+				tasks: e.data.tasks.map((t) => ({ ...t })),
+				nextId: e.data.nextId,
+			};
+			continue;
+		}
+		if (e.type !== "message") continue;
+		const msg = e.message;
+		if (msg?.role !== "toolResult" || msg.toolName !== "todo") continue;
+		if (!isTaskDetails(msg.details)) continue;
+		result = {
+			tasks: msg.details.tasks.map((t) => ({ ...t })),
+			nextId: msg.details.nextId,
+		};
+	}
+	return result;
+}'''
+	if old not in t:
+		print("skip replay patch: anchor missing")
+		return
+	REPLAY.write_text(t.replace(old, new, 1))
+	print("patched", REPLAY)
+
+
 def main() -> None:
 	if not ROOT.exists():
 		raise SystemExit(0)
@@ -225,6 +282,7 @@ def main() -> None:
 	patch_format()
 	patch_overlay()
 	patch_index_clear()
+	patch_replay()
 
 
 if __name__ == "__main__":
