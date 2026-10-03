@@ -45,7 +45,7 @@ assert(requests[1].a == "t" and requests[1].t == "f" and requests[1].f == 100)
 local src = vim.base64.decode(requests[1].data)
 assert(vim.fn.filereadable(src) == 1)
 local dimensions = image.util.dim(src)
-assert(dimensions.width > 0 and dimensions.width * 9 == dimensions.height * 16, "keep the 16:9 artwork")
+assert(dimensions.width > 0 and dimensions.height > 0, "background must have readable dimensions")
 
 local scale = 0
 local function placement()

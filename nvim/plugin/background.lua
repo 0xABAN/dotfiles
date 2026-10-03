@@ -39,7 +39,7 @@ local function start()
     local height = rows * (cell.cell_height > 0 and cell.cell_height or 18)
 
     -- Keep the largest scale for this session: smaller viewports crop more,
-    -- larger ones may zoom in. Uniform scaling preserves the 16:9 source art.
+    -- larger ones may zoom in. Uniform scaling preserves the source aspect ratio.
     scale = math.max(scale, width / dimensions.width, height / dimensions.height)
     local crop_width = math.max(1, math.floor(width / scale))
     local crop_height = math.max(1, math.floor(height / scale))
