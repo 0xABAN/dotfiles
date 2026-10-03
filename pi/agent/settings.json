@@ -36,7 +36,8 @@
     "npm:pi-web-access",
     "npm:@juicesharp/rpiv-todo",
     "../../dev/pi-extensions/inline-skills",
-    "../../dev/pi-extensions/dj"
+    "../../dev/pi-extensions/dj",
+    "npm:pi-claude-bridge"
   ],
   "powerline": {
     "preset": "default",
