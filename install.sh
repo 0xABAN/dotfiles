@@ -71,8 +71,8 @@ do
   link "$ROOT/pi/agent/$name" "$HOME/.pi/agent/$name"
 done
 
-# Keep the short command as a pointer to the single computer-use skill.
-link "$ROOT/pi/agent/prompts/use-computer.md" "$HOME/.pi/agent/prompts/use-computer.md"
+# Retire the old computer-use shortcut, preserving any machine-local copy.
+backup "$HOME/.pi/agent/prompts/use-computer.md"
 
 echo "== shared agent instructions =="
 backup "$HOME/AGENTS.md"

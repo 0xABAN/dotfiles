@@ -1,6 +1,6 @@
 ---
 name: use-computer
-description: Operate macOS apps through Cua Driver MCP using Pi's current model. Use for /use-computer, desktop screenshots, accessibility inspection, clicking, typing, and native app or browser chrome control.
+description: Operate macOS apps through Cua Driver MCP using Pi's current model. Use for desktop screenshots, accessibility inspection, clicking, typing, and native app or browser chrome control.
 ---
 
 # Use computer
