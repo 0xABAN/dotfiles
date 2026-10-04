@@ -11,7 +11,7 @@ return {
         { section = "keys", gap = 1, padding = 3 },
       },
       preset = {
-        header = require "dashboard-header",
+        header = require "dashboard_header",
       },
     },
   },
