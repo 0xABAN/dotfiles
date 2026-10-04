@@ -6,9 +6,15 @@
   "defaultTools": [
     "+codemode"
   ],
-  "defaultProvider": "anthropic",
+  "defaultProvider": "claude-bridge",
   "defaultModel": "claude-opus-5-5",
   "defaultThinkingLevel": "xhigh",
+  "enabledModels": [
+    "claude-bridge/claude-opus-5-5",
+    "openai-codex/gpt-6-astra",
+    "openai-codex/gpt-6.1-sol",
+    "openai-codex/gpt-6-luna"
+  ],
   "packages": [
     "npm:@tintinweb/pi-subagents",
     "npm:@juicesharp/rpiv-ask-user-question",
