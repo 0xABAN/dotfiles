@@ -15,7 +15,7 @@ Read-only exploration mode for safe code analysis.
 - `Shift+Tab` - Toggle plan mode (Claude Code style)
 - `Ctrl+Alt+P` - Toggle plan mode (backup)
 
-Use `/effort` to select the thinking level.
+Use Pi’s built-in `/thinking` command to select the thinking level.
 
 ## Usage
 
