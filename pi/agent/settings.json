@@ -1,6 +1,7 @@
 {
   "lastChangelogVersion": "1.0.0",
   "theme": "everforest-dark-hard",
+  "themes": ["themes"],
   "quietStartup": true,
   "defaultTools": [
     "+codemode"

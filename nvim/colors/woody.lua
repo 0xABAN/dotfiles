@@ -1,5 +1,5 @@
 -- Pi "woody" syntax palette → nvim highlights.
--- Source: pi/agent/themes/woody.json (+ powerline ash/cream diffs)
+-- Source: pi/agent/themes/woody/woody.json (+ powerline ash/cream diffs)
 
 vim.cmd("highlight clear")
 if vim.fn.exists("syntax_on") == 1 then

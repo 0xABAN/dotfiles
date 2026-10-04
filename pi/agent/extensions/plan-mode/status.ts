@@ -1,5 +1,5 @@
-import rosePine from "../../themes/rose-pine.json";
-import everforest from "../../themes/everforest-dark-hard.json";
+import rosePine from "../../themes/rose_pine/rose-pine.json";
+import everforest from "../../themes/everforest/everforest-dark-hard.json";
 
 /** Interpolate the label without painting its spaces. */
 function shine(text: string, stops: [number, number, number][]): string {

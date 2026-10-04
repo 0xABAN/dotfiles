@@ -73,6 +73,10 @@ the driver's implicit session across observation and action calls.
 | `agent/themes/`, `agents/`, `skills/`, `prompts/` | Theme data and agent instructions |
 | `rpiv-todo/config.json` | Todo widget configuration |
 
+Themes live in family folders under `agent/themes/`, alongside their licenses.
+The `themes: ["themes"]` setting discovers them recursively. Run `/reload` after
+theme edits; Pi’s automatic theme watcher only watches root-level files.
+
 `whimsical.ts` remains the entrypoint; its helper directory has no `index.ts`.
 Pi discovers top-level extension files and subdirectories with an entrypoint.
 Keep helpers inside their feature directory so Pi does not load them as separate
