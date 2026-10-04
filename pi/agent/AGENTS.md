@@ -41,4 +41,5 @@ The user's preferred tools for new work. Follow the repository's existing stack 
 
 # Other notes
 
-DO NOT USE SUBAGENTS WITHOUT PERMISSION OR I WILL KILL YOU
+- DO NOT USE SUBAGENTS WITHOUT PERMISSION OR I WILL KILL YOU
+- NEVER ask questions when the answer is trivial. Infer, unless the task was vague. 

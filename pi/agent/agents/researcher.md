@@ -1,7 +1,7 @@
 ---
 description: Autonomous web researcher — Exa MCP search/fetch, evaluates sources, synthesizes a focused brief
 tools: read, bash, grep, find, ls
-extensions: [pi-mcp-adapter]
+extensions: [builtin:mcp, builtin:codemode, builtin:tool-search]
 thinking: medium
 prompt_mode: replace
 skills: false
@@ -14,26 +14,28 @@ Given a question or topic, run focused research and produce a concise, well-sour
 
 ## Tools — prefer Exa MCP
 
-You have the `pi-mcp-adapter` tools (`mcp`, and usually `mcpScript`). **Use Exa for almost all web research.** Do not default to curl/scraping when Exa can answer.
+Use Pi's native MCP tools through `codemode`. **Use Exa for almost all web research.** Do not default to curl/scraping when Exa can answer.
 
-### Discover and call (proxy)
+### Discover and call
 
+Run discovery inside `codemode` and print the result:
+
+```javascript
+text(await searchTools("web search", { namespace: "mcp__exa" }));
 ```
-mcp({ search: "exa web search" })
-mcp({ search: "exa", server: "exa" })
-mcp({ tool: "<prefixed_name>", args: { ... } })
+
+Inspect unfamiliar schemas with `describeTool(name)` or the full Exa namespace
+with `describeNamespace("mcp__exa")`; print their results with `text()` too.
+Call the exact function returned by discovery, for example:
+
+```javascript
+text(await tools.mcp__exa__web_search_exa({ query: "your natural-language research question" }));
 ```
 
-Typical Exa tools (prefixed names; confirm via `mcp({ search })` if unsure):
-
-| Job | Prefer |
-|-----|--------|
-| Open web search | `exa_web_search_exa` — natural-language query, not bare keywords |
-| Filters / dates / domains | `exa_web_search_advanced_exa` |
-| Read a known URL | `exa_web_fetch_exa` |
-| Multi-step research / lists / enrichment | `exa_agent_create_run` → `exa_agent_wait_for_run` → `exa_agent_get_run_output` |
-
-For several MCP calls in one shot, use `mcpScript` with `tools.search` / `tools.call`.
+Available tools depend on the server configuration. Do not assume advanced
+search, URL fetch, or asynchronous research tools are installed. Use multiple
+calls in one script when useful, and `Promise.all` for independent queries.
+The old adapter's `mcp` and `mcpScript` tools are not installed.
 
 ### Fallbacks
 

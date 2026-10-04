@@ -70,13 +70,5 @@ shared auth file is the deliberate exception to configuration isolation.
 
 ```sh
 bash -n pi-clean
-node --test pi_clean.test.mjs auth_store.test.mjs
 pi-clean --version
 ```
-
-The launcher test uses a fake entry point to check fresh state, environment-key
-stripping, argument forwarding, symlink resolution, exit status, cleanup, and
-missing-install errors. Auth tests use the pinned backend with synthetic OAuth
-credentials to check persistence, the shared lock, read-only helpers, logout, and
-independent custom stores. A catalog-listing check exercises the official CLI.
-Tests use disposable auth files, never your credentials or paid model calls.

@@ -2,7 +2,7 @@ Launch a specialized subagent. Available types: {{typeList}}.
 
 Roles:
 - scout — fast codebase recon; returns compressed context for handoff
-- researcher — web/docs research brief via Exa MCP (`mcp` / `mcpScript`); bash only as fallback
+- researcher — web/docs research brief via native Exa MCP in `codemode`; bash only as fallback
 - reviewer — code/plan/PR review with evidence; small fixes ok
 - oracle — checks decisions against inherited context and catches drift
 - worker — implements bounded tasks and approved oracle handoffs

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Give our activity widgets a shared short-window budget in Pi 0.87.1.
+"""Give our activity widgets a shared short-window budget in Pi 1.0.0.
 
 The host supplies available rows; each package retains semantic rendering and
 state ownership. Validate the complete patch before backing up or writing.
@@ -83,8 +83,8 @@ def main() -> None:
     if root is None or not root.exists():
         print("Pi host not installed; skipping compact layout")
         return
-    if json.loads((root / "package.json").read_text()).get("version") != "0.87.1":
-        raise ValueError("compact layout requires Pi 0.87.1; review upstream first")
+    if json.loads((root / "package.json").read_text()).get("version") != "1.0.0":
+        raise ValueError("compact layout requires Pi 1.0.0; review upstream first")
     sources = {name: (root / name).read_text() for name in (HOST, VIEWPORT)}
     if (root / MODULE).exists():
         sources[MODULE] = (root / MODULE).read_text()

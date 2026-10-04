@@ -8,6 +8,12 @@ HOST = "dist/core/agent-session.js"
 MARKER = "// configs:compaction-queue-v2"
 ORIGINAL = '''    async _runAgentPrompt(messages) {
         this._agentRunAbortRequested = false;
+        // Compaction before the prompt may have scheduled a retry; the new prompt replaces it.
+        this._failedResponse = undefined;
+        this._recordSelection();
+        // The run records the loadout in the transcript; restored tools that did not register by now
+        // are dropped, so a tool that never registers does not stay pending.
+        this._pendingToolNames.clear();
         this._isAgentRunActive = true;
         try {
             await this.agent.prompt(messages);
@@ -28,6 +34,7 @@ ORIGINAL = '''    async _runAgentPrompt(messages) {
         finally {
             if (this._agentRunAbortRequested)
                 this._finishCancelledRetry();
+            this._failedResponse = undefined;
             this._runSystemPromptOptions = undefined;
             this._flushPendingBashMessages();
             this._flushPendingCustomMessages();
@@ -69,8 +76,8 @@ def main() -> None:
     if root is None or not root.exists():
         print("Pi SDK not installed; skipping compaction queue fix")
         return
-    if json.loads((root / "package.json").read_text()).get("version") != "0.87.1":
-        raise ValueError("compaction queue fix requires Pi 0.87.1; review upstream first")
+    if json.loads((root / "package.json").read_text()).get("version") != "1.0.0":
+        raise ValueError("compaction queue fix requires Pi 1.0.0; review upstream first")
     sources = {HOST: (root / HOST).read_text()}
     patched = patch_sources(sources)
     if patched != sources:

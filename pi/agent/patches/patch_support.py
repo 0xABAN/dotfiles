@@ -8,7 +8,6 @@ import json
 import os
 from pathlib import Path
 import shutil
-import subprocess
 import tempfile
 
 
@@ -18,13 +17,17 @@ def read_payload(name: str) -> str:
 
 
 def discover_pi_root() -> Path | None:
-    """Honor the existing SDK override before asking the active npm installation."""
+    """Locate the active Pi command, not an unrelated Node/npm installation."""
     if os.environ.get("PI_SDK_ROOT"):
         return Path(os.environ["PI_SDK_ROOT"]).expanduser()
-    if not shutil.which("npm"):
+    launcher = shutil.which("pi")
+    if launcher is None:
         return None
-    result = subprocess.run(["npm", "root", "-g"], capture_output=True, text=True, check=True)
-    return Path(result.stdout.strip()) / "@earendil-works/pi-coding-agent"
+    for root in Path(launcher).resolve(strict=True).parents:
+        manifest = root / "package.json"
+        if manifest.is_file() and json.loads(manifest.read_text()).get("name") == "@earendil-works/pi-coding-agent":
+            return root
+    raise ValueError(f"cannot locate the Pi package owning {launcher}; set PI_SDK_ROOT explicitly")
 
 
 def backup_sources(

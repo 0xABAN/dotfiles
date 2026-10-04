@@ -22,8 +22,8 @@ const ACTIONS = {
     fetch_content: ["◎", "Web"],
     source_check: ["◎", "Web"],
     get_search_content: ["◎", "Web"],
-    mcp: ["⌇", "MCP"],
-    mcpScript: ["⋈", "Batch"],
+    codemode: ["⋈", "Batch"],
+    tool_search: ["⊙", "Find"],
     Agent: ["◇", "Agent"],
     get_subagent_result: ["◇", "Agent"],
     steer_subagent: ["◇", "Agent"],
@@ -47,44 +47,23 @@ function ownedBy(component, packageName) {
     return source === `npm:${packageName}` || source?.startsWith(`npm:${packageName}@`) === true;
 }
 
-/** Identify the requested MCP operation without parsing scripts or contacting servers. */
+/** Native MCP owns the server/tool label; arguments no longer pass through a proxy. */
 function toolInvocation(component) {
     const name = component.toolName;
     const args = component.args ?? {};
-    if (!ownedBy(component, "pi-mcp-adapter")) return { name, args, operation: name };
-
-    const label = component.toolDefinition?.label;
-    const namespace = name.startsWith("mcp__") && label === `MCP: ${name.slice(5)}`;
-    if ((name === "mcp" && !args.action || namespace) && typeof args.tool === "string") {
-        const server = namespace ? name.slice(5) : plain(args.server);
-        const target = server && !args.tool.includes("/") ? `${server}/${args.tool}` : args.tool;
-        let forwarded = args.args ?? {};
-        if (typeof forwarded === "string") {
-            try {
-                // Never echo malformed/oversized JSON: sensitive fields cannot be identified safely.
-                forwarded = forwarded.length <= 50_000 ? JSON.parse(forwarded) : "[oversized JSON arguments]";
-            } catch {
-                forwarded = "[invalid JSON arguments]";
-            }
-        }
-        return { name: target, args: forwarded, operation: args.tool.split("/").at(-1) };
+    if (component.toolDefinition?.configsTranscriptSource !== "builtin:mcp") {
+        return { name, args, operation: name };
     }
-    // Direct registrations expose the original operation through the adapter's label.
-    const operation = label?.startsWith("MCP: ") ? label.slice(5) : name;
-    return { name, args, operation };
+    const label = component.toolDefinition.label;
+    return { name: label, args, operation: label.split("/").at(-1) };
 }
 
 function toolAction(component) {
     const name = component.toolName;
     if (Object.hasOwn(NATIVE_ACTIONS, name)) return NATIVE_ACTIONS[name];
     if (ownedBy(component, "pi-web-access")) return ["◎", "Web"];
-    if (ownedBy(component, "pi-mcp-adapter")) {
-        const invocation = toolInvocation(component);
-        const operation = invocation.operation;
-        // The gateway also accepts canonical prefixed names, not only server/tool paths.
-        const bare = operation.replace(/^(?:mcp__)?(?:exa|firecrawl|tavily|brave|searxng)_/, "");
-        if (WEB_MCP_TOOLS.has(operation) || WEB_MCP_TOOLS.has(bare)) return ["◎", "Web"];
-        if (invocation.name !== name) return ["⌇", "Tool"];
+    if (component.toolDefinition?.configsTranscriptSource === "builtin:mcp") {
+        return WEB_MCP_TOOLS.has(toolInvocation(component).operation) ? ["◎", "Web"] : ["⌇", "MCP"];
     }
     return Object.hasOwn(ACTIONS, name) ? ACTIONS[name] : ["⌇", "Tool"];
 }
@@ -257,7 +236,6 @@ function toolState(component) {
     const result = component.result;
     const details = result?.details;
     const web = ownedBy(component, "pi-web-access");
-    const mcp = ownedBy(component, "pi-mcp-adapter");
     if (!result || component.isPartial) {
         const waiting = web && ["curating", "waiting-for-approval", "curator-fallback"].includes(details?.phase);
         return {
@@ -265,15 +243,12 @@ function toolState(component) {
             notice: waiting ? "Waiting for browser approval; expand for details." : "",
         };
     }
-    if (result.isError || (web || mcp) && details?.error) {
+    if (result.isError || web && details?.error) {
         const text = result.content?.find(part => part.type === "text" && typeof part.text === "string" && part.text.trim())?.text;
         const message = plain(details?.message) || plain(details?.error?.message)
             || (web ? plain(details?.error) : "") || text?.split(/\r?\n/).find(line => plain(line))
             || plain(details?.error) || "Tool failed; expand for details.";
-        // MCP auth/connection/validation feedback is actionable, not a failed execution.
-        const failed = result.isError || web || ["tool_error", "call_failed", "input_required_needs_ui"].includes(details?.error)
-            || details?.mode === "script" && ["timeout", "aborted", "script_error"].includes(details?.error);
-        return { status: failed ? "×" : "!", color: failed ? "error" : "warning", notice: plain(message) };
+        return { status: "×", color: "error", notice: plain(message) };
     }
     if (web) {
         for (const [total, successful, unit] of [
@@ -290,11 +265,6 @@ function toolState(component) {
         if (Array.isArray(errors) && errors.length) {
             return { status: "!", color: "warning", notice: "Research includes search errors; expand for details." };
         }
-    }
-    if (mcp && details?.mode === "script" && Array.isArray(details.calls)) {
-        const failed = details.calls.filter(call => call?.ok === false).length;
-        if (failed) return { status: "!", color: "warning",
-            notice: `${failed} of ${details.calls.length} MCP operations failed or unfinished; expand for details.` };
     }
     return { status: "✓", color: "muted", notice: "" };
 }
@@ -457,7 +427,7 @@ export class TranscriptContainer extends Container {
                 const nativePadding = defaultTextBody
                     ? Math.min(bodyPadding, Math.max(0, Math.floor((width - 1) / 2)))
                     : 1;
-                // ponytail: pinned 0.84.2 Box/Text fields; use setters if upstream adds them.
+                // ponytail: pinned 1.0.0 Box/Text fields; use setters if upstream adds them.
                 // Only the host shell changes, never extension-owned framing or image rows.
                 for (const body of [child.contentBox, child.contentText]) {
                     if (body && body.paddingX !== nativePadding) {

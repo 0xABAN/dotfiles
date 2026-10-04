@@ -1,14 +1,38 @@
 # Maintaining the Pi configuration
 
 This directory owns Pi configuration, local extensions, and compatibility patches.
-Installation and appearance settings are in the [repository guide](../README.md).
+Run `./install.sh` from the repository root to link configuration and apply patches.
+
+## Native MCP and codemode
+
+This configuration targets Pi **1.0.0**. `defaultTools: ["+codemode"]` adds
+native code execution/discovery without replacing the ordinary tool selection.
+MCP tools use native codemode exposure; `pi-mcp-adapter` is no longer installed.
+Native MCP does not support MCP Apps interfaces.
+
+Keep machine-local server definitions and secrets in `~/.pi/agent/mcp.json`.
+The native schema uses `enabled: false`, not `disabled: true`, and does not read
+the adapter's `imports` or `settings`. Servers previously imported from OpenCode
+must have complete definitions here; changes in OpenCode no longer sync into Pi.
+The example leaves LeetCode disabled until its credentials are configured.
+
+Use `/mcp`, `/mcp reconnect <server>`, and `pi mcp list` for connection status.
+Within `codemode`, use `searchTools`, `describeTool`, and `describeNamespace`,
+then call the discovered `tools` functions. Explicitly emit text with `text()`
+and screenshots with `image()`. The old `mcp`/`mcpScript` gateway API is gone.
+
+The Subagents SDK patch registers these same built-in factories for child
+sessions, respecting extension allowlists and isolation. Deferred MCP tools stay
+out of model prompts unless explicitly activated. Tool restrictions cover both
+direct and nested calls through Pi 1.0's private `_beforeToolCall` hook; review
+that boundary before upgrading. The researcher allows `builtin:mcp`,
+`builtin:codemode`, and `builtin:tool-search` by name.
 
 ## Computer use
 
-Computer use runs through the `cua-driver` MCP server and the existing
-`pi-mcp-adapter` package. Pi supplies the current model and authentication;
-Cua Driver supplies desktop observations and actions. No separate model API
-key is needed.
+Computer use runs through the `cua-driver` server and Pi's native MCP support.
+Pi supplies the current model and authentication; Cua Driver supplies desktop
+observations and actions. No separate model API key is needed.
 
 Install the driver using the [official installer](https://cua.ai/docs/start-here/drive-your-first-app):
 
@@ -31,9 +55,9 @@ reported by `~/.local/bin/cua-driver mcp-config`. The dotfiles installer
 preserves this machine-local file, including its other servers and secrets.
 
 Run `/reload` in Pi, then `/mcp reconnect cua-driver` and ask for the task.
-The adapter discovers tools through its `mcp` proxy and passes screenshots
-to the model as images. A single MCP connection preserves the driver's
-implicit session across observation and action calls.
+Discover tools through `codemode`; emit screenshot blocks with `image()` so
+the current model can inspect them. A single native MCP connection preserves
+the driver's implicit session across observation and action calls.
 
 ## Where changes belong
 
@@ -46,8 +70,6 @@ implicit session across observation and action calls.
 | `agent/patches/*.py` | Target-specific anchors, compatibility rules, and patch commands |
 | `agent/patches/patch_support.py` | SDK discovery, exact source loading, backup/write mechanics, and counted replacements |
 | `agent/patches/payloads/` | Renderer source grouped by `host`, `powerline`, `tui`, `todo`, `subagents`, and `intercom` |
-| `agent/tests/` | Feature and patch contract tests |
-| `agent/tests/support/` | Disposable fixtures, isolated native runners, and the plan-mode harness |
 | `agent/themes/`, `agents/`, `skills/`, `prompts/` | Theme data and agent instructions |
 | `rpiv-todo/config.json` | Todo widget configuration |
 
@@ -68,8 +90,8 @@ row, even when its renderer is silent. Collapsed text cards never bypass it;
 native images stay inline and expansion restores the original detailed bodies.
 Built-in names retain their action labels. Explicit families cover Web, Agent,
 Batch, Flow, Ask, Tasks, Goal, Chat and MCP; unknown operations use Tool.
-Registered owner metadata identifies MCP forwarding/direct registrations and
-known package error contracts, not exemptions from the shared layout.
+Registered owner metadata identifies native MCP registrations and known package
+error contracts, not exemptions from the shared layout.
 
 Generic rows show actual named arguments, with terminal controls and credential
 fields/URL credentials removed from the preview. Expansion wraps up to 50K
@@ -109,6 +131,10 @@ names for Web classification, never fuzzy matches such as any tool containing
 "search". Only known package metadata may override display status; an arbitrary
 extension's `details.error` can be domain data. The terminal owns the base background.
 
+Pi 1.0's user-message Markdown cache and theme-aware `ThemedText` notices remain
+native. The patches add layout only; do not restore a second user-message cache
+or replace native notice invalidation/coalescing.
+
 Plan-mode status formatting is pure; the entrypoint owns status publication,
 tool restoration, and persistence. Whimsical's compaction adapter contains the
 host-specific prototype hook. Keep that compatibility code out of its catalog.
@@ -130,10 +156,10 @@ gate for extreme window sizes.
 
 | Target | Supported input | Commands under `agent/patches/` |
 |--------|-----------------|--------------------------------|
-| Pi unbundled host and package-local TUI | Pi `0.87.1` | `pi_horizontal_inset.py`, `pi_markdown_code.py`, `pi_transcript.py`, `pi_extension_dialogs.py`, `pi_activity_notices.py`, `pi_compact_layout.py`, `pi_editor_gap.py`, `pi_compaction_queue.py` |
+| Pi unbundled host and package-local TUI | Pi `1.0.0` | `pi_horizontal_inset.py`, `pi_markdown_code.py`, `pi_transcript.py`, `pi_extension_dialogs.py`, `pi_activity_notices.py`, `pi_compact_layout.py`, `pi_editor_gap.py`, `pi_compaction_queue.py` |
 | Powerline | Git commit `8c9bda10fdfd2822e89334ec85f3da9f8ca49182` | `powerline_dj.py`, `powerline_layout.py`, `powerline_editor.py`, `powerline_compaction_queue.py` |
 | rpiv-todo UI | `@juicesharp/rpiv-todo` `2.9.0`, after legacy tweaks | `rpiv_todo_ui.py` |
-| Subagents UI | `@tintinweb/pi-subagents` `0.19.0` | `subagents_ui.py` |
+| Subagents UI and native SDK tools | `@tintinweb/pi-subagents` `0.19.0`, Pi `1.0.0` | `subagents_ui.py`, `subagents-native-tools.py` |
 | Intercom messages | `pi-intercom` `0.13.0` | `intercom_ui.py` (with host `pi_transcript.py`) |
 
 Shared helpers do not decide compatibility. Each guarded patcher validates its
@@ -161,87 +187,55 @@ Do not change persistence as part of a visual cleanup.
 
 `install.sh` owns the serial order: powerline DJ/layout/compaction queue, host
 inset, editor, Markdown code panels, transcript, Intercom UI, dialogs, notices, compact layout,
-editor gap, compaction queue, legacy Todo tweaks, Todo UI, Subagents UI, then
-`pi/launcher.py`.
+editor gap, compaction queue, legacy Todo tweaks, Todo UI, Subagents UI and native
+tools, then launcher selection.
 The legacy Todo command remains best-effort; the other patch failures propagate.
 Powerline owns the editor; Whimsical owns the working indicator.
 Pi-pretty is not installed, so its indicator cannot override Whimsical.
 
 ### Which CLI runs the patches?
 
-Pi 0.87.1 declares `dist/bundle/cli.js` as its npm `pi` command. That bundled
+Pi 1.0.0 declares `dist/bundle/cli.js` as its npm `pi` command. That bundled
 program contains its own host implementation; patching `dist/modes/...` does not
-change it. A successful import test or `pi --version` cannot prove the customized
-host is running.
+change it. `pi --version` alone cannot prove the customized host is running.
 
-Our customized command instead selects the published `dist/cli.js`. It calls
-`setupCli()` and `main()` and loads the unbundled host and package-local TUI that
-our patchers modify. **This is a published but private compatibility boundary,
-not a documented upstream entrypoint guarantee.** `pi/launcher.py` checks the
-exact version, npm bin declaration and entry/setup bytes before atomically
-repointing only the known npm-owned symlink. Unknown wrappers, targets and
-modified entrypoints are refused. Package metadata and minified bundles are
-never edited. Repeating the command is a no-op.
+After its patch chain, `install.sh` selects the published `dist/cli.js`, which
+loads the unbundled host and package-local TUI. **This is a published but private
+compatibility boundary, not a documented upstream entrypoint guarantee.** The
+installer checks the exact version, npm bin declaration and entry/setup bytes
+before atomically repointing only the known npm-owned symlink. Unknown wrappers,
+targets and modified entrypoints are refused. Package metadata and minified
+bundles are never edited. An already-selected launcher is left unchanged.
 
-After all host patches pass, select it explicitly (POSIX npm installation only):
+The exact old link is saved as `pi` plus `launcher.json` under the printed
+`~/.config/theme-backups/pi-launcher-*` directory. To roll back, verify the current
+link still equals the recorded `replacement`, then replace only that symlink with
+the recorded `target`; do not copy its resolved package file. A refusal leaves the
+original link in place. Every npm update/reinstall may reset the link to the
+bundled CLI; reapply the patches and launcher selection afterward.
 
-```sh
-python3 -B pi/launcher.py --sdk "$(npm root -g)/@earendil-works/pi-coding-agent" \
-  --launcher "$(command -v pi)"
-```
+`pi-clean` is separate: its launcher invokes its own unbundled `dist/cli.js`, whose
+host is deliberately unpatched. Custom-host activation does not change it.
 
-The helper retains the exact old link as `pi` plus `launcher.json` under the
-printed `~/.config/theme-backups/pi-launcher-*` directory. To roll back, verify
-the current link still equals the recorded `replacement`, then replace only
-that symlink with the recorded `target`; do not copy its resolved package file.
-A refusal leaves the original link in place. Every npm update/reinstall may
-reset the link to the bundled CLI: **replay this final step after every update**.
-`install.sh` does this after its patch chain. Do not run the broad installer just
-to repair a launcher. Restart existing Pi processes after activation.
+## Applying patches
 
-`pi-clean` is separate: its launcher already invokes its own unbundled
-`dist/cli.js`, whose host is deliberately unpatched. Neither this helper nor
-custom-host activation changes `pi-clean`.
-
-## Verification and replay
-
-Run commands from the repository root. Guard and unit tests need Bun and Python 3.10+:
-
-```sh
-env -u PI_SDK_ROOT bun test pi/agent/tests
-```
-
-Native checks require supported package sources and opt in through `PI_SDK_ROOT`:
-
-```sh
-PI_SDK_ROOT="$(npm root -g)/@earendil-works/pi-coding-agent" \
-  bun test pi/agent/tests
-```
-
-`PI_POWERLINE_ROOT`, `PI_SUBAGENTS_ROOT`, `PI_INTERCOM_ROOT`, and `RPIV_TODO_TEST_ROOT` override the
-usual installed package source paths for tests. Guard fixtures exercise patch
-mechanics without an installation; they do not prove upstream compatibility.
-Native tests apply checkout patchers to disposable copies and retain real Pi
-rendering. Only read-only dependencies are symlinked. Native suites run in child
-processes because Bun module mocks leak between test files; guard cases run once
-in the parent. Without `PI_SDK_ROOT`, native cases report explicit skips; package
-cases also skip when their optional package source is absent. An invalid or
-incompatible configured SDK fails rather than counting as verified.
-
-Use the affected test file while editing, then the full Pi suite for changes to
-shared support or rendering boundaries. Check migration, exact backups,
-refusal-before-write, and repeatability alongside native behavior. Avoid using
-live installation state as an expected result.
-
-After verification, run the relevant patch command, for example:
+Run the relevant patch command from the repository root, for example:
 
 ```sh
 python3 -B pi/agent/patches/pi_transcript.py
 ```
 
-Restart Pi for host or bundled-TUI changes. Extension/package source changes use
-`/reload`; a full restart also reloads them. Check the visible UI after runtime
-changes. Commit only explicit owned files or hunks, with related tests, and keep
+Host patchers discover the SDK that owns the actual `pi` command, not the package
+under whichever `npm` happens to be on `PATH`. Set `PI_SDK_ROOT` explicitly when
+validating an isolated installation. Version and source guards still apply.
+
+`./install.sh` replays the complete patch chain and launcher selection. It is not
+an upgrade transaction: the legacy Todo step is best-effort. Keep backups and
+inspect failures rather than loosening compatibility guards.
+
+Restart Pi for host or package-local TUI changes. Extension/package source
+changes use `/reload`; a full restart also reloads them. Check the visible UI
+after runtime changes. Commit only explicit owned files or hunks and keep
 independently revertible changes separate.
 
 ## Host-provided extension dependencies
@@ -270,11 +264,11 @@ Manual `pi update --extensions`, Pi release notices, model-catalog refreshes and
 real warnings/errors remain unchanged. This does not enable offline mode.
 
 Apply with `python3 -B pi/agent/patches/pi_activity_notices.py`, then restart Pi.
-The installer and upgrade checker already replay this patch.
+The installer replays this patch.
 
 ## Messages queued during compaction
 
-Pi 0.87.1 can still go idle with pending messages when async input hooks finish
+Pi 1.0.0 can still go idle with pending messages when async input hooks finish
 between its final queue check and run settlement. `pi_compaction_queue.py` adds
 a synchronous queue recheck after the new `agent_before_settle` boundary. It
 preserves native boundary hooks, context validation, abort guards, steering,
@@ -286,125 +280,15 @@ rejects the prompt, but Powerline has already marked it sent. The host patch abo
 does not fix this path. `powerline_compaction_queue.py` keeps the item queued and
 rechecks `ctx.isIdle()` using the existing cancellable timer before sending.
 
-The installer and upgrade checker replay both patches. After a reinstall, apply
+The installer replays both patches. After a reinstall, apply
 them and **restart Pi**; `/reload` cannot reload the host session loop. For the
 Powerline-only change, `/reload` is sufficient:
 
 ```sh
 python3 -B pi/agent/patches/pi_compaction_queue.py
 python3 -B pi/agent/patches/powerline_compaction_queue.py
-PI_SDK_ROOT="$(npm root -g)/@earendil-works/pi-coding-agent" \
-  bun test pi/agent/tests/pi_compaction_queue.test.ts pi/agent/tests/powerline_compaction_queue.test.ts
 ```
 
-The patch backs up the original `dist/core/agent-session.js` and refuses unknown
-versions or changed settlement code. A deterministic boundary test checks that
-late input resumes without overriding abort or invalid context. Tests use an
-isolated SDK copy and a fake provider to exercise the actual session loop and
-interactive queue flush, with
-async input hooks around the race, both delivery modes, multiple messages, manual
-compaction, and overflow recovery. The Powerline test loads its complete extension
-and real editor, queues text during `/compact`, and holds a later completion hook
-past the delivery timer. It checks that messages stay pending until completion,
-reach the fake model exactly once, and still work after a real session reload.
-Both patches back up before writing and refuse changed anchors. No model requests
-are made.
-
-## Checking a Pi upgrade
-
-Keep the existing editor. Stage a candidate before changing either live install:
-
-```sh
-python3 -B pi/upgrade.py 0.87.1
-# After successful checks, also retain rollback copies (still no activation):
-python3 -B pi/upgrade.py 0.87.1 --backup
-```
-
-Requires Python 3.10+, Git, npm/Node, Bun, tmux, and the installed Powerline, Todo,
-Subagents and Intercom sources under `~/.pi/agent/`. Use an exact stable version;
-`latest`, ranges, prereleases and arbitrary npm specs are rejected. The command
-installs only inside a private `/tmp/pi-upgrade-<version>-*` directory, using
-`npm install --ignore-scripts --save-exact` against the public npm registry.
-
-The check snapshots current configuration sources (including uncommitted files),
-copies installed package sources into a temporary HOME, and sets `PI_SDK_ROOT`
-to the candidate. It runs the full `pi/agent/tests` native suite and the copied
-clean-launcher/auth tests, using synthetic credentials. It then replays host and
-Powerline patches inside the stage, selects the candidate npm symlink with the
-same launcher helper used at activation, and launches **that executable** in
-120×44 tmux terminals in regular and fullscreen modes. The rendered faux-provider
-response must show `◆ You`, `● Pi`, the cream separator, a two-column outer inset
-and the configured Powerline footer. Intercom must show only its invocation row
-when collapsed, a borderless incoming sender/preview, and full details/attachments
-after expansion. Synthetic web/MCP registrations cover shared labels, actual
-invocations, unknown-operation fallback, credential redaction and expanded custom
-cards. Native confirmation and selection dialogs are exercised independently.
-Captured ANSI/plain screens, executed commands and individual assertions are
-retained under `cli-smoke/`.
-
-The terminal checks load copied Powerline sources with the configured theme
-and Powerline options. They do not load all
-personal extensions: Intercom's entrypoint, MCP and subagents can contact live
-peers/services. Intercom's exact renderer callbacks and pure formatting helpers
-are extracted into a synthetic npm package with its normal owner metadata;
-synthetic tool execution and incoming messages exercise the real host pipeline.
-No Intercom broker, bus or session hooks are loaded. Web/MCP fixtures load no real
-package entrypoints or network clients. These checks prove renderer integration,
-not delivery or remote execution. Personal auth, remaining settings,
-Node overrides and API-key environment variables are not inherited by commands;
-PATH is retained to locate tools. This is isolation for testing, not a sandbox.
-Only npm installation needs network access; no model calls or lifecycle scripts
-are requested. There are no live patcher calls.
-
-A dependency, patch, test, missing-source or skipped-test failure stops the check
-with a nonzero exit status. Unknown host versions must fail their existing exact
-patch guards: review and adapt those patches separately, never loosen them to
-make the checker green. Source changes during the check also require a rerun.
-Logs, the candidate lockfile, input hashes, source/package copies and `report.json`
-remain in the printed stage directory on success or failure. A green report
-covers these tests only, not every extension or live OAuth refresh. The report
-records both the candidate command and the actual `pi` found on PATH. An unknown
-live wrapper or a symlink belonging to another npm installation stops the check. Native child tests are represented by their parent suite
-checks in the reported Bun count.
-
-The patch-contract table above is the version authority. The patch purposes are:
-
-- Host inset: shared viewport margins; transcript: speaker/tool rows and metrics.
-- Markdown code panels: hidden fences, retained syntax highlighting, and full-width dark rows.
-- Editor gap: idle breathing room without separating active loaders from the editor.
-- Compaction queue: recheck pending messages before the session becomes idle.
-- Dialogs: native selector/input visibility; notices: activity wrapping;
-  compact layout: small-window widget and footer budgets.
-- Powerline DJ/layout/editor: mode presentation, footer sizing and editor frame.
-- Powerline compaction queue: wait for actual idle state, not a 50 ms assumption.
-- Legacy Todo: dependency and persistence tweaks; Todo UI: task presentation.
-- Subagents UI: agent panels, previews and constrained-window layout.
-- Intercom UI: incoming sender/preview and expanded metadata, without delivery changes.
-
-`--backup` runs only after all checks pass. It copies the global Pi package,
-`pi/clean` including its installed dependencies, and the complete Powerline
-source (including `index.ts` and `bash-mode/editor.ts`), plus the Intercom package
-source, into `rollback/`.
-It also saves the actual command's exact link as `pi-launcher` and its path/target
-in `launcher.json`. Package-copy links are dereferenced; the launcher link itself
-is deliberately preserved. `auth.json` is excluded. A partial copy is not a
-completed backup; check `backup_complete` and `status` in the report. Staging and
-backups can consume hundreds of MB; retain them through the upgrade, then remove
-only the printed stage directory when no longer needed. `/tmp` is not durable
-archival storage; move the whole directory elsewhere if it must survive cleanup.
-
-**Activation remains manual.** Before any install or live patch, require a green
-report for the exact version and unchanged sources, a complete fresh backup,
-and no concurrent package/config edits. Update each intended install explicitly,
-replay patches and the launcher selection in the documented serial order, stop
-on the first failure, and verify normal/clean startup plus the visible UI before restarting working
-sessions. Do not treat `install.sh` as an upgrade transaction: its legacy Todo
-step is best-effort. Restore affected files from the matching rollback copies
-if activation fails; do not overwrite credentials or unrelated configuration.
-The checker neither activates nor provides an automatic rollback operation.
-
-Offline checks for the upgrade command itself:
-
-```sh
-python3 -B -m unittest pi/upgrade_test.py pi/launcher_test.py
-```
+The host patch backs up the original `dist/core/agent-session.js` and refuses
+unknown versions or changed settlement code. Both patches back up before writing
+and refuse changed anchors.

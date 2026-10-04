@@ -1,7 +1,10 @@
 {
-  "lastChangelogVersion": "0.87.1",
+  "lastChangelogVersion": "1.0.0",
   "theme": "everforest-dark-hard",
   "quietStartup": true,
+  "defaultTools": [
+    "+codemode"
+  ],
   "defaultProvider": "xai",
   "defaultModel": "grok-4.6",
   "defaultThinkingLevel": "xhigh",
@@ -12,16 +15,11 @@
     "openai-codex/gpt-5.6-terra"
   ],
   "packages": [
-    "npm:pi-mcp-adapter",
     "npm:@tintinweb/pi-subagents",
     "npm:@juicesharp/rpiv-ask-user-question",
     {
       "source": "npm:pi-goal",
       "skills": []
-    },
-    {
-      "source": "https://github.com/ShpetimA/pi-fff",
-      "extensions": []
     },
     "npm:pi-intercom",
     "https://github.com/nicobailon/pi-powerline-footer@8c9bda10fdfd2822e89334ec85f3da9f8ca49182",

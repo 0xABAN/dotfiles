@@ -1,6 +1,7 @@
 {
   "mcpServers": {
     "leetcode": {
+      "enabled": false,
       "command": "npx",
       "args": [
         "-y",
@@ -13,48 +14,11 @@
         "LEETCODE_SESSION": "YOUR_LEETCODE_SESSION_HERE"
       }
     },
-    "github": {
-      "disabled": true
-    },
-    "slack": {
-      "disabled": true
-    },
-    "node_repl": {
-      "disabled": true
-    },
-    "firecrawl": {
-      "disabled": true
-    },
-    "humanizer": {
-      "disabled": true
-    },
-    "canvas": {
-      "disabled": true
-    },
-    "computer-use": {
-      "disabled": true
-    },
-    "runpod": {
-      "disabled": true
-    },
-    "chrome-devtools": {
-      "disabled": true
-    },
-    "pixellab": {
-      "disabled": true
-    },
     "cua-driver": {
       "command": "cua-driver",
       "args": [
         "mcp"
       ]
     }
-  },
-  "imports": [
-    "opencode"
-  ],
-  "settings": {
-    "hostConfigDiscovery": "off",
-    "mcpFooterStatus": "off"
   }
 }

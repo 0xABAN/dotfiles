@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Align native extension selectors, confirmations, inputs and editors in Pi 0.87.1.
+"""Align native extension selectors, confirmations, inputs and editors in Pi 1.0.0.
 
 Display only: retain original input/focus/timeout/external-editor handlers. Refuse
 unknown or partial sources before writing; back up exact originals. Restart Pi.
@@ -130,8 +130,8 @@ def main() -> None:
         print("Pi host not installed; skipping native dialog UI patch")
         return
     version = json.loads((root / "package.json").read_text())["version"]
-    if version != "0.87.1":
-        raise ValueError(f"native dialog UI requires Pi 0.87.1, found {version}; review upstream first")
+    if version != "1.0.0":
+        raise ValueError(f"native dialog UI requires Pi 1.0.0, found {version}; review upstream first")
     sources = {name: (root / name).read_text() for name in EDITS}
     if (root / MODULE).exists():
         sources[MODULE] = (root / MODULE).read_text()

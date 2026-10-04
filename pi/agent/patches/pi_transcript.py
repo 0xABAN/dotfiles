@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install the transcript and UI-only tool metrics into Pi 0.87.1; restart to apply.
+"""Install the transcript and UI-only tool metrics into Pi 1.0.0; restart to apply.
 
 Preserve native tool execution and model-visible output. Timings share the
 existing result-entry write, outside its message. Refuse partial/unknown hosts
@@ -112,8 +112,14 @@ EDITS = {
          "constructor(text, markdownTheme = getMarkdownTheme(), outputPad = 1, markdownTransformers = [], timestamp)"),
         ("        this.outputPad = outputPad;", "        this.outputPad = outputPad + 2;\n        this.transcriptBasePad = outputPad;\n        this.timestamp = timestamp;"),
         ("        this.outputPad = padding;", "        this.outputPad = padding + 2;\n        this.transcriptBasePad = padding;"),
-        ('        const contentBox = new Box(this.outputPad, 1, (content) => theme.bg("userMessageBg", content));',
-         "        const contentBox = new Box(this.outputPad, 0);"),
+        ('''        // The Markdown pads and colors its own background: a Box around it would keep a second full-width copy of every
+        // line, with identical output.
+        this.addChild(new Markdown(this.text, this.outputPad, 1, this.markdownTheme, {
+            color: (content) => theme.fg("userMessageText", content),
+            bgColor: (content) => theme.bg("userMessageBg", content),''',
+         '''        // Keep upstream's single Markdown cache; transcript headers own spacing and separators.
+        this.addChild(new Markdown(this.text, this.outputPad, 0, this.markdownTheme, {
+            color: (content) => theme.fg("userMessageText", content),'''),
         ("        const lines = super.render(width);", '''        const padding = transcriptPadding(this.transcriptBasePad, width);
         if (this.outputPad !== padding) {
             this.outputPad = padding;
@@ -216,7 +222,8 @@ PRE_UNIVERSAL_TOOLS_LOOKUP = EDITS[BASE + "interactive-mode.js"][2]
 EDITS[BASE + "interactive-mode.js"][2] = (old_lookup, '''    getRegisteredToolDefinition(toolName) {
         const definition = withBuiltInRenderers(toolName, this.session.getToolDefinition(toolName));
         if (!definition) return definition;
-        const source = this.session.getAllTools().find(tool => tool.name === toolName)?.sourceInfo?.source;
+        const origin = this.session.getAllTools().find(tool => tool.name === toolName)?.sourceInfo;
+        const source = origin?.source === "builtin" ? origin.path : origin?.source;
         return { ...definition, configsTranscriptSource: source };
     }''')
 
@@ -325,8 +332,8 @@ def main() -> None:
         print("Pi host not installed; skipping transcript preview")
         return
     version = json.loads((root / "package.json").read_text())["version"]
-    if version != "0.87.1":
-        raise ValueError(f"transcript patch requires Pi 0.87.1, found {version}; review upstream first")
+    if version != "1.0.0":
+        raise ValueError(f"transcript patch requires Pi 1.0.0, found {version}; review upstream first")
     sources = {name: (root / name).read_text() for name in EDITS}
     if (root / MODULE).exists():
         sources[MODULE] = (root / MODULE).read_text()
