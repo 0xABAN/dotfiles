@@ -91,7 +91,6 @@
   },
   "skills": [
     "-skills/brand",
-    "-skills/brief",
     "-skills/test-driven-development",
     "-skills/use-railway",
     "-skills/watch"
