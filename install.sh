@@ -103,7 +103,7 @@ if [[ -d /Applications/CuaDriver.app ]]; then
     "$cua_driver" stop
   fi
 
-  link "$ROOT/pi/agent/launchagents/$launch_agent_label.plist" "$launch_agent_plist"
+  link "$ROOT/launchagents/$launch_agent_label.plist" "$launch_agent_plist"
   launchctl bootstrap "$launch_agent_domain" "$launch_agent_plist"
 else
   echo "CuaDriver.app is not installed; skipped its LaunchAgent"
