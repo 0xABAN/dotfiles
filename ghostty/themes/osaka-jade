@@ -1,5 +1,4 @@
 # Osaka Jade: charcoal canvas, white text, and the shared #439187 teal accent.
-# cmux uses its darker #326d65 companion for workspace selection.
 background = #121319
 foreground = #D8DAD8
 cursor-color = #F2F3F0

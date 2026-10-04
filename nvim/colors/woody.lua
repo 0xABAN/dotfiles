@@ -31,7 +31,7 @@ local function hi(group, opts)
   vim.api.nvim_set_hl(0, group, opts)
 end
 
--- UI (bg NONE so Ghostty/cmux opacity shows through)
+-- UI (bg NONE so Ghostty opacity shows through)
 hi("Normal", { fg = c.text, bg = "NONE" })
 hi("NormalNC", { fg = c.text, bg = "NONE" })
 hi("NormalFloat", { fg = c.text, bg = "NONE" })

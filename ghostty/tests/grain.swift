@@ -1,6 +1,5 @@
 // Run on macOS: swift -suppress-warnings ghostty/tests/grain.swift
 // Use the system's deprecated OpenGL API to test actual GLSL without dependencies.
-// Live cmux verification still covers its separate GLSL-to-Metal translation.
 import AppKit
 import OpenGL.GL3
 
