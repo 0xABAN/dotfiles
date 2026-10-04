@@ -93,84 +93,84 @@ fi
 
 
 # Extensions must use Pi's host modules rather than declare bundled copies.
-python3 -B "$ROOT/pi/agent/patches/host-peer-dependencies.py"
+python3 -B "$ROOT/pi/agent/patches/host_peer_dependencies.py"
 
 # Keep DJ above powerline's own last-prompt row. Fail visibly if upstream anchors changed.
-if [[ -f "$ROOT/pi/agent/patches/powerline-dj.py" ]]; then
-  python3 "$ROOT/pi/agent/patches/powerline-dj.py"
+if [[ -f "$ROOT/pi/agent/patches/powerline_dj.py" ]]; then
+  python3 "$ROOT/pi/agent/patches/powerline_dj.py"
 fi
 
 # Align footer groups and enable the context meter used by settings.json.
-if [[ -f "$ROOT/pi/agent/patches/powerline-layout.py" ]]; then
-  python3 "$ROOT/pi/agent/patches/powerline-layout.py"
+if [[ -f "$ROOT/pi/agent/patches/powerline_layout.py" ]]; then
+  python3 "$ROOT/pi/agent/patches/powerline_layout.py"
 fi
 
 # Powerline must wait for all compaction hooks before sending its saved prompt.
-if [[ -f "$ROOT/pi/agent/patches/powerline-compaction-queue.py" ]]; then
-  python3 "$ROOT/pi/agent/patches/powerline-compaction-queue.py"
+if [[ -f "$ROOT/pi/agent/patches/powerline_compaction_queue.py" ]]; then
+  python3 "$ROOT/pi/agent/patches/powerline_compaction_queue.py"
 fi
 
 # Inset the whole Pi viewport before removing the editor's old private gutter.
-if [[ -f "$ROOT/pi/agent/patches/pi-horizontal-inset.py" ]]; then
-  python3 "$ROOT/pi/agent/patches/pi-horizontal-inset.py"
+if [[ -f "$ROOT/pi/agent/patches/pi_horizontal_inset.py" ]]; then
+  python3 "$ROOT/pi/agent/patches/pi_horizontal_inset.py"
 fi
 
 # Frame the existing editor without replacing its input/autocomplete owner.
-if [[ -f "$ROOT/pi/agent/patches/powerline-editor.py" ]]; then
-  python3 "$ROOT/pi/agent/patches/powerline-editor.py"
+if [[ -f "$ROOT/pi/agent/patches/powerline_editor.py" ]]; then
+  python3 "$ROOT/pi/agent/patches/powerline_editor.py"
 fi
 
 # Render fenced Markdown code as full-width dark panels while retaining highlighting.
-if [[ -f "$ROOT/pi/agent/patches/pi-markdown-code.py" ]]; then
-  python3 "$ROOT/pi/agent/patches/pi-markdown-code.py"
+if [[ -f "$ROOT/pi/agent/patches/pi_markdown_code.py" ]]; then
+  python3 "$ROOT/pi/agent/patches/pi_markdown_code.py"
 fi
 
 # Display-only transcript preview: keep native tools, history and expansion intact.
-if [[ -f "$ROOT/pi/agent/patches/pi-transcript.py" ]]; then
-  python3 "$ROOT/pi/agent/patches/pi-transcript.py"
+if [[ -f "$ROOT/pi/agent/patches/pi_transcript.py" ]]; then
+  python3 "$ROOT/pi/agent/patches/pi_transcript.py"
 fi
 
 # Intercom's incoming messages share the transcript; delivery stays package-owned.
-if [[ -f "$ROOT/pi/agent/patches/intercom-ui.py" ]]; then
-  python3 "$ROOT/pi/agent/patches/intercom-ui.py"
+if [[ -f "$ROOT/pi/agent/patches/intercom_ui.py" ]]; then
+  python3 "$ROOT/pi/agent/patches/intercom_ui.py"
 fi
 
 # Agents' pickers, confirmations and editors use these shared native dialogs.
-if [[ -f "$ROOT/pi/agent/patches/pi-extension-dialogs.py" ]]; then
-  python3 "$ROOT/pi/agent/patches/pi-extension-dialogs.py"
+if [[ -f "$ROOT/pi/agent/patches/pi_extension_dialogs.py" ]]; then
+  python3 "$ROOT/pi/agent/patches/pi_extension_dialogs.py"
 fi
 
 # Native notifications own wrapping, including continuation-line indentation.
-if [[ -f "$ROOT/pi/agent/patches/pi-activity-notices.py" ]]; then
-  python3 "$ROOT/pi/agent/patches/pi-activity-notices.py"
+if [[ -f "$ROOT/pi/agent/patches/pi_activity_notices.py" ]]; then
+  python3 "$ROOT/pi/agent/patches/pi_activity_notices.py"
 fi
 
 # Share short-window activity space without clipping extension-owned content.
-if [[ -f "$ROOT/pi/agent/patches/pi-compact-layout.py" ]]; then
-  python3 "$ROOT/pi/agent/patches/pi-compact-layout.py"
+if [[ -f "$ROOT/pi/agent/patches/pi_compact_layout.py" ]]; then
+  python3 "$ROOT/pi/agent/patches/pi_compact_layout.py"
 fi
 
 # Add idle breathing room while keeping active loaders flush to the editor.
-if [[ -f "$ROOT/pi/agent/patches/pi-editor-gap.py" ]]; then
-  python3 "$ROOT/pi/agent/patches/pi-editor-gap.py"
+if [[ -f "$ROOT/pi/agent/patches/pi_editor_gap.py" ]]; then
+  python3 "$ROOT/pi/agent/patches/pi_editor_gap.py"
 fi
 
 # Resume messages queued while compaction and async input hooks finish.
-if [[ -f "$ROOT/pi/agent/patches/pi-compaction-queue.py" ]]; then
-  python3 "$ROOT/pi/agent/patches/pi-compaction-queue.py"
+if [[ -f "$ROOT/pi/agent/patches/pi_compaction_queue.py" ]]; then
+  python3 "$ROOT/pi/agent/patches/pi_compaction_queue.py"
 fi
 
 # Re-apply local tints on installed pi packages
-if [[ -f "$ROOT/pi/agent/patches/rpiv-todo-gray.py" ]]; then
-  python3 "$ROOT/pi/agent/patches/rpiv-todo-gray.py" || true
+if [[ -f "$ROOT/pi/agent/patches/rpiv_todo_gray.py" ]]; then
+  python3 "$ROOT/pi/agent/patches/rpiv_todo_gray.py" || true
 fi
 
 # Match extension-owned activity surfaces to the transcript, after legacy todo tweaks.
-if [[ -f "$ROOT/pi/agent/patches/rpiv-todo-ui.py" ]]; then
-  python3 "$ROOT/pi/agent/patches/rpiv-todo-ui.py"
+if [[ -f "$ROOT/pi/agent/patches/rpiv_todo_ui.py" ]]; then
+  python3 "$ROOT/pi/agent/patches/rpiv_todo_ui.py"
 fi
-if [[ -f "$ROOT/pi/agent/patches/subagents-ui.py" ]]; then
-  python3 "$ROOT/pi/agent/patches/subagents-ui.py"
+if [[ -f "$ROOT/pi/agent/patches/subagents_ui.py" ]]; then
+  python3 "$ROOT/pi/agent/patches/subagents_ui.py"
 fi
 
 # npm restores its bundled bin on update; our host patches need the unbundled CLI.

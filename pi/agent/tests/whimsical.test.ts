@@ -4,8 +4,8 @@ import { join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { sparkleFrames, INTERVAL_MS } from "../extensions/whimsical/animation.ts";
 import { SYMBOLS } from "../extensions/whimsical/catalog.ts";
-import { temporaryDirectory } from "./support/patch-fixtures";
-import { nativeSuite } from "./support/native-suite";
+import { temporaryDirectory } from "./support/patch_fixtures";
+import { nativeSuite } from "./support/native_suite";
 
 const sdk = process.env.PI_SDK_ROOT;
 const { unitTest: test, nativeTest } = nativeSuite(import.meta.path, !!sdk);

@@ -41,7 +41,7 @@ class UpgradeTest(unittest.TestCase):
                     repo / "pi/clean/package.json": "{}",
                     repo / "pi/clean/package-lock.json": "old lock",
                     repo / "pi/clean/pi-clean": "launcher",
-                    repo / "pi/clean/auth-store.mjs": "adapter",
+                    repo / "pi/clean/auth_store.mjs": "adapter",
                     repo / "pi/clean/node_modules/installed.txt": "live clean install",
                     home / upgrade.POWERLINE / "package.json": '{"version":"1.0.0"}',
                     home / upgrade.POWERLINE / "index.ts": "original editor",
@@ -99,7 +99,7 @@ class UpgradeTest(unittest.TestCase):
                         if failure == "missing-summary":
                             output = "nothing ran\n"
                     elif args[:2] == ["node", "--test"]:
-                        self.assertIn("auth-store.test.mjs", args)
+                        self.assertIn("auth_store.test.mjs", args)
                         code = 1 if failure == "clean" else 0
                         output = "# pass 3\n# fail 0\n# skipped 0\n"
                         if failure == "source-change":
@@ -121,11 +121,11 @@ class UpgradeTest(unittest.TestCase):
                             }))
                         else:
                             self.assertTrue(args[2].startswith("pi/agent/patches/"))
-                            if args[2] == "pi/agent/patches/intercom-ui.py":
+                            if args[2] == "pi/agent/patches/intercom_ui.py":
                                 code = 1 if failure == "intercom" else 0
-                            if args[2] == "pi/agent/patches/pi-compaction-queue.py":
+                            if args[2] == "pi/agent/patches/pi_compaction_queue.py":
                                 code = 1 if failure == "compaction-queue" else 0
-                            if args[2] == "pi/agent/patches/powerline-compaction-queue.py":
+                            if args[2] == "pi/agent/patches/powerline_compaction_queue.py":
                                 code = 1 if failure == "powerline-queue" else 0
                             for name in ("markdown-code", "editor-gap"):
                                 if args[2] == f"pi/agent/patches/pi-{name}.py":
@@ -167,11 +167,11 @@ class UpgradeTest(unittest.TestCase):
                     rollback = stage / "rollback"
                     self.assertEqual((rollback / "powerline/bash-mode/editor.ts").read_text(), "original bash editor")
                     self.assertTrue((rollback / "intercom/package.json").exists())
-                    self.assertIn(["python3", "-B", "pi/agent/patches/intercom-ui.py"], calls)
-                    self.assertIn(["python3", "-B", "pi/agent/patches/pi-compaction-queue.py"], calls)
-                    self.assertIn(["python3", "-B", "pi/agent/patches/powerline-compaction-queue.py"], calls)
-                    self.assertIn(["python3", "-B", "pi/agent/patches/pi-markdown-code.py"], calls)
-                    self.assertIn(["python3", "-B", "pi/agent/patches/pi-editor-gap.py"], calls)
+                    self.assertIn(["python3", "-B", "pi/agent/patches/intercom_ui.py"], calls)
+                    self.assertIn(["python3", "-B", "pi/agent/patches/pi_compaction_queue.py"], calls)
+                    self.assertIn(["python3", "-B", "pi/agent/patches/powerline_compaction_queue.py"], calls)
+                    self.assertIn(["python3", "-B", "pi/agent/patches/pi_markdown_code.py"], calls)
+                    self.assertIn(["python3", "-B", "pi/agent/patches/pi_editor_gap.py"], calls)
                     self.assertEqual((rollback / "pi-clean/node_modules/installed.txt").read_text(), "live clean install")
                     self.assertFalse((rollback / "global-pi/alias.txt").is_symlink())
                     self.assertFalse(list(rollback.rglob("auth.json")))

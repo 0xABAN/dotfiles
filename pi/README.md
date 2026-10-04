@@ -130,11 +130,11 @@ gate for extreme window sizes.
 
 | Target | Supported input | Commands under `agent/patches/` |
 |--------|-----------------|--------------------------------|
-| Pi unbundled host and package-local TUI | Pi `0.87.1` | `pi-horizontal-inset.py`, `pi-markdown-code.py`, `pi-transcript.py`, `pi-extension-dialogs.py`, `pi-activity-notices.py`, `pi-compact-layout.py`, `pi-editor-gap.py`, `pi-compaction-queue.py` |
-| Powerline | Git commit `8c9bda10fdfd2822e89334ec85f3da9f8ca49182` | `powerline-dj.py`, `powerline-layout.py`, `powerline-editor.py`, `powerline-compaction-queue.py` |
-| rpiv-todo UI | `@juicesharp/rpiv-todo` `2.9.0`, after legacy tweaks | `rpiv-todo-ui.py` |
-| Subagents UI | `@tintinweb/pi-subagents` `0.19.0` | `subagents-ui.py` |
-| Intercom messages | `pi-intercom` `0.13.0` | `intercom-ui.py` (with host `pi-transcript.py`) |
+| Pi unbundled host and package-local TUI | Pi `0.87.1` | `pi_horizontal_inset.py`, `pi_markdown_code.py`, `pi_transcript.py`, `pi_extension_dialogs.py`, `pi_activity_notices.py`, `pi_compact_layout.py`, `pi_editor_gap.py`, `pi_compaction_queue.py` |
+| Powerline | Git commit `8c9bda10fdfd2822e89334ec85f3da9f8ca49182` | `powerline_dj.py`, `powerline_layout.py`, `powerline_editor.py`, `powerline_compaction_queue.py` |
+| rpiv-todo UI | `@juicesharp/rpiv-todo` `2.9.0`, after legacy tweaks | `rpiv_todo_ui.py` |
+| Subagents UI | `@tintinweb/pi-subagents` `0.19.0` | `subagents_ui.py` |
+| Intercom messages | `pi-intercom` `0.13.0` | `intercom_ui.py` (with host `pi_transcript.py`) |
 
 Shared helpers do not decide compatibility. Each guarded patcher validates its
 complete source set before writing. Preserve exact anchors and occurrence counts,
@@ -154,7 +154,7 @@ The backup-enabled patchers save originals under `~/.config/theme-backups/`.
 that already existed belongs in the backup, not in that list. Restore originals
 from the relevant backup and remove only files recorded as newly added.
 
-The legacy `rpiv-todo-gray.py` also owns dependency-control removal and the
+The legacy `rpiv_todo_gray.py` also owns dependency-control removal and the
 clear/persistence includes. Its failure policy and sequencing remain distinct.
 The Todo UI patch recognizes only the exact clear-block reinjection it supports.
 Do not change persistence as part of a visual cleanup.
@@ -236,7 +236,7 @@ live installation state as an expected result.
 After verification, run the relevant patch command, for example:
 
 ```sh
-python3 -B pi/agent/patches/pi-transcript.py
+python3 -B pi/agent/patches/pi_transcript.py
 ```
 
 Restart Pi for host or bundled-TUI changes. Extension/package source changes use
@@ -246,7 +246,7 @@ independently revertible changes separate.
 
 ## Host-provided extension dependencies
 
-`host-peer-dependencies.py` repairs the installed manifests for Subagents 0.19.0,
+`host_peer_dependencies.py` repairs the installed manifests for Subagents 0.19.0,
 Ask User Question/Todo 2.9.0, and Web Access 0.27.0. TypeBox belongs in wildcard
 `peerDependencies`, alongside Pi's host modules, not in `dependencies`.
 The patch preserves unrelated dependencies, backs up manifests, and refuses
@@ -256,8 +256,8 @@ packages that other dependencies may still need.
 The installer replays this repair. After updating or reinstalling packages, run:
 
 ```sh
-python3 -B pi/agent/patches/host-peer-dependencies.py
-python3 -B pi/agent/patches/host-peer-dependencies.py --check
+python3 -B pi/agent/patches/host_peer_dependencies.py
+python3 -B pi/agent/patches/host_peer_dependencies.py --check
 ```
 
 Then `/reload` Pi to refresh package diagnostics.
@@ -269,13 +269,13 @@ at startup, removing the package-update reminder and its background lookups.
 Manual `pi update --extensions`, Pi release notices, model-catalog refreshes and
 real warnings/errors remain unchanged. This does not enable offline mode.
 
-Apply with `python3 -B pi/agent/patches/pi-activity-notices.py`, then restart Pi.
+Apply with `python3 -B pi/agent/patches/pi_activity_notices.py`, then restart Pi.
 The installer and upgrade checker already replay this patch.
 
 ## Messages queued during compaction
 
 Pi 0.87.1 can still go idle with pending messages when async input hooks finish
-between its final queue check and run settlement. `pi-compaction-queue.py` adds
+between its final queue check and run settlement. `pi_compaction_queue.py` adds
 a synchronous queue recheck after the new `agent_before_settle` boundary. It
 preserves native boundary hooks, context validation, abort guards, steering,
 follow-up, and retry behavior without timers or bypassing input hooks.
@@ -283,7 +283,7 @@ follow-up, and retry behavior without timers or bypassing input hooks.
 Powerline's custom editor uses a separate persisted queue. Its 50 ms delivery
 timer can run while later `session_compact` hooks are still executing. Pi then
 rejects the prompt, but Powerline has already marked it sent. The host patch above
-does not fix this path. `powerline-compaction-queue.py` keeps the item queued and
+does not fix this path. `powerline_compaction_queue.py` keeps the item queued and
 rechecks `ctx.isIdle()` using the existing cancellable timer before sending.
 
 The installer and upgrade checker replay both patches. After a reinstall, apply
@@ -291,10 +291,10 @@ them and **restart Pi**; `/reload` cannot reload the host session loop. For the
 Powerline-only change, `/reload` is sufficient:
 
 ```sh
-python3 -B pi/agent/patches/pi-compaction-queue.py
-python3 -B pi/agent/patches/powerline-compaction-queue.py
+python3 -B pi/agent/patches/pi_compaction_queue.py
+python3 -B pi/agent/patches/powerline_compaction_queue.py
 PI_SDK_ROOT="$(npm root -g)/@earendil-works/pi-coding-agent" \
-  bun test pi/agent/tests/pi-compaction-queue.test.ts pi/agent/tests/powerline-compaction-queue.test.ts
+  bun test pi/agent/tests/pi_compaction_queue.test.ts pi/agent/tests/powerline_compaction_queue.test.ts
 ```
 
 The patch backs up the original `dist/core/agent-session.js` and refuses unknown

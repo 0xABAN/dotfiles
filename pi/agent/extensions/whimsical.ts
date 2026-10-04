@@ -5,7 +5,7 @@ import type {
 import { Loader } from "@earendil-works/pi-tui";
 
 import { INTERVAL_MS, randomFrames } from "./whimsical/animation.ts";
-import { installCompactionIndicator } from "./whimsical/compaction-loader.ts";
+import { installCompactionIndicator } from "./whimsical/compaction_loader.ts";
 
 // Preserve the original import-time, process-wide compatibility installation.
 installCompactionIndicator();

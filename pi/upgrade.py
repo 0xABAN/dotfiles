@@ -144,13 +144,13 @@ def check_upgrade(version: str, backup: bool, repo: Path, home: Path, stage: Pat
             run("config-tests", ["bun", "test", "pi/agent/tests"], snapshot), "bun",
         )
         report["coverage"]["clean"] = test_counts(
-            run("clean-tests", ["node", "--test", "--test-reporter=tap", "pi-clean.test.mjs", "auth-store.test.mjs"], clean), "node",
+            run("clean-tests", ["node", "--test", "--test-reporter=tap", "pi_clean.test.mjs", "auth_store.test.mjs"], clean), "node",
         )
         # Native tests patch disposable fixtures, not the candidate itself. Replay
         # into this candidate only after the unmodified clean-launcher tests pass.
-        for patcher in ("powerline-dj", "powerline-layout", "powerline-compaction-queue", "pi-horizontal-inset", "powerline-editor",
-                        "pi-markdown-code", "pi-transcript", "intercom-ui", "pi-extension-dialogs", "pi-activity-notices",
-                        "pi-compact-layout", "pi-editor-gap", "pi-compaction-queue"):
+        for patcher in ("powerline_dj", "powerline_layout", "powerline_compaction_queue", "pi_horizontal_inset", "powerline_editor",
+                        "pi_markdown_code", "pi_transcript", "intercom_ui", "pi_extension_dialogs", "pi_activity_notices",
+                        "pi_compact_layout", "pi_editor_gap", "pi_compaction_queue"):
             run(patcher, ["python3", "-B", f"pi/agent/patches/{patcher}.py"], snapshot)
         candidate_launcher = clean / "node_modules/.bin/pi"
         run("select-launcher", ["python3", "-B", "pi/launcher.py", "--sdk", str(sdk),

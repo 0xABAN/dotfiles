@@ -31,7 +31,7 @@ local function check()
 end
 
 check()
-require("rose-pine").setup(dofile(root .. "/nvim/lua/plugins/rose-pine.lua").opts)
+require("rose-pine").setup(dofile(root .. "/nvim/lua/plugins/rose_pine.lua").opts)
 vim.cmd.colorscheme("rose-pine")
 assert(vim.api.nvim_get_hl(0, { name = "Normal", link = false }).fg == 0xe0def4)
 vim.cmd.colorscheme("everforest")

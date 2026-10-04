@@ -56,6 +56,6 @@ env -i \
   PI_CLEAN_AUTH_PATH="$agent_dir/auth.json" \
   PI_OFFLINE=1 \
   PI_TELEMETRY=0 \
-  "$node" --import "$install_dir/auth-store.mjs" "$cli" \
+  "$node" --import "$install_dir/auth_store.mjs" "$cli" \
     --no-session --no-extensions --no-skills --no-prompt-templates \
     --no-themes --no-context-files "$@"

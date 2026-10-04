@@ -47,7 +47,7 @@ and stored API keys are available immediately. Login and token refresh persist
 across invocations; **logout affects normal Pi too**. Environment-only API keys
 are still stripped.
 
-The pinned CLI has no separate auth-path option. `auth-store.mjs` is loaded before
+The pinned CLI has no separate auth-path option. `auth_store.mjs` is loaded before
 CLI startup and redirects its default `AuthStorage.create` calls to the shared
 file, using **the same lock path** as normal Pi. A temporary symlink supports
 read-only auth helpers; writes do not lock through that alias. Explicit custom
@@ -70,7 +70,7 @@ shared auth file is the deliberate exception to configuration isolation.
 
 ```sh
 bash -n pi-clean
-node --test pi-clean.test.mjs auth-store.test.mjs
+node --test pi_clean.test.mjs auth_store.test.mjs
 pi-clean --version
 ```
 
