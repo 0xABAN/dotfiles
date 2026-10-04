@@ -67,9 +67,9 @@ the driver's implicit session across observation and action calls.
 | `agent/extensions/` | Local extension entrypoints and lifecycle handlers |
 | `agent/extensions/plan-mode/` | Mode transitions, command policy, and status formatting |
 | `agent/extensions/whimsical/` | Animation catalog, frame generation, and compaction-loader adapter |
-| `agent/patches/*.py` | Target-specific anchors, compatibility rules, and patch commands |
-| `agent/patches/patch_support.py` | SDK discovery, exact source loading, backup/write mechanics, and counted replacements |
-| `agent/patches/payloads/` | Renderer source grouped by `host`, `powerline`, `tui`, `todo`, `subagents`, and `intercom` |
+| `patches/*.py` | Target-specific anchors, compatibility rules, and patch commands |
+| `patches/patch_support.py` | SDK discovery, exact source loading, backup/write mechanics, and counted replacements |
+| `patches/payloads/` | Renderer source grouped by `host`, `powerline`, `tui`, `todo`, `subagents`, and `intercom` |
 | `agent/themes/`, `agents/`, `skills/`, `prompts/` | Theme data and agent instructions |
 | `rpiv-todo/config.json` | Todo widget configuration |
 
@@ -158,7 +158,7 @@ gate for extreme window sizes.
 
 ## Patch contracts
 
-| Target | Supported input | Commands under `agent/patches/` |
+| Target | Supported input | Commands under `patches/` |
 |--------|-----------------|--------------------------------|
 | Pi unbundled host and package-local TUI | Pi `1.0.0` | `pi_horizontal_inset.py`, `pi_markdown_code.py`, `pi_transcript.py`, `pi_extension_dialogs.py`, `pi_activity_notices.py`, `pi_compact_layout.py`, `pi_editor_gap.py`, `pi_compaction_queue.py` |
 | Powerline | Git commit `8c9bda10fdfd2822e89334ec85f3da9f8ca49182` | `powerline_dj.py`, `powerline_layout.py`, `powerline_editor.py`, `powerline_compaction_queue.py` |
@@ -226,7 +226,7 @@ host is deliberately unpatched. Custom-host activation does not change it.
 Run the relevant patch command from the repository root, for example:
 
 ```sh
-python3 -B pi/agent/patches/pi_transcript.py
+python3 -B pi/patches/pi_transcript.py
 ```
 
 Host patchers discover the SDK that owns the actual `pi` command, not the package
@@ -254,8 +254,8 @@ packages that other dependencies may still need.
 The installer replays this repair. After updating or reinstalling packages, run:
 
 ```sh
-python3 -B pi/agent/patches/host_peer_dependencies.py
-python3 -B pi/agent/patches/host_peer_dependencies.py --check
+python3 -B pi/patches/host_peer_dependencies.py
+python3 -B pi/patches/host_peer_dependencies.py --check
 ```
 
 Then `/reload` Pi to refresh package diagnostics.
@@ -267,7 +267,7 @@ at startup, removing the package-update reminder and its background lookups.
 Manual `pi update --extensions`, Pi release notices, model-catalog refreshes and
 real warnings/errors remain unchanged. This does not enable offline mode.
 
-Apply with `python3 -B pi/agent/patches/pi_activity_notices.py`, then restart Pi.
+Apply with `python3 -B pi/patches/pi_activity_notices.py`, then restart Pi.
 The installer replays this patch.
 
 ## Messages queued during compaction
@@ -289,8 +289,8 @@ them and **restart Pi**; `/reload` cannot reload the host session loop. For the
 Powerline-only change, `/reload` is sufficient:
 
 ```sh
-python3 -B pi/agent/patches/pi_compaction_queue.py
-python3 -B pi/agent/patches/powerline_compaction_queue.py
+python3 -B pi/patches/pi_compaction_queue.py
+python3 -B pi/patches/powerline_compaction_queue.py
 ```
 
 The host patch backs up the original `dist/core/agent-session.js` and refuses
