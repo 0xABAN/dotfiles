@@ -39,7 +39,6 @@ Install the driver using the [official installer](https://cua.ai/docs/start-here
 ```bash
 curl -fsSL https://cua.ai/driver/install.sh -o /tmp/cua-driver-install.sh
 /bin/bash /tmp/cua-driver-install.sh --no-modify-path
-open -n -g -a CuaDriver --args serve
 ~/.local/bin/cua-driver permissions grant
 ~/.local/bin/cua-driver permissions status
 ```
@@ -48,10 +47,14 @@ Enable CuaDriver in macOS Accessibility and Screen & System Audio Recording
 settings. Restart the driver if macOS requests it. Permission status must
 reflect CuaDriver's daemon, not a terminal's existing grants.
 
-The tracked `agent/mcp.json.example` launches `cua-driver mcp` from `PATH`;
-ensure `~/.local/bin` is on `PATH`. For an existing installation, merge just
-that server entry into `~/.pi/agent/mcp.json`, using the absolute binary path
-reported by `~/.local/bin/cua-driver mcp-config`. The dotfiles installer
+The repository's `install.sh` creates and loads a per-user LaunchAgent. It
+starts `CuaDriver.app` with `serve --grant existing-profile` at login and keeps
+the daemon running. This is where the existing-profile grant belongs. The tracked
+`agent/mcp.json.example` starts the MCP client with plain `cua-driver mcp`;
+ensure `~/.local/bin` is on `PATH`. Do not put `--grant` on the MCP command:
+it cannot change a daemon that's already running. For an existing installation,
+merge the plain MCP entry into `~/.pi/agent/mcp.json`, using the absolute binary
+path reported by `~/.local/bin/cua-driver mcp-config`. The dotfiles installer
 preserves this machine-local file, including its other servers and secrets.
 
 Run `/reload` in Pi, then `/mcp reconnect cua-driver` and ask for the task.

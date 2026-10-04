@@ -88,6 +88,26 @@ else
   echo "left existing ~/.pi/agent/mcp.json in place (not symlinked; secrets)"
 fi
 
+echo "== Cua Driver LaunchAgent =="
+if [[ -d /Applications/CuaDriver.app ]]; then
+  launch_agent_label="com.trycua.cua-driver"
+  launch_agent_domain="gui/$(id -u)"
+  launch_agent_plist="$HOME/Library/LaunchAgents/$launch_agent_label.plist"
+  cua_driver="/Applications/CuaDriver.app/Contents/MacOS/cua-driver"
+
+  if launchctl print "$launch_agent_domain/$launch_agent_label" >/dev/null 2>&1; then
+    launchctl bootout "$launch_agent_domain/$launch_agent_label"
+  fi
+
+  if "$cua_driver" status --json >/dev/null 2>&1; then
+    "$cua_driver" stop
+  fi
+
+  link "$ROOT/pi/agent/launchagents/$launch_agent_label.plist" "$launch_agent_plist"
+  launchctl bootstrap "$launch_agent_domain" "$launch_agent_plist"
+else
+  echo "CuaDriver.app is not installed; skipped its LaunchAgent"
+fi
 
 # Extensions must use Pi's host modules rather than declare bundled copies.
 python3 -B "$ROOT/pi/patches/host_peer_dependencies.py"
