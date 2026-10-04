@@ -90,6 +90,7 @@
     }
   },
   "skills": [
+    "!**/.agents/skills/write/**",
     "-skills/brand",
     "-skills/test-driven-development",
     "-skills/use-railway",
