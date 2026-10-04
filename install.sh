@@ -71,9 +71,6 @@ do
   link "$ROOT/pi/agent/$name" "$HOME/.pi/agent/$name"
 done
 
-# Retire the old computer-use shortcut, preserving any machine-local copy.
-backup "$HOME/.pi/agent/prompts/use-computer.md"
-
 echo "== shared agent instructions =="
 backup "$HOME/AGENTS.md"
 link "$ROOT/pi/agent/AGENTS.md" "$HOME/.pi/agent/AGENTS.md"

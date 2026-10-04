@@ -70,7 +70,7 @@ the driver's implicit session across observation and action calls.
 | `patches/*.py` | Target-specific anchors, compatibility rules, and patch commands |
 | `patches/patch_support.py` | SDK discovery, exact source loading, backup/write mechanics, and counted replacements |
 | `patches/payloads/` | Renderer source grouped by `host`, `powerline`, `tui`, `todo`, `subagents`, and `intercom` |
-| `agent/themes/`, `agents/`, `skills/`, `prompts/` | Theme data and agent instructions |
+| `agent/themes/`, `agents/`, `skills/` | Theme data and agent instructions |
 | `rpiv-todo/config.json` | Todo widget configuration |
 
 Themes live in family folders under `agent/themes/`, alongside their licenses.
