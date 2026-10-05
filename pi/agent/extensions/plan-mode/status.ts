@@ -1,5 +1,6 @@
 import rosePine from "../../themes/rose_pine/rose-pine.json";
 import everforest from "../../themes/everforest/everforest-dark-hard.json";
+import type { AgentMode } from "./utils.ts";
 
 /** Interpolate the label without painting its spaces. */
 function shine(text: string, stops: [number, number, number][]): string {
@@ -36,20 +37,27 @@ function thinkingLabel(level: string): string {
 }
 
 /** Pure presentation: lifecycle code owns status keys, tool state and persistence. */
-export function formatPlanStatus(enabled: boolean, thinkingLevel?: string, themeName?: string): { mode: string; thinking: string } {
-	const mid: [number, number, number] = enabled
-		? [196, 160, 230] // pastel purple (plan)
-		: [173, 210, 203]; // pale teal (build, #add2cb)
+export function formatModeStatus(mode: AgentMode, thinkingLevel?: string, themeName?: string): { mode: string; thinking: string } {
+	const mid: [number, number, number] = mode === "learn"
+		? [230, 152, 117] // warm peach (learn)
+		: mode === "plan"
+			? [196, 160, 230] // pastel purple (plan)
+			: [173, 210, 203]; // pale teal (build, #add2cb)
 
 	// Reuse each imported palette while preserving the older themes' gradient.
 	const rose = rosePine.vars;
 	// Hard and Medium share their foreground/accent colors.
 	const forest = everforest.vars;
-	const hexStops = themeName === "rose-pine"
-		? [rose.text, enabled ? rose.iris : rose.foam, rose.rose]
-		: themeName === "everforest-dark-medium" || themeName === "everforest-dark-hard"
-			? [forest.fg, enabled ? forest.purple : forest.green, forest.yellow]
-			: undefined;
+	let hexStops: string[] | undefined;
+	if (themeName === "rose-pine") {
+		const accent = mode === "learn" ? rose.gold : mode === "plan" ? rose.iris : rose.foam;
+		hexStops = [rose.text, accent, rose.rose];
+	} else if (themeName === "everforest-dark-medium" || themeName === "everforest-dark-hard") {
+		hexStops = mode === "learn"
+			? [forest.yellow, forest.orange, forest.yellow]
+			: [forest.fg, mode === "plan" ? forest.purple : forest.green, forest.yellow];
+	}
+
 	const stops: [number, number, number][] = hexStops
 		? hexStops.map((hex) => [
 			Number.parseInt(hex.slice(1, 3), 16),
@@ -58,8 +66,10 @@ export function formatPlanStatus(enabled: boolean, thinkingLevel?: string, theme
 		])
 		: [[255, 255, 255], mid, [243, 238, 223]];
 
+	const label = mode === "learn" ? "\uF19D  learn mode" : mode === "plan" ? "\uF022  plan mode" : "\uF121  build mode";
+
 	return {
-		mode: shine(enabled ? "\uF022  plan mode" : "\uF121  build mode", stops),
+		mode: shine(label, stops),
 		thinking: shine(thinkingLabel(thinkingLevel || "off"), stops),
 	};
 }

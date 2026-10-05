@@ -1,6 +1,8 @@
 /**
- * Pure utility functions for plan mode.
+ * Pure utility functions for agent modes.
  */
+
+export type AgentMode = "build" | "plan" | "learn";
 
 // Destructive commands blocked in plan mode
 const DESTRUCTIVE_PATTERNS = [

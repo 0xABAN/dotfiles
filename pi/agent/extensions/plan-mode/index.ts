@@ -1,21 +1,16 @@
 /**
- * Plan Mode Extension
- *
- * Read-only exploration mode for safe code analysis.
- * When enabled, built-in write tools are disabled.
- *
- * Features:
- * - /plan command or Shift+Tab to toggle
- * - Bash restricted to allowlisted read-only commands
- * - On execute: remind to seed an rpiv-todo list (no hard gate)
+ * Build, Plan, and Learn share one mode controller and tool checkpoint.
+ * Shift+Tab cycles modes; /plan and /learn toggle their mode directly.
+ * Plan preserves the existing exploration/execute flow. Learn teaches without
+ * doing the task and permits only local file inspection.
  */
 
 import type { AgentMessage } from "@earendil-works/pi-agent-core";
 import type { AssistantMessage, TextContent } from "@earendil-works/pi-ai";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
-import { Key } from "@earendil-works/pi-tui";
-import { extractPlanSteps, isSafeCommand } from "./utils.ts";
-import { formatPlanStatus } from "./status.ts";
+import { type AgentMode, extractPlanSteps, isSafeCommand } from "./utils.ts";
+import { formatModeStatus } from "./status.ts";
+import { LEARN_MODE_PROMPT, LEARN_MODE_TOOLS } from "./learn.ts";
 
 function isAssistantMessage(m: AgentMessage): m is AssistantMessage {
 	return m.role === "assistant" && Array.isArray(m.content);
@@ -30,18 +25,23 @@ function getTextContent(message: AssistantMessage): string {
 
 // Tools
 const PLAN_MODE_TOOLS = ["read", "bash", "grep", "find", "ls", "questionnaire"];
-const NORMAL_MODE_TOOLS = ["read", "bash", "edit", "write"];
 const PLAN_MODE_DISABLED_TOOLS = new Set<string>(["edit", "write"]);
-const PLAN_MANAGED_TOOLS = new Set<string>([...PLAN_MODE_TOOLS, ...NORMAL_MODE_TOOLS]);
+const LEARN_MODE_APPENDIX = `\n\n<learn_mode>\n${LEARN_MODE_PROMPT}</learn_mode>`;
 
+interface ModeState {
+	mode: AgentMode;
+	buildTools: string[];
+}
+
+/** Persisted by the original two-mode controller; migrate on the next switch. */
 interface PlanModeState {
 	enabled: boolean;
 	toolsBeforePlanMode?: string[];
 }
 
 export default function planModeExtension(pi: ExtensionAPI): void {
-	let planModeEnabled = false;
-	let toolsBeforePlanMode: string[] | undefined;
+	let mode: AgentMode = "build";
+	let buildTools: string[] = [];
 
 	pi.registerFlag("plan", {
 		description: "Start in plan mode (read-only exploration)",
@@ -49,14 +49,20 @@ export default function planModeExtension(pi: ExtensionAPI): void {
 		default: false,
 	});
 
+	pi.registerFlag("learn", {
+		description: "Start in learn mode (guided thinking, no solutions)",
+		type: "boolean",
+		default: false,
+	});
+
 	function updateStatus(ctx: ExtensionContext): void {
-		const status = formatPlanStatus(planModeEnabled, ctx.thinkingLevel, ctx.ui.theme?.name);
+		const status = formatModeStatus(mode, ctx.thinkingLevel, ctx.ui.theme?.name);
 		ctx.ui.setStatus("agent-mode", status.mode);
 		ctx.ui.setStatus("agent-thinking", status.thinking);
 	}
 
 	function withTodo(toolNames: string[]): string[] {
-		// keep rpiv-todo's tool available across mode switches
+		// Keep rpiv-todo available while planning, never in Learn.
 		return [...new Set([...toolNames, "todo"])];
 	}
 
@@ -67,63 +73,93 @@ export default function planModeExtension(pi: ExtensionAPI): void {
 		]);
 	}
 
-	function getNormalModeTools(activeToolNames: string[]): string[] {
-		return withTodo([
-			...NORMAL_MODE_TOOLS,
-			...activeToolNames.filter((name) => !PLAN_MANAGED_TOOLS.has(name)),
-		]);
-	}
-
-	function enablePlanModeTools(): void {
-		if (toolsBeforePlanMode === undefined) {
-			toolsBeforePlanMode = pi.getActiveTools();
+	function applyModeTools(): void {
+		if (mode === "learn") {
+			pi.setActiveTools([...LEARN_MODE_TOOLS]);
+		} else if (mode === "plan") {
+			pi.setActiveTools(getPlanModeTools(buildTools));
+		} else {
+			pi.setActiveTools(buildTools);
 		}
-		pi.setActiveTools(getPlanModeTools(toolsBeforePlanMode));
-	}
-
-	function restoreNormalModeTools(): void {
-		pi.setActiveTools(withTodo(toolsBeforePlanMode ?? getNormalModeTools(pi.getActiveTools())));
-		toolsBeforePlanMode = undefined;
 	}
 
 	function persistState(): void {
-		pi.appendEntry("plan-mode", {
-			enabled: planModeEnabled,
-			toolsBeforePlanMode,
-		});
+		pi.appendEntry("agent-mode", { mode, buildTools } satisfies ModeState);
 	}
 
-	function setPlanMode(enabled: boolean, ctx: ExtensionContext): void {
-		planModeEnabled = enabled;
+	function setMode(nextMode: AgentMode, ctx: ExtensionContext): void {
+		if (nextMode === mode) return;
 
-		if (planModeEnabled) {
-			enablePlanModeTools();
-		} else {
-			restoreNormalModeTools();
-		}
+		// Carry the same Build checkpoint through Plan ↔ Learn transitions.
+		if (mode === "build") buildTools = pi.getActiveTools();
+		mode = nextMode;
+		applyModeTools();
 		updateStatus(ctx);
 		persistState();
 	}
 
+	function changeMode(nextMode: AgentMode, ctx: ExtensionContext): void {
+		// A running turn already has its instructions and may have tools in flight.
+		if (!ctx.isIdle()) {
+			ctx.ui.notify("Wait for the current turn to finish or cancel it before changing modes.", "warning");
+			return;
+		}
+		setMode(nextMode, ctx);
+	}
+
+	function restoreState(ctx: ExtensionContext): void {
+		mode = "build";
+		const entry = ctx.sessionManager.getBranch().findLast(
+			(e) => e.type === "custom" && (e.customType === "agent-mode" || e.customType === "plan-mode"),
+		);
+
+		if (entry?.type === "custom") {
+			if (entry.customType === "agent-mode") {
+				const state = entry.data as ModeState;
+				mode = state.mode;
+				buildTools = state.buildTools;
+			} else {
+				const state = entry.data as PlanModeState;
+				mode = state.enabled ? "plan" : "build";
+				if (state.toolsBeforePlanMode) buildTools = state.toolsBeforePlanMode;
+			}
+		}
+
+		applyModeTools();
+		updateStatus(ctx);
+	}
+
 	pi.registerCommand("plan", {
 		description: "Toggle plan mode (read-only exploration)",
-		handler: async (_args, ctx) => setPlanMode(!planModeEnabled, ctx),
+		handler: async (_args, ctx) => changeMode(mode === "plan" ? "build" : "plan", ctx),
+	});
+
+	pi.registerCommand("learn", {
+		description: "Toggle learn mode (guided thinking, no solutions)",
+		handler: async (_args, ctx) => changeMode(mode === "learn" ? "build" : "learn", ctx),
 	});
 
 	pi.registerShortcut("shift+tab", {
-		description: "Toggle plan mode",
-		handler: async (ctx) => setPlanMode(!planModeEnabled, ctx),
+		description: "Cycle build, plan, and learn modes",
+		handler: async (ctx) => changeMode(mode === "build" ? "plan" : mode === "plan" ? "learn" : "build", ctx),
 	});
 
-	// Keep Ctrl+Alt+P as a backup (doesn't steal thinking cycle)
-	pi.registerShortcut(Key.ctrlAlt("p"), {
+	// Keep Ctrl+Alt+P as a direct Plan toggle.
+	pi.registerShortcut("ctrl+alt+p", {
 		description: "Toggle plan mode",
-		handler: async (ctx) => setPlanMode(!planModeEnabled, ctx),
+		handler: async (ctx) => changeMode(mode === "plan" ? "build" : "plan", ctx),
 	});
 
-	// Block destructive bash in plan mode
+	// Exposure alone is not a permission boundary: also block nested/inactive calls.
 	pi.on("tool_call", async (event, _ctx) => {
-		if (planModeEnabled && event.toolName === "bash") {
+		if (mode === "learn" && !LEARN_MODE_TOOLS.has(event.toolName)) {
+			return {
+				block: true,
+				reason: "Learn mode permits only read, grep, find, and ls. Guide the learner; do not execute their task.",
+			};
+		}
+
+		if (mode === "plan" && event.toolName === "bash") {
 			const command = event.input.command as string;
 			if (!isSafeCommand(command)) {
 				return {
@@ -134,13 +170,14 @@ export default function planModeExtension(pi: ExtensionAPI): void {
 		}
 	});
 
-	// Filter out stale plan mode context when not in plan mode
+	// Drop stale Plan instructions, including execution reminders while learning.
 	pi.on("context", async (event) => {
-		if (planModeEnabled) return;
+		if (mode === "plan") return;
 		return {
 			messages: event.messages.filter((m) => {
 				const msg = m as AgentMessage & { customType?: string };
 				if (msg.customType === "plan-mode-context") return false;
+				if (mode === "learn" && msg.customType === "plan-mode-execute") return false;
 				if (msg.role !== "user") return true;
 
 				const content = msg.content;
@@ -157,10 +194,19 @@ export default function planModeExtension(pi: ExtensionAPI): void {
 		};
 	});
 
-	pi.on("before_agent_start", async (_event, ctx) => {
+	pi.on("before_agent_start", async (event, ctx) => {
 		// Status strings contain ANSI colors; refresh after a theme selection.
 		if (ctx.hasUI) updateStatus(ctx);
-		if (!planModeEnabled) return;
+
+		// The Claude bridge forwards appendSystemPrompt but drops custom sections.
+		// Remove only our exact appendix so other extensions' instructions stay intact.
+		const options = event.systemPromptOptions;
+		options.appendSystemPrompt = options.appendSystemPrompt.replace(LEARN_MODE_APPENDIX, "");
+		if (mode === "learn") {
+			options.appendSystemPrompt += LEARN_MODE_APPENDIX;
+			return;
+		}
+		if (mode !== "plan") return;
 		return {
 			message: {
 				customType: "plan-mode-context",
@@ -173,7 +219,7 @@ export default function planModeExtension(pi: ExtensionAPI): void {
 
 	// After a Plan: section, offer execute / stay / refine
 	pi.on("agent_end", async (event, ctx) => {
-		if (!planModeEnabled || !ctx.hasUI) return;
+		if (mode !== "plan" || !ctx.hasUI) return;
 
 		const lastAssistant = event.messages.findLast(isAssistantMessage);
 		if (!lastAssistant) return;
@@ -187,8 +233,10 @@ export default function planModeExtension(pi: ExtensionAPI): void {
 			"Refine the plan",
 		]);
 
+		if (mode !== "plan") return;
+
 		if (choice?.startsWith("Execute")) {
-			setPlanMode(false, ctx);
+			setMode("build", ctx);
 
 			const list = steps.map((s, i) => `${i + 1}. ${s}`).join("\n");
 			pi.sendMessage(
@@ -215,24 +263,16 @@ ${list}`,
 		if (ctx.hasUI) updateStatus(ctx);
 	});
 
-	pi.on("session_start", async (_event, ctx) => {
-		if (pi.getFlag("plan") === true) {
-			planModeEnabled = true;
-		}
+	pi.on("session_start", async (event, ctx) => {
+		buildTools = pi.getActiveTools();
+		restoreState(ctx);
 
-		const entries = ctx.sessionManager.getEntries();
-		const planModeEntry = entries.findLast(
-			(e: { type: string; customType?: string }) => e.type === "custom" && e.customType === "plan-mode",
-		) as { data?: PlanModeState } | undefined;
-
-		if (planModeEntry?.data) {
-			planModeEnabled = planModeEntry.data.enabled ?? planModeEnabled;
-			toolsBeforePlanMode = planModeEntry.data.toolsBeforePlanMode ?? toolsBeforePlanMode;
+		// Explicit startup flags override saved state; Learn wins if both are set.
+		if (event.reason === "startup") {
+			if (pi.getFlag("learn") === true) setMode("learn", ctx);
+			else if (pi.getFlag("plan") === true) setMode("plan", ctx);
 		}
-
-		if (planModeEnabled) {
-			enablePlanModeTools();
-		}
-		updateStatus(ctx);
 	});
+
+	pi.on("session_tree", async (_event, ctx) => restoreState(ctx));
 }

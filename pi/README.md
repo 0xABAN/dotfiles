@@ -81,7 +81,7 @@ the driver's implicit session across observation and action calls.
 |------|----------------|
 | `agent/settings.json`, `keybindings.json`, `subagents.json` | Package selection and user-facing configuration |
 | `agent/extensions/` | Local extension entrypoints and lifecycle handlers |
-| `agent/extensions/plan-mode/` | Mode transitions, command policy, and status formatting |
+| `agent/extensions/plan-mode/` | Build/Plan/Learn transitions, teaching policy, tool permissions, and status formatting |
 | `agent/extensions/whimsical/` | Animation catalog, frame generation, and compaction-loader adapter |
 | `patches/*.py` | Target-specific anchors, compatibility rules, and patch commands |
 | `patches/patch_support.py` | SDK discovery, exact source loading, backup/write mechanics, and counted replacements |
@@ -155,7 +155,13 @@ Pi 1.0's user-message Markdown cache and theme-aware `ThemedText` notices remain
 native. The patches add layout only; do not restore a second user-message cache
 or replace native notice invalidation/coalescing.
 
-Plan-mode status formatting is pure; the entrypoint owns status publication,
+The mode controller cycles Build → Plan → Learn with Shift+Tab; `/learn` enters
+or leaves Learn directly. Learn permits only local file inspection and teaches
+with concepts and hints rather than task solutions. Everforest gives it a
+graduation-cap icon and an amber/orange gradient distinct from Build and Plan.
+See [mode controls and checks](agent/extensions/plan-mode/README.md).
+
+Mode status formatting is pure; the entrypoint owns status publication,
 tool restoration, and persistence. Whimsical's compaction adapter contains the
 host-specific prototype hook. Keep that compatibility code out of its catalog.
 
