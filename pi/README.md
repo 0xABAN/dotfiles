@@ -36,6 +36,11 @@ fails with `prompt-capture: no capture for this ...`. Append-mode agents embed
 the parent prompt verbatim and resolve without it. The bridge registers no tools
 unless AskClaude is enabled, so this does not widen agent tool scope.
 
+One-off model calls with their own system prompt need the same care. The bridge
+serves those only when they carry `cacheRetention: "none"`, through an isolated
+Claude Code query with that prompt and no tools. `web_access_page_answer.py` adds
+the marker to `fetch_content` answer mode, which otherwise fails on the bridge.
+
 ## Computer use
 
 Computer use runs through the `cua-driver` server and Pi's native MCP support.
@@ -176,6 +181,7 @@ gate for extreme window sizes.
 | rpiv-todo UI | `@juicesharp/rpiv-todo` `2.9.0`, after legacy tweaks | `rpiv_todo_ui.py` |
 | Subagents UI and native SDK tools | `@tintinweb/pi-subagents` `0.19.0`, Pi `1.0.0` | `subagents_ui.py`, `subagents-native-tools.py` |
 | Intercom messages | `pi-intercom` `0.13.0` | `intercom_ui.py` (with host `pi_transcript.py`) |
+| Web page answers | `pi-web-access` `0.27.0` | `web_access_page_answer.py` |
 
 Shared helpers do not decide compatibility. Each guarded patcher validates its
 complete source set before writing. Preserve exact anchors and occurrence counts,
@@ -203,7 +209,7 @@ Do not change persistence as part of a visual cleanup.
 `install.sh` owns the serial order: powerline DJ/layout/compaction queue, host
 inset, editor, Markdown code panels, transcript, Intercom UI, dialogs, notices, compact layout,
 editor gap, compaction queue, legacy Todo tweaks, Todo UI, Subagents UI and native
-tools, then launcher selection.
+tools, web page answers, then launcher selection.
 The legacy Todo command remains best-effort; the other patch failures propagate.
 Powerline owns the editor; Whimsical owns the working indicator.
 Pi-pretty is not installed, so its indicator cannot override Whimsical.

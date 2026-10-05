@@ -195,6 +195,11 @@ if [[ -f "$ROOT/pi/patches/subagents-native-tools.py" ]]; then
   python3 "$ROOT/pi/patches/subagents-native-tools.py"
 fi
 
+# Claude bridge serves fetch_content page answers only when marked as one-off calls.
+if [[ -f "$ROOT/pi/patches/web_access_page_answer.py" ]]; then
+  python3 "$ROOT/pi/patches/web_access_page_answer.py"
+fi
+
 # npm restores its bundled bin on update; our host patches need the unbundled CLI.
 # Preserve config-only installation on machines that do not have Pi yet.
 if command -v pi >/dev/null 2>&1; then
