@@ -39,7 +39,7 @@ interface PlanModeState {
 	toolsBeforePlanMode?: string[];
 }
 
-export default function planModeExtension(pi: ExtensionAPI): void {
+export default function modesExtension(pi: ExtensionAPI): void {
 	let mode: AgentMode = "build";
 	let buildTools: string[] = [];
 

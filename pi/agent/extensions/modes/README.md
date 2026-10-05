@@ -1,6 +1,7 @@
-# Build, Plan, and Learn modes
+# Modes
 
-One controller owns the mode shortcut, tool permissions, and status badge.
+Build, Plan, and Learn share one controller for the mode shortcut, tool permissions,
+and status badge.
 
 ## Controls
 
@@ -77,7 +78,7 @@ The reminder is not a tool gate.
 From the repository root:
 
 ```sh
-bun pi/agent/extensions/plan-mode/check.mjs
+bun pi/agent/extensions/modes/check.mjs
 ```
 
 The check covers mode transitions, direct and nested tool guards, prompt cleanup,

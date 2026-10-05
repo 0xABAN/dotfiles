@@ -1,4 +1,4 @@
-// Run from the repository root: bun pi/agent/extensions/plan-mode/check.mjs
+// Run from the repository root: bun pi/agent/extensions/modes/check.mjs
 import assert from "node:assert/strict";
 import modeExtension from "./index.ts";
 import { LEARN_MODE_PROMPT, LEARN_MODE_TOOLS } from "./learn.ts";
