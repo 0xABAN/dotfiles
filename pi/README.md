@@ -28,6 +28,14 @@ direct and nested calls through Pi 1.0's private `_beforeToolCall` hook; review
 that boundary before upgrading. The researcher allows `builtin:mcp`,
 `builtin:codemode`, and `builtin:tool-search` by name.
 
+`prompt_mode: replace` agents must list `pi-claude-bridge` in `extensions:`.
+Claude bridge refuses any system prompt it never recorded, and only its own
+`before_agent_start` hook records one. A replacement prompt does not embed the
+parent's, so without the bridge loaded in the child, every bridge-model turn
+fails with `prompt-capture: no capture for this ...`. Append-mode agents embed
+the parent prompt verbatim and resolve without it. The bridge registers no tools
+unless AskClaude is enabled, so this does not widen agent tool scope.
+
 ## Computer use
 
 Computer use runs through the `cua-driver` server and Pi's native MCP support.

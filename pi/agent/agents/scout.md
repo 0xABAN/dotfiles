@@ -4,7 +4,7 @@ tools: read, grep, find, ls, bash, write
 thinking: low
 prompt_mode: replace
 skills: false
-extensions: false
+extensions: [pi-claude-bridge]
 inherit_context: false
 ---
 

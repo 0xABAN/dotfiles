@@ -1,7 +1,7 @@
 ---
 description: Autonomous web researcher — Exa MCP search/fetch, evaluates sources, synthesizes a focused brief
 tools: read, bash, grep, find, ls
-extensions: [builtin:mcp, builtin:codemode, builtin:tool-search]
+extensions: [builtin:mcp, builtin:codemode, builtin:tool-search, pi-claude-bridge]
 thinking: medium
 prompt_mode: replace
 skills: false
