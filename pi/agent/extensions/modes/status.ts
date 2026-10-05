@@ -53,9 +53,9 @@ export function formatModeStatus(mode: AgentMode, thinkingLevel?: string, themeN
 		const accent = mode === "learn" ? rose.gold : mode === "plan" ? rose.iris : rose.foam;
 		hexStops = [rose.text, accent, rose.rose];
 	} else if (themeName === "everforest-dark-medium" || themeName === "everforest-dark-hard") {
-		hexStops = mode === "learn"
-			? [forest.yellow, forest.orange, forest.yellow]
-			: [forest.fg, mode === "plan" ? forest.purple : forest.green, forest.yellow];
+		const accent = mode === "learn" ? forest.blue : mode === "plan" ? forest.purple : forest.green;
+		// All mode icons start at the neutral foreground; only the accent differs.
+		hexStops = [forest.fg, accent, forest.yellow];
 	}
 
 	const stops: [number, number, number][] = hexStops

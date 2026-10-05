@@ -42,10 +42,11 @@ following its instructions, so this is not a guarantee against answer leakage.
 
 ### Appearance
 
-Learn has a graduation-cap icon and a separate color palette. Everforest Hard
-and Medium use a yellow → orange → yellow gradient (`#DBBC7F` → `#E69875` →
-`#DBBC7F`) for the mode and thinking badges. Build keeps its green accent and
-Plan its purple. Rose Pine uses gold for Learn; other themes use warm peach.
+All mode icons share the same neutral color. Learn keeps its graduation-cap icon.
+Everforest Hard and Medium use a foreground → muted teal → yellow gradient
+(`#D3C6AA` → `#7FBBB3` → `#DBBC7F`) for Learn's mode and thinking badges. Build
+keeps its green accent and Plan its purple. Rose Pine uses gold for Learn; other
+themes use warm peach.
 
 ### Inspiration
 

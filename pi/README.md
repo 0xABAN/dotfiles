@@ -158,7 +158,8 @@ or replace native notice invalidation/coalescing.
 The mode controller cycles Build → Plan → Learn with Shift+Tab; `/learn` enters
 or leaves Learn directly. Learn permits only local file inspection and teaches
 with concepts and hints rather than task solutions. Everforest gives it a
-graduation-cap icon and an amber/orange gradient distinct from Build and Plan.
+graduation-cap icon in the same neutral color as Build and Plan, with a distinct
+muted-teal gradient for the label.
 See [mode controls and checks](agent/extensions/modes/README.md).
 
 Mode status formatting is pure; the entrypoint owns status publication,

@@ -201,7 +201,7 @@ assert.match(h.mode(), /build mode$/);
 assert.deepEqual(h.tools(), BUILD_TOOLS);
 assert.equal(h.sent.at(-1).message.customType, "plan-mode-execute");
 
-// Everforest Hard and Medium share a distinct amber/orange Learn palette.
+// Mode icons share one neutral color; Everforest Learn uses its muted teal accent.
 for (const theme of ["everforest-dark-hard", "everforest-dark-medium", "rose-pine", "osaka-jade"]) {
 	const learn = formatModeStatus("learn", "xhigh", theme);
 	const build = formatModeStatus("build", "xhigh", theme);
@@ -211,9 +211,14 @@ for (const theme of ["everforest-dark-hard", "everforest-dark-medium", "rose-pin
 	assert.notEqual(learn.thinking, build.thinking);
 	assert.notEqual(learn.thinking, plan.thinking);
 	assert(learn.mode.endsWith("\x1b[0m"));
+
+	const iconColor = /^\x1b\[38;2;\d+;\d+;\d+m/.exec(build.mode)?.[0];
+	assert(iconColor);
+	assert(learn.mode.startsWith(iconColor));
+	assert(plan.mode.startsWith(iconColor));
 	if (theme.startsWith("everforest")) {
-		assert(learn.mode.startsWith("\x1b[38;2;219;188;127m"));
-		assert(learn.thinking.includes("\x1b[38;2;230;152;117m"));
+		assert(learn.mode.startsWith("\x1b[38;2;211;198;170m"));
+		assert(learn.thinking.includes("\x1b[38;2;127;187;179m"));
 	}
 }
 assert.deepEqual(
