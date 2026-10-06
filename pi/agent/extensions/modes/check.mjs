@@ -98,14 +98,17 @@ const learnAppendix = promptEvent.systemPromptOptions.appendSystemPrompt;
 await h.emit("before_agent_start", promptEvent);
 assert.equal(promptEvent.systemPromptOptions.appendSystemPrompt, learnAppendix);
 
-const lesson = { role: "user", content: "Here is my prediction." };
+// Both tutor explanations and learner progress must survive context filtering.
+const explanation = { role: "assistant", content: [{ type: "text", text: "A return exits the whole function." }] };
+const lesson = { role: "user", content: "I understand return. I have not traced the loop yet." };
 const context = await h.emit("context", { messages: [
 	{ role: "custom", customType: "plan-mode-context", content: "Produce a plan." },
 	{ role: "custom", customType: "plan-mode-execute", content: "Execute the plan." },
 	{ role: "user", content: [{ type: "text", text: "[PLAN MODE ACTIVE]" }] },
+	explanation,
 	lesson,
 ] });
-assert.deepEqual(context.messages, [lesson]);
+assert.deepEqual(context.messages, [explanation, lesson]);
 await h.emit("agent_end", { messages: [{ role: "assistant", content: [{ type: "text", text: "Plan:\n1. Implement a solution" }] }] });
 assert.equal(h.sent.length, 0, "Learn must not offer to execute a Plan section");
 

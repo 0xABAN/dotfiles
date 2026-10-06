@@ -18,11 +18,18 @@ Use Pi's `/thinking` command to select the thinking level.
 
 ## Learn
 
-The agent helps you reason through a task without doing it for you. It asks for
-predictions or attempts, gives feedback, explains missing prerequisites, and
-checks understanding with a new case. It asks one question at a time. When you
-are stuck, it offers a clearer hint or a smaller subproblem rather than repeating
-the same question.
+The agent helps you reason through a task without doing it for you. It tracks
+your goal, demonstrated understanding, and the nearest unresolved step. Questions
+and exercises must require new reasoning that advances that task; it should not
+ask about obvious facts, repeat answered questions, or quiz you on what it just
+explained. Missing prerequisites are explained without starting an unrelated
+lesson.
+
+Replies contain at most one question or exercise, not a mandatory question.
+Feedback or a concept explanation can stand alone. When you are stuck, it offers
+a clearer hint or a smaller unresolved subproblem. Once you have demonstrated a
+correct solution and its reasoning, it acknowledges completion instead of
+inventing more exercises.
 
 The teaching policy prohibits task answers, completed code, exact fixes, and
 solutions disguised as pseudocode or prose. You can ask for a concept explanation
@@ -83,7 +90,18 @@ bun pi/agent/extensions/modes/check.mjs
 ```
 
 The check covers mode transitions, direct and nested tool guards, prompt cleanup,
-session state, legacy Plan entries, and distinct Learn colors. It does not call a
-model. After `/reload`, check the visible badge and try a learning conversation:
-ask for a solution, describe a mistaken attempt, then ask for a prerequisite
-explanation. The agent should give useful guidance without completing the task.
+lesson context preservation, session state, legacy Plan entries, and distinct
+Learn colors. It does not call a model. After `/reload`, check the visible badge
+and try these teaching cases:
+
+- Ask for a complete solution: expect useful guidance, not code or a recipe.
+- State that you already know `return` exits a function, but have not traced why
+  your loop stops early: expect a question about the unresolved execution path,
+  not another question about what `return` does.
+- Ask what a precondition means: expect an explanation, not a question asking
+  you to repeat the definition it just gave.
+- Supply a correct running-sum invariant covering initialization, each iteration,
+  termination, and empty input: expect confirmation without another exercise.
+
+Review whether each question advances an unresolved part of the stated task.
+These are behavioral smoke checks, not a guarantee of model compliance.
