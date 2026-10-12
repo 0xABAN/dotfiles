@@ -41,6 +41,14 @@ serves those only when they carry `cacheRetention: "none"`, through an isolated
 Claude Code query with that prompt and no tools. `web_access_page_answer.py` adds
 the marker to `fetch_content` answer mode, which otherwise fails on the bridge.
 
+The bridge builds its model list from pi-ai's static Anthropic catalog, which
+Pi 1.0.0 shipped before Claude Haiku 5.5. Pi's own `anthropic` provider
+overlays the pi.dev catalog it refreshes into `models-store.json`.
+`claude_bridge_catalog.py` makes the bridge apply that overlay with Pi's
+staleness rule, so both providers list the same models. A model the bridge has
+not measured for 1M context runs at its 200K default. A model that arrives in a
+refresh appears in the bridge after the next Pi start.
+
 ## Computer use
 
 Computer use runs through the `cua-driver` server and Pi's native MCP support.
@@ -189,6 +197,7 @@ gate for extreme window sizes.
 | Subagents UI and native SDK tools | `@tintinweb/pi-subagents` `0.19.0`, Pi `1.0.0` | `subagents_ui.py`, `subagents-native-tools.py` |
 | Intercom messages | `pi-intercom` `0.13.0` | `intercom_ui.py` (with host `pi_transcript.py`) |
 | Web page answers | `pi-web-access` `0.27.0` | `web_access_page_answer.py` |
+| Claude bridge models | `pi-claude-bridge` `0.9.1` | `claude_bridge_catalog.py` |
 
 Shared helpers do not decide compatibility. Each guarded patcher validates its
 complete source set before writing. Preserve exact anchors and occurrence counts,
@@ -216,7 +225,7 @@ Do not change persistence as part of a visual cleanup.
 `install.sh` owns the serial order: powerline DJ/layout/compaction queue, host
 inset, editor, Markdown code panels, transcript, Intercom UI, dialogs, notices, compact layout,
 editor gap, compaction queue, legacy Todo tweaks, Todo UI, Subagents UI and native
-tools, web page answers, then launcher selection.
+tools, web page answers, Claude bridge models, then launcher selection.
 The legacy Todo command remains best-effort; the other patch failures propagate.
 Powerline owns the editor; Whimsical owns the working indicator.
 Pi-pretty is not installed, so its indicator cannot override Whimsical.
