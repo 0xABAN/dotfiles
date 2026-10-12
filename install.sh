@@ -83,7 +83,7 @@ link "$ROOT/pi/rpiv-todo/config.json" "$HOME/.config/rpiv-todo/config.json"
 # secrets stay machine-local
 if [[ ! -f "$HOME/.pi/agent/mcp.json" ]]; then
   cp "$ROOT/pi/agent/mcp.json.example" "$HOME/.pi/agent/mcp.json"
-  echo "created ~/.pi/agent/mcp.json from example — fill LEETCODE_SESSION (etc.)"
+  echo "created ~/.pi/agent/mcp.json from example"
 else
   echo "left existing ~/.pi/agent/mcp.json in place (not symlinked; secrets)"
 fi

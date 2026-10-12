@@ -1,19 +1,5 @@
 {
   "mcpServers": {
-    "leetcode": {
-      "enabled": false,
-      "command": "npx",
-      "args": [
-        "-y",
-        "@jinzcdev/leetcode-mcp-server",
-        "--site",
-        "global"
-      ],
-      "env": {
-        "LEETCODE_SITE": "global",
-        "LEETCODE_SESSION": "YOUR_LEETCODE_SESSION_HERE"
-      }
-    },
     "cua-driver": {
       "command": "cua-driver",
       "args": [

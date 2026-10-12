@@ -14,7 +14,7 @@ Keep machine-local server definitions and secrets in `~/.pi/agent/mcp.json`.
 The native schema uses `enabled: false`, not `disabled: true`, and does not read
 the adapter's `imports` or `settings`. Servers previously imported from OpenCode
 must have complete definitions here; changes in OpenCode no longer sync into Pi.
-The example leaves LeetCode disabled until its credentials are configured.
+The example configures only Cua Driver.
 
 Use `/mcp`, `/mcp reconnect <server>`, and `pi mcp list` for connection status.
 Within `codemode`, use `searchTools`, `describeTool`, and `describeNamespace`,
