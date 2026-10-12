@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install the transcript and UI-only tool metrics into Pi 1.0.0; restart to apply.
+"""Install the transcript and UI-only tool metrics into Pi 1.1.0; restart to apply.
 
 Preserve native tool execution and model-visible output. Timings share the
 existing result-entry write, outside its message. Refuse partial/unknown hosts
@@ -74,9 +74,9 @@ EDITS = {
         ("        this.chatContainer = new Container();",
          "        this.chatContainer = new TranscriptContainer(() => this.outputPad, () => this.ui.terminal.rows);"),
         ('''    getRegisteredToolDefinition(toolName) {
-        return withBuiltInRenderers(toolName, this.session.getToolDefinition(toolName));
+        return this.session.extensionRunner.resolveToolRenderers(toolName, () => withBuiltInRenderers(toolName, this.session.getToolDefinition(toolName)));
     }''', '''    getRegisteredToolDefinition(toolName) {
-        const definition = withBuiltInRenderers(toolName, this.session.getToolDefinition(toolName));
+        const definition = this.session.extensionRunner.resolveToolRenderers(toolName, () => withBuiltInRenderers(toolName, this.session.getToolDefinition(toolName)));
         if (!definition) return definition;
         // Only native and the installed pretty formatters opt into compact rows.
         // Do not replace arbitrary extensions' custom UI, even for built-in names.
@@ -90,9 +90,9 @@ EDITS = {
          "new UserMessageComponent(textContent, this.getMarkdownThemeWithSettings(), this.outputPad, this.getMarkdownTransformers(), message.timestamp)"),
         ("                component.markExecutionStarted();",
          "                startToolTiming(component);\n                component.markExecutionStarted();"),
-        ("                    component.updateResult({ ...event.result, isError: event.isError });", '''                    const timing = finishToolTiming(component);
+        ("                    component.updateResult({ ...event.result, isError: event.isError, durationMs: event.durationMs });", '''                    const timing = finishToolTiming(component);
                     if (timing) this.sessionManager.configsToolTimings.set(event.toolCallId, timing);
-                    component.updateResult({ ...event.result, isError: event.isError });'''),
+                    component.updateResult({ ...event.result, isError: event.isError, durationMs: event.durationMs });'''),
         ("        const renderedPendingTools = new Map();",
          "        const renderedPendingTools = new Map();\n        const toolTimings = collectToolTimings(this.sessionManager.getBranch());"),
         ('                this.pendingTools.clear();\n                this.ui.requestRender();\n                break;\n            case "agent_settled":',
@@ -220,7 +220,7 @@ EDITS[BASE + "interactive-mode.js"][2] = (old_lookup, previous_lookup.replace(
 # Universal rows need provenance for protocol-specific names/errors, not a card allowlist.
 PRE_UNIVERSAL_TOOLS_LOOKUP = EDITS[BASE + "interactive-mode.js"][2]
 EDITS[BASE + "interactive-mode.js"][2] = (old_lookup, '''    getRegisteredToolDefinition(toolName) {
-        const definition = withBuiltInRenderers(toolName, this.session.getToolDefinition(toolName));
+        const definition = this.session.extensionRunner.resolveToolRenderers(toolName, () => withBuiltInRenderers(toolName, this.session.getToolDefinition(toolName)));
         if (!definition) return definition;
         const origin = this.session.getAllTools().find(tool => tool.name === toolName)?.sourceInfo;
         const source = origin?.source === "builtin" ? origin.path : origin?.source;
@@ -332,8 +332,8 @@ def main() -> None:
         print("Pi host not installed; skipping transcript preview")
         return
     version = json.loads((root / "package.json").read_text())["version"]
-    if version != "1.0.0":
-        raise ValueError(f"transcript patch requires Pi 1.0.0, found {version}; review upstream first")
+    if version != "1.1.0":
+        raise ValueError(f"transcript patch requires Pi 1.1.0, found {version}; review upstream first")
     sources = {name: (root / name).read_text() for name in EDITS}
     if (root / MODULE).exists():
         sources[MODULE] = (root / MODULE).read_text()

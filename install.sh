@@ -200,11 +200,6 @@ if [[ -f "$ROOT/pi/patches/web_access_page_answer.py" ]]; then
   python3 "$ROOT/pi/patches/web_access_page_answer.py"
 fi
 
-# Claude bridge lists the Claude models in Pi's refreshed catalog, not only pi-ai's.
-if [[ -f "$ROOT/pi/patches/claude_bridge_catalog.py" ]]; then
-  python3 "$ROOT/pi/patches/claude_bridge_catalog.py"
-fi
-
 # npm restores its bundled bin on update; our host patches need the unbundled CLI.
 # Preserve config-only installation on machines that do not have Pi yet.
 if command -v pi >/dev/null 2>&1; then
@@ -237,8 +232,8 @@ def select_launcher(sdk: Path, launcher: Path, backup_root: Path) -> Path | None
     # Canonicalize the parent only: macOS /tmp is itself a symlink.
     launcher = launcher.parent.resolve(strict=True) / launcher.name
     package = json.loads((sdk / "package.json").read_text())
-    if package.get("name") != PACKAGE or package.get("version") != "1.0.0" or package.get("bin") != {"pi": STOCK}:
-        raise ValueError("launcher requires the published Pi 1.0.0 bin contract; review upstream first")
+    if package.get("name") != PACKAGE or package.get("version") != "1.1.0" or package.get("bin") != {"pi": STOCK}:
+        raise ValueError("launcher requires the published Pi 1.1.0 bin contract; review upstream first")
     for name, expected in ENTRY_HASHES.items():
         if (sdk / name).is_symlink() or hashlib.sha256((sdk / name).read_bytes()).hexdigest() != expected:
             raise ValueError(f"unrecognized CLI entry: {name}")

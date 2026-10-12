@@ -5,7 +5,7 @@ Run `./install.sh` from the repository root to link configuration and apply patc
 
 ## Native MCP and codemode
 
-This configuration targets Pi **1.0.0**. `defaultTools: ["+codemode"]` adds
+This configuration targets Pi **1.1.0**. `defaultTools: ["+codemode"]` adds
 native code execution/discovery without replacing the ordinary tool selection.
 MCP tools use native codemode exposure; `pi-mcp-adapter` is no longer installed.
 Native MCP does not support MCP Apps interfaces.
@@ -24,7 +24,7 @@ and screenshots with `image()`. The old `mcp`/`mcpScript` gateway API is gone.
 The Subagents SDK patch registers these same built-in factories for child
 sessions, respecting extension allowlists and isolation. Deferred MCP tools stay
 out of model prompts unless explicitly activated. Tool restrictions cover both
-direct and nested calls through Pi 1.0's private `_beforeToolCall` hook; review
+direct and nested calls through Pi 1.1's private `_beforeToolCall` hook; review
 that boundary before upgrading. The researcher allows `builtin:mcp`,
 `builtin:codemode`, and `builtin:tool-search` by name.
 
@@ -41,13 +41,14 @@ serves those only when they carry `cacheRetention: "none"`, through an isolated
 Claude Code query with that prompt and no tools. `web_access_page_answer.py` adds
 the marker to `fetch_content` answer mode, which otherwise fails on the bridge.
 
-The bridge builds its model list from pi-ai's static Anthropic catalog, which
-Pi 1.0.0 shipped before Claude Haiku 5.5. Pi's own `anthropic` provider
-overlays the pi.dev catalog it refreshes into `models-store.json`.
-`claude_bridge_catalog.py` makes the bridge apply that overlay with Pi's
-staleness rule, so both providers list the same models. A model the bridge has
-not measured for 1M context runs at its 200K default. A model that arrives in a
-refresh appears in the bridge after the next Pi start.
+Pi 1.1.0's bundled pi-ai catalog includes Claude Haiku 5.5, so the bridge no
+longer needs the local catalog overlay. Haiku uses the bridge's existing 200K
+context limit until upstream verifies its 1M support.
+
+Claude bridge authenticates through Claude Code, independently of Pi's
+`/login anthropic`. Check `claude auth status` and use `claude auth login`
+when Claude Code is logged out; refreshing Pi's tokens does not refresh the
+bridge's credentials.
 
 ## Computer use
 
@@ -191,13 +192,12 @@ gate for extreme window sizes.
 
 | Target | Supported input | Commands under `patches/` |
 |--------|-----------------|--------------------------------|
-| Pi unbundled host and package-local TUI | Pi `1.0.0` | `pi_horizontal_inset.py`, `pi_markdown_code.py`, `pi_transcript.py`, `pi_extension_dialogs.py`, `pi_activity_notices.py`, `pi_compact_layout.py`, `pi_editor_gap.py`, `pi_compaction_queue.py` |
+| Pi unbundled host and package-local TUI | Pi `1.1.0` | `pi_horizontal_inset.py`, `pi_markdown_code.py`, `pi_transcript.py`, `pi_extension_dialogs.py`, `pi_activity_notices.py`, `pi_compact_layout.py`, `pi_editor_gap.py`, `pi_compaction_queue.py` |
 | Powerline | Git commit `8c9bda10fdfd2822e89334ec85f3da9f8ca49182` | `powerline_dj.py`, `powerline_layout.py`, `powerline_editor.py`, `powerline_compaction_queue.py` |
 | rpiv-todo UI | `@juicesharp/rpiv-todo` `2.9.0`, after legacy tweaks | `rpiv_todo_ui.py` |
-| Subagents UI and native SDK tools | `@tintinweb/pi-subagents` `0.19.0`, Pi `1.0.0` | `subagents_ui.py`, `subagents-native-tools.py` |
+| Subagents UI and native SDK tools | `@tintinweb/pi-subagents` `0.19.0`, Pi `1.1.0` | `subagents_ui.py`, `subagents-native-tools.py` |
 | Intercom messages | `pi-intercom` `0.13.0` | `intercom_ui.py` (with host `pi_transcript.py`) |
 | Web page answers | `pi-web-access` `0.27.0` | `web_access_page_answer.py` |
-| Claude bridge models | `pi-claude-bridge` `0.9.1` | `claude_bridge_catalog.py` |
 
 Shared helpers do not decide compatibility. Each guarded patcher validates its
 complete source set before writing. Preserve exact anchors and occurrence counts,
@@ -225,14 +225,14 @@ Do not change persistence as part of a visual cleanup.
 `install.sh` owns the serial order: powerline DJ/layout/compaction queue, host
 inset, editor, Markdown code panels, transcript, Intercom UI, dialogs, notices, compact layout,
 editor gap, compaction queue, legacy Todo tweaks, Todo UI, Subagents UI and native
-tools, web page answers, Claude bridge models, then launcher selection.
+tools, web page answers, then launcher selection.
 The legacy Todo command remains best-effort; the other patch failures propagate.
 Powerline owns the editor; Whimsical owns the working indicator.
 Pi-pretty is not installed, so its indicator cannot override Whimsical.
 
 ### Which CLI runs the patches?
 
-Pi 1.0.0 declares `dist/bundle/cli.js` as its npm `pi` command. That bundled
+Pi 1.1.0 declares `dist/bundle/cli.js` as its npm `pi` command. That bundled
 program contains its own host implementation; patching `dist/modes/...` does not
 change it. `pi --version` alone cannot prove the customized host is running.
 
@@ -275,6 +275,25 @@ changes use `/reload`; a full restart also reloads them. Check the visible UI
 after runtime changes. Commit only explicit owned files or hunks and keep
 independently revertible changes separate.
 
+### Upgrade checks
+
+The Pi 1.1.0 transcript patch preserves the new `resolveToolRenderers()` chain
+and forwards native `durationMs` to package renderers. The local transcript's
+existing branch timing metadata remains separate.
+
+Run the offline checks against the target SDK (fresh or already patched):
+
+```sh
+python3 -B pi/patches/check_pi_patches.py /path/to/pi-coding-agent
+# Runtime checks require the patches to have been applied:
+node pi/patches/check_pi_runtime.mjs /path/to/pi-coding-agent
+bun pi/agent/extensions/modes/check.mjs
+```
+
+These check patch replay/refusal, launcher hashes, renderer resolution, duration
+forwarding, narrow layouts, both screen modes, and settlement/permission guards.
+They do not make model requests or change credentials.
+
 ## Host-provided extension dependencies
 
 `host_peer_dependencies.py` repairs the installed manifests for Subagents 0.19.0,
@@ -305,7 +324,7 @@ The installer replays this patch.
 
 ## Messages queued during compaction
 
-Pi 1.0.0 can still go idle with pending messages when async input hooks finish
+Pi 1.1.0 can still go idle with pending messages when async input hooks finish
 between its final queue check and run settlement. `pi_compaction_queue.py` adds
 a synchronous queue recheck after the new `agent_before_settle` boundary. It
 preserves native boundary hooks, context validation, abort guards, steering,

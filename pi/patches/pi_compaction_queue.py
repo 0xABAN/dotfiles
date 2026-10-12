@@ -76,8 +76,8 @@ def main() -> None:
     if root is None or not root.exists():
         print("Pi SDK not installed; skipping compaction queue fix")
         return
-    if json.loads((root / "package.json").read_text()).get("version") != "1.0.0":
-        raise ValueError("compaction queue fix requires Pi 1.0.0; review upstream first")
+    if json.loads((root / "package.json").read_text()).get("version") != "1.1.0":
+        raise ValueError("compaction queue fix requires Pi 1.1.0; review upstream first")
     sources = {HOST: (root / HOST).read_text()}
     patched = patch_sources(sources)
     if patched != sources:

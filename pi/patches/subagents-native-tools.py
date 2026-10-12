@@ -70,8 +70,8 @@ def main() -> None:
         print("pi-subagents not installed; skipping native tools")
         return
     sdk = discover_pi_root()
-    if sdk is None or json.loads((sdk / "package.json").read_text()).get("version") != "1.0.0":
-        raise ValueError("subagent native tools require Pi 1.0.0; review upstream first")
+    if sdk is None or json.loads((sdk / "package.json").read_text()).get("version") != "1.1.0":
+        raise ValueError("subagent native tools require Pi 1.1.0; review upstream first")
     if json.loads((root / "package.json").read_text()).get("version") != "0.19.0":
         raise ValueError("subagent native tools require pi-subagents 0.19.0; review upstream first")
     sources = {RUNNER: (root / RUNNER).read_text()}

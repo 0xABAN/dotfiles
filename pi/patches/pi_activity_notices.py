@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Align Pi 1.0.0 notices without losing native theme refresh or status coalescing.
+"""Align Pi 1.1.0 notices without losing native theme refresh or status coalescing.
 
 Disable automatic package-update reminders, not manual updates or other warnings.
 """
@@ -76,8 +76,8 @@ def main() -> None:
     if root is None or not root.exists():
         print("Pi host not installed; skipping activity notices")
         return
-    if json.loads((root / "package.json").read_text()).get("version") != "1.0.0":
-        raise ValueError("activity notices require Pi 1.0.0; review upstream first")
+    if json.loads((root / "package.json").read_text()).get("version") != "1.1.0":
+        raise ValueError("activity notices require Pi 1.1.0; review upstream first")
     sources = {HOST: (root / HOST).read_text()}
     if (root / MODULE).exists():
         sources[MODULE] = (root / MODULE).read_text()
