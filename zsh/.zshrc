@@ -7,6 +7,9 @@ alias ccr="claude --resume"
 alias p="pi"
 alias oc="opencode"
 
+# Hide pi's "Update Available" banner; `pi update` still works on demand.
+export PI_SKIP_VERSION_CHECK=1
+
 alias gaa="git add --all"
 alias gcl="git clone"
 alias gs="git status"
