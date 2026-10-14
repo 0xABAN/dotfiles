@@ -80,6 +80,9 @@ echo "== rpiv-todo config =="
 mkdir -p "$HOME/.config/rpiv-todo"
 link "$ROOT/pi/rpiv-todo/config.json" "$HOME/.config/rpiv-todo/config.json"
 
+echo "== ponytail config =="
+link "$ROOT/pi/ponytail/config.json" "$HOME/.config/ponytail/config.json"
+
 # secrets stay machine-local
 if [[ ! -f "$HOME/.pi/agent/mcp.json" ]]; then
   cp "$ROOT/pi/agent/mcp.json.example" "$HOME/.pi/agent/mcp.json"
