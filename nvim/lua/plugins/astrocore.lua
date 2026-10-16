@@ -39,6 +39,7 @@ return {
         wrap = false,
         clipboard = "unnamedplus", -- yank → macOS clipboard
         keymodel = "startsel,stopsel", -- shift+special starts/stops visual
+        exrc = true, -- load a project's .nvim.lua; Neovim asks before trusting each file
       },
     },
     -- silent write when buffer changes (skips unnamed/special buffers)
