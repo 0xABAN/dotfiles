@@ -23,6 +23,12 @@ export PATH="$HOME/.local/bin:$PATH"
 export PATH="/Library/Frameworks/Python.framework/Versions/3.12/bin:$PATH"
 alias python=python3
 
+# One-off C++ compiles default to C++23. A later -std flag still wins, and
+# build systems (CMake, make) bypass aliases, so project settings are untouched.
+alias c++="c++ -std=c++23"
+alias clang++="clang++ -std=c++23"
+alias g++="g++ -std=c++23"
+
 PROMPT='%n @ mac %1~ %% '
 
 # Google Cloud SDK
