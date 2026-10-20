@@ -52,9 +52,6 @@ link "$ROOT/ghostty/themes/osaka-jade" "$HOME/.config/ghostty/themes/osaka-jade"
 link "$ROOT/ghostty/themes/everforest-dark-medium" "$HOME/.config/ghostty/themes/everforest-dark-medium"
 link "$ROOT/ghostty/shaders/grain.glsl" "$HOME/.config/ghostty/shaders/grain.glsl"
 
-echo "== clangd =="
-link "$ROOT/clangd/config.yaml" "$HOME/Library/Preferences/clangd/config.yaml"
-
 echo "== nvim =="
 mkdir -p "$HOME/.config"
 link "$ROOT/nvim" "$HOME/.config/nvim"

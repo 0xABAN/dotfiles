@@ -1,6 +1,0 @@
-# Analyze C++ sources as C++23 by default. Appended flags also override a
-# project's own -std, but that only affects editor diagnostics, not builds.
-If:
-  PathMatch: '.*\.(cpp|cc|cxx|hpp|hh|hxx)'
-CompileFlags:
-  Add: [-std=c++23]
