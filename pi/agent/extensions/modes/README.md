@@ -35,10 +35,17 @@ The teaching policy prohibits task answers, completed code, exact fixes, and
 solutions disguised as pseudocode or prose. You can ask for a concept explanation
 or a stronger hint; asking for the answer does not disable the policy.
 
-Only `read`, `grep`, `find`, and `ls` are available. The tool-call guard also blocks
-inactive and nested tools, including shell execution, codemode, delegation,
-remote actions, and Todo updates. You write the code and run experiments yourself.
-Existing source files and tool results remain visible; Learn does not redact them.
+For documentation-heavy topics, such as Node.js sockets, the agent teaches from
+primary docs. It fetches a page before linking it, then tells you where to look:
+the heading, the passage that addresses your current gap, and what to skip.
+
+Learn reads local files (`read`, `grep`, `find`, `ls`) and the web (`web_search`,
+`fetch_content`, `get_search_content`). The tool-call guard blocks every other
+tool, including inactive and nested ones: shell execution, codemode, delegation,
+edits, and Todo updates. Web tools only read remote content, though they may cache
+pages or clone repositories outside the project. You write the code and run
+experiments yourself. Existing source files and tool results remain visible;
+Learn does not redact them.
 
 The controller injects the teaching policy each turn through `appendSystemPrompt`,
 which the Claude bridge forwards. Leaving Learn removes only that policy and
@@ -102,6 +109,9 @@ and try these teaching cases:
   not another question about what `return` does.
 - Ask what a precondition means: expect an explanation, not a question asking
   you to repeat the definition it just gave.
+- Ask how a Node.js socket learns that its peer finished sending: expect a
+  fetched nodejs.org link with the heading to read, not a summary that answers
+  your task.
 - Supply a correct running-sum invariant covering initialization, each iteration,
   termination, and empty input: expect confirmation without another exercise.
 

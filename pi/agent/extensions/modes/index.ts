@@ -2,7 +2,7 @@
  * Build, Plan, and Learn share one mode controller and tool checkpoint.
  * Shift+Tab cycles modes; /plan and /learn toggle their mode directly.
  * Plan preserves the existing exploration/execute flow. Learn teaches without
- * doing the task and permits only local file inspection.
+ * doing the task and permits only local file inspection and web reading.
  */
 
 import type { AgentMessage } from "@earendil-works/pi-agent-core";
@@ -155,7 +155,7 @@ export default function modesExtension(pi: ExtensionAPI): void {
 		if (mode === "learn" && !LEARN_MODE_TOOLS.has(event.toolName)) {
 			return {
 				block: true,
-				reason: "Learn mode permits only read, grep, find, and ls. Guide the learner; do not execute their task.",
+				reason: `Learn mode permits only ${[...LEARN_MODE_TOOLS].join(", ")}. Guide the learner; do not execute their task.`,
 			};
 		}
 

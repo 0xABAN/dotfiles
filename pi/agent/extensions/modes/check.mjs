@@ -78,7 +78,7 @@ assert.equal(h.mode(), "\uF19D  learn mode");
 assert.deepEqual(h.tools(), [...LEARN_MODE_TOOLS]);
 
 // Deferred and nested tools must not bypass the Learn permission boundary.
-for (const toolName of ["bash", "powershell", "edit", "write", "codemode", "tool_search", "todo", "Agent", "SubagentWorkflow", "intercom", "fetch_content", "custom_tool", "mcp_write"]) {
+for (const toolName of ["bash", "powershell", "edit", "write", "codemode", "tool_search", "todo", "Agent", "SubagentWorkflow", "intercom", "source_check", "custom_tool", "mcp_write"]) {
 	for (const parentToolCallId of [undefined, "outer-tool"]) {
 		const result = await h.emit("tool_call", { toolName, input: {}, parentToolCallId });
 		assert.equal(result.block, true, `Learn allowed ${toolName}`);
@@ -86,6 +86,10 @@ for (const toolName of ["bash", "powershell", "edit", "write", "codemode", "tool
 }
 for (const toolName of LEARN_MODE_TOOLS) {
 	assert.equal(await h.emit("tool_call", { toolName, input: {} }), undefined);
+}
+// Documentation-heavy lessons need search and fetched pages, not only local files.
+for (const toolName of ["web_search", "fetch_content", "get_search_content"]) {
+	assert(LEARN_MODE_TOOLS.has(toolName), `Learn lacks ${toolName}`);
 }
 
 // appendSystemPrompt reaches both native providers and Claude bridge's projection.
