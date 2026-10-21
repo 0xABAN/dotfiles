@@ -203,6 +203,11 @@ if [[ -f "$ROOT/pi/patches/web_access_page_answer.py" ]]; then
   python3 "$ROOT/pi/patches/web_access_page_answer.py"
 fi
 
+# Claude Code otherwise replays a resumed session's first system prompt forever.
+if [[ -f "$ROOT/pi/patches/claude_bridge_prompt_snapshot.py" ]]; then
+  python3 "$ROOT/pi/patches/claude_bridge_prompt_snapshot.py"
+fi
+
 # npm restores its bundled bin on update; our host patches need the unbundled CLI.
 # Preserve config-only installation on machines that do not have Pi yet.
 if command -v pi >/dev/null 2>&1; then

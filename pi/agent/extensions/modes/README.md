@@ -42,7 +42,9 @@ Existing source files and tool results remain visible; Learn does not redact the
 
 The controller injects the teaching policy each turn through `appendSystemPrompt`,
 which the Claude bridge forwards. Leaving Learn removes only that policy and
-preserves other appended instructions.
+preserves other appended instructions. Switching an existing bridge session
+relies on `patches/claude_bridge_prompt_snapshot.py`; without it, Claude Code
+keeps the session's first system prompt.
 
 Tool restrictions are enforced in code. Teaching behavior relies on the model
 following its instructions, so this is not a guarantee against answer leakage.

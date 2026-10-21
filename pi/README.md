@@ -41,6 +41,14 @@ serves those only when they carry `cacheRetention: "none"`, through an isolated
 Claude Code query with that prompt and no tools. `web_access_page_answer.py` adds
 the marker to `fetch_content` answer mode, which otherwise fails on the bridge.
 
+Claude Code records a session's system prompt on its first request and replays
+that record on every resume, ignoring a different `append`. The bridge resumes
+its Claude Code session on every Pi turn, so later prompt changes (a mode switch,
+skills, context files, tool loadouts) never reached the model.
+`claude_bridge_prompt_snapshot.py` sets the Agent SDK's `snapshot: false` so
+each query renders the current prompt. As the SDK documents, a prompt change
+then invalidates the prompt-cache prefix and earlier thinking blocks.
+
 Pi 1.1.0's bundled pi-ai catalog includes Claude Haiku 5.5, so the bridge no
 longer needs the local catalog overlay. Haiku uses the bridge's existing 200K
 context limit until upstream verifies its 1M support.
@@ -198,6 +206,7 @@ gate for extreme window sizes.
 | Subagents UI and native SDK tools | `@tintinweb/pi-subagents` `0.19.0`, Pi `1.1.0` | `subagents_ui.py`, `subagents-native-tools.py` |
 | Intercom messages | `pi-intercom` `0.13.0` | `intercom_ui.py` (with host `pi_transcript.py`) |
 | Web page answers | `pi-web-access` `0.27.0` | `web_access_page_answer.py` |
+| Claude bridge prompt refresh | `pi-claude-bridge` `0.9.1` | `claude_bridge_prompt_snapshot.py` |
 
 Shared helpers do not decide compatibility. Each guarded patcher validates its
 complete source set before writing. Preserve exact anchors and occurrence counts,
