@@ -1,7 +1,6 @@
 alias dev="cd ~/Projects"
 alias code="zed"
 
-alias cc="claude"
 alias ccr="claude --resume"
 
 alias p="pi"
