@@ -6,10 +6,6 @@ return {
       -- Not managed by Mason; uses Apple's clangd from Xcode, which knows the SDK header paths.
       servers = { "clangd" },
       config = {
-        clangd = {
-          -- Project compile commands take precedence over these fallback flags.
-          init_options = { fallbackFlags = { "-std=c++20" } },
-        },
         basedpyright = {
           settings = {
             basedpyright = {
