@@ -53,9 +53,11 @@ _autosuggest-or-complete() {
 zle -N _autosuggest-or-complete
 bindkey '^I' _autosuggest-or-complete
 
+# Load nvm without activating a version: activation costs ~200ms per shell.
+# `node` is Homebrew's until `nvm use` runs in a project.
 export NVM_DIR="$HOME/.nvm"
 [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] &&
-  source "/opt/homebrew/opt/nvm/nvm.sh"
+  source "/opt/homebrew/opt/nvm/nvm.sh" --no-use
 
 # Rex CLI, bundled inside the app
 export PATH="/Applications/Rex Beta.app/Contents/Helpers/Rex Server.rex/Contents/MacOS:$PATH"
