@@ -18,6 +18,9 @@ alias python=python3
 
 PROMPT='%n @ mac %1~ %% '
 
+# Initialize completion once, before any tool registers its completions.
+autoload -Uz compinit && compinit
+
 # Google Cloud SDK
 if [ -f "$HOME/.local/google-cloud-sdk/path.zsh.inc" ]; then
   . "$HOME/.local/google-cloud-sdk/path.zsh.inc"
