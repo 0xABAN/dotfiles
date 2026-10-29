@@ -12,8 +12,6 @@ alias gcm="git commit -m"
 alias gps="git push"
 alias gpl="git pull"
 
-export PATH="$HOME/.local/bin:$PATH"
-export PATH="/Library/Frameworks/Python.framework/Versions/3.12/bin:$PATH"
 alias python=python3
 
 PROMPT='%n @ mac %1~ %% '
