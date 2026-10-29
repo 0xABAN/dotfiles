@@ -48,20 +48,6 @@ gotd-smoke() {
   )
 }
 
-# Launch two tModLoader clients (local multiplayer testing).
-tml() {
-  local tml_sh="$HOME/Library/Application Support/Steam/steamapps/common/tModLoader/start-tModLoader.sh"
-  "$tml_sh" "$@" >/dev/null 2>&1 &
-  "$tml_sh" "$@" >/dev/null 2>&1 &
-  disown
-}
-
-# Kill all tModLoader clients started via tml / Steam.
-tmlkill() {
-  pkill -f 'tModLoader\.dll' 2>/dev/null
-  pkill -f 'start-tModLoader\.sh' 2>/dev/null
-}
-
 # .NET SDK (tModLoader + CLI)
 export DOTNET_ROOT="$HOME/.dotnet"
 export PATH="$DOTNET_ROOT:$PATH"
@@ -103,3 +89,7 @@ autoload -Uz compinit
 export NVM_DIR="$HOME/.nvm"
 [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] &&
   source "/opt/homebrew/opt/nvm/nvm.sh"
+
+export PATH="/Applications/Rex
+ Beta.app/Contents/Helpers/Rex
+ Server.rex/Contents/MacOS:$PATH"
