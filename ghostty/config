@@ -1,0 +1,23 @@
+# One opaque background; Neovim and Pi inherit it rather than stack paint layers.
+theme = Everforest Dark Hard
+background-opacity = 1
+background-blur = 0
+background-opacity-cells = true
+# Retain the static grain shader without changing text colors.
+custom-shader = ~/.config/ghostty/shaders/grain.glsl
+custom-shader-animation = false
+
+# Let Neovim own undo/redo and Mac line/file selection
+keybind = cmd+z=unbind
+keybind = cmd+shift+z=unbind
+keybind = cmd+shift+arrow_left=unbind
+keybind = cmd+shift+arrow_right=unbind
+keybind = cmd+shift+arrow_up=unbind
+keybind = cmd+shift+arrow_down=unbind
+# Ctrl-Left/Right CSI — stays in insert. Default esc:b/f is a real Escape.
+keybind = alt+arrow_left=text:\x1b[1;5D
+keybind = alt+arrow_right=text:\x1b[1;5C
+keybind = alt+shift+arrow_left=unbind
+keybind = alt+shift+arrow_right=unbind
+keybind = alt+shift+arrow_up=unbind
+keybind = alt+shift+arrow_down=unbind
