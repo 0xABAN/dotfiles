@@ -1,10 +1,6 @@
 alias dev="cd ~/Projects"
-alias code="zed"
-
-alias ccr="claude --resume"
 
 alias p="pi"
-alias oc="opencode"
 
 # Hide pi's "Update Available" banner; `pi update` still works on demand.
 export PI_SKIP_VERSION_CHECK=1
@@ -15,8 +11,6 @@ alias gs="git status"
 alias gcm="git commit -m"
 alias gps="git push"
 alias gpl="git pull"
-
-export EDITOR="zed --wait"
 
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="/Library/Frameworks/Python.framework/Versions/3.12/bin:$PATH"
@@ -32,22 +26,6 @@ if [ -f "$HOME/.local/google-cloud-sdk/completion.zsh.inc" ]; then
   . "$HOME/.local/google-cloud-sdk/completion.zsh.inc"
 fi
 
-# Daytona completion (if installed)
-if [ -f "$HOME/.daytona.completion_script.zsh" ]; then
-  source "$HOME/.daytona.completion_script.zsh"
-fi
-
-gotd-smoke() {
-  local release_date="${1:-2099-07-22}"
-  local data_dir="${2:-/tmp/gotd-daytona-smoke}"
-  (
-    cd "$HOME/dev/vibe-check" || return
-    uv run --project src/backend python -m src.backend.cli \
-      --runtime daytona --artifact-only --real-smoke \
-      --date "$release_date" --data-dir "$data_dir"
-  )
-}
-
 # .NET SDK (tModLoader + CLI)
 export DOTNET_ROOT="$HOME/.dotnet"
 export PATH="$DOTNET_ROOT:$PATH"
@@ -57,10 +35,6 @@ HISTFILE=~/.zsh_history
 HISTSIZE=10000
 SAVEHIST=10000
 setopt APPEND_HISTORY
-
-# fzf
-alias ff="fzf"
-source <(fzf --zsh)
 
 # Smart directory jumps and history-based inline suggestions.
 eval "$(zoxide init zsh --cmd cd)"
@@ -80,11 +54,6 @@ bindkey '^I' _autosuggest-or-complete
 
 # machine-local secrets / overrides (not tracked)
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
-# The following lines have been added by Docker Desktop to enable Docker CLI completions.
-fpath=(/Users/adam/.docker/completions $fpath)
-autoload -Uz compinit
-(( ${+_comps[docker]} )) || compinit
-# End of Docker CLI completions
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] &&
