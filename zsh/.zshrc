@@ -90,6 +90,5 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] &&
   source "/opt/homebrew/opt/nvm/nvm.sh"
 
-export PATH="/Applications/Rex
- Beta.app/Contents/Helpers/Rex
- Server.rex/Contents/MacOS:$PATH"
+# Rex CLI, bundled inside the app
+export PATH="/Applications/Rex Beta.app/Contents/Helpers/Rex Server.rex/Contents/MacOS:$PATH"
