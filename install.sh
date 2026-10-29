@@ -52,6 +52,9 @@ link "$ROOT/ghostty/themes/osaka-jade" "$HOME/.config/ghostty/themes/osaka-jade"
 link "$ROOT/ghostty/themes/everforest-dark-medium" "$HOME/.config/ghostty/themes/everforest-dark-medium"
 link "$ROOT/ghostty/shaders/grain.glsl" "$HOME/.config/ghostty/shaders/grain.glsl"
 
+echo "== rex =="
+link "$ROOT/rex/init.lua" "$HOME/.config/rex/init.lua"
+
 echo "== nvim =="
 mkdir -p "$HOME/.config"
 link "$ROOT/nvim" "$HOME/.config/nvim"
