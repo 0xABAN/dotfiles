@@ -1,4 +1,3 @@
--- Ported from ~/.config/ghostty/config.
 -- Rex leaves cmd+z, cmd+shift+z, and alt+shift+arrows unbound already, so
 -- unbinding them here would only produce "nothing is bound" warnings.
 

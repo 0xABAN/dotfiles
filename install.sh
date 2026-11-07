@@ -47,14 +47,10 @@ link() {
 echo "== zsh =="
 link "$ROOT/zsh/.zshrc" "$HOME/.zshrc"
 
-echo "== terminal theme =="
-link "$ROOT/ghostty/config" "$HOME/.config/ghostty/config"
-link "$ROOT/ghostty/themes/osaka-jade" "$HOME/.config/ghostty/themes/osaka-jade"
-link "$ROOT/ghostty/themes/everforest-dark-medium" "$HOME/.config/ghostty/themes/everforest-dark-medium"
-link "$ROOT/ghostty/shaders/grain.glsl" "$HOME/.config/ghostty/shaders/grain.glsl"
-
 echo "== rex =="
 link "$ROOT/rex/init.lua" "$HOME/.config/rex/init.lua"
+# Rex keeps themes in app settings, not init.lua, so the theme is imported by hand.
+echo "rex theme: Settings > Theme > Import $ROOT/rex/themes/everforest-dark-hard"
 
 echo "== nvim =="
 mkdir -p "$HOME/.config"
