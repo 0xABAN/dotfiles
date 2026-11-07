@@ -1,6 +1,6 @@
 # Maintaining the Pi configuration
 
-This directory owns Pi configuration, local extensions, and compatibility patches.
+This directory owns Pi configuration and compatibility patches.
 Run `./install.sh` from the repository root to link configuration and apply patches.
 
 ## Native MCP and codemode
@@ -97,9 +97,7 @@ the driver's implicit session across observation and action calls.
 | Path | Responsibility |
 |------|----------------|
 | `agent/settings.json`, `keybindings.json`, `subagents.json` | Package selection and user-facing configuration |
-| `agent/extensions/` | Local extension entrypoints and lifecycle handlers |
-| `agent/extensions/modes/` | Build/Plan/Learn transitions, teaching policy, tool permissions, and status formatting |
-| `agent/extensions/whimsical/` | Animation catalog, frame generation, and compaction-loader adapter |
+| `agent/extensions/powerline-footer/theme.json` | Powerline footer theme overrides, read from Pi's agent extension path |
 | `patches/*.py` | Target-specific anchors, compatibility rules, and patch commands |
 | `patches/patch_support.py` | SDK discovery, exact source loading, backup/write mechanics, and counted replacements |
 | `patches/payloads/` | Renderer source grouped by `host`, `powerline`, `tui`, `todo`, `subagents`, and `intercom` |
@@ -110,14 +108,10 @@ Themes live in family folders under `agent/themes/`, alongside their licenses.
 The `themes: ["themes"]` setting discovers them recursively. Run `/reload` after
 theme edits; Pi’s automatic theme watcher only watches root-level files.
 
-`whimsical.ts` remains the entrypoint; its helper directory has no `index.ts`.
-Pi discovers top-level extension files and subdirectories with an entrypoint.
-Keep helpers inside their feature directory so Pi does not load them as separate
-extensions. Small extensions can stay in one file.
-
-DJ and inline-skills belong to the separate `~/dev/pi-extensions` checkout.
-Keep sessions, credentials, installed packages, and runtime locks out of
-commits.
+Personal extensions (commit-policy, DJ, gray-thinking, inline-skills, modes,
+response-time, and whimsical) belong to the separate `~/dev/pi-extensions`
+checkout, which `agent/settings.json` loads as one collection package. Keep
+sessions, credentials, installed packages, and runtime locks out of commits.
 
 ## Rendering boundaries
 
@@ -178,11 +172,7 @@ reading, and teaches with concepts, hints, and pointers into primary docs rather
 than task solutions. Everforest gives it a graduation-cap icon in the same
 neutral color as Build and Plan, with a distinct muted-teal gradient for the
 label.
-See [mode controls and checks](agent/extensions/modes/README.md).
-
-Mode status formatting is pure; the entrypoint owns status publication,
-tool restoration, and persistence. Whimsical's compaction adapter contains the
-host-specific prototype hook. Keep that compatibility code out of its catalog.
+See [mode controls and checks](https://github.com/0xABAN/pi-extensions/tree/main/modes).
 
 ### Compact windows
 
@@ -297,7 +287,7 @@ Run the offline checks against the target SDK (fresh or already patched):
 python3 -B pi/patches/check_pi_patches.py /path/to/pi-coding-agent
 # Runtime checks require the patches to have been applied:
 node pi/patches/check_pi_runtime.mjs /path/to/pi-coding-agent
-bun pi/agent/extensions/modes/check.mjs
+(cd ~/dev/pi-extensions && bun modes/check.mjs)
 ```
 
 These check patch replay/refusal, launcher hashes, renderer resolution, duration

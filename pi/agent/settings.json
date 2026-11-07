@@ -34,8 +34,7 @@
     "https://github.com/nicobailon/pi-skill-palette",
     "npm:pi-web-access",
     "npm:@juicesharp/rpiv-todo",
-    "../../dev/pi-extensions/inline-skills",
-    "../../dev/pi-extensions/dj",
+    "../../dev/pi-extensions",
     "npm:pi-claude-bridge"
   ],
   "powerline": {
