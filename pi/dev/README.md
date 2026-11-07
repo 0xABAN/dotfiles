@@ -27,12 +27,13 @@ settings never touch your daily `pi` in `~/.pi/agent`.
 
 On first run it creates:
 
-- `settings.json`, copied from `settings.json` here. It loads the Claude bridge
-  from the copy your daily `pi` installed, plus the third-party extensions the
-  patchers leave alone: `pi-goal`, `ponytail` and `pi-skill-palette`.
-  It also sets the default model and uses the Everforest theme from
-  `pi/agent/themes`, like your daily `pi`. Pi edits this copy as you change
-  settings; delete it to start over.
+- `settings.json`, copied from `settings.json` here. It loads the extensions
+  from `~/dev/pi-extensions`, both your own collection and the maintained copies
+  of powerline, todo, ask-user-question, intercom and the Claude bridge, plus
+  `pi-goal`, `ponytail` and `pi-skill-palette`. Like your daily `pi`, it sets the
+  default model, the Everforest theme from `pi/agent/themes`, quiet startup,
+  codemode and the powerline layout. Pi edits this copy as you change settings;
+  delete it to start over.
 - `models.json`, a link to your daily `models.json`, so custom providers such as
   Cerebras work.
 - `keybindings.json`, a link to your daily `keybindings.json`, so `pi-dev` uses
