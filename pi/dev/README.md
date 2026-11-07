@@ -38,8 +38,7 @@ On first run it creates:
 - `keybindings.json`, a link to your daily `keybindings.json`, which frees
   `shift+tab` for the `modes` extension.
 
-Your daily `pi`'s downloaded tools (`fd`, `rg`) are reused, and the check for new
-Pi releases is off.
+Your daily `pi`'s downloaded tools (`fd`, `rg`) are reused.
 
 ## Verify
 

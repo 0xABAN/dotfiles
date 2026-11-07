@@ -27,5 +27,4 @@ done
 
 PATH="$daily_agent_dir/bin:$PATH" \
   PI_CODING_AGENT_DIR="$agent_dir" \
-  PI_SKIP_VERSION_CHECK=1 \
   exec "$fork_dir/pi-test.sh" "$@"
