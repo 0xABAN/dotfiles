@@ -166,10 +166,9 @@ Pi 1.0's user-message Markdown cache and theme-aware `ThemedText` notices remain
 native. The patches add layout only; do not restore a second user-message cache
 or replace native notice invalidation/coalescing.
 
-The mode controller cycles Build → Plan → Learn with Shift+Tab; `/learn` enters
-or leaves Learn directly. Learn permits only local file inspection and web
-reading, and teaches with concepts, hints, and pointers into primary docs rather
-than task solutions. Everforest gives it a graduation-cap icon in the same
+The mode controller cycles Build → Plan → Learn with Shift+Tab. Plan and Learn
+share one read-only tool set, and Learn teaches with concepts, hints, and pointers
+into primary docs rather than task solutions. Everforest gives it a graduation-cap icon in the same
 neutral color as Build and Plan, with a distinct muted-teal gradient for the
 label.
 See [mode controls and checks](https://github.com/0xABAN/pi-extensions/tree/main/modes).
