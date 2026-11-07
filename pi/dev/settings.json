@@ -7,6 +7,18 @@
     "~/dev/configs/pi/agent/themes"
   ],
   "packages": [
-    "~/.pi/agent/npm/node_modules/pi-claude-bridge"
+    "~/.pi/agent/npm/node_modules/pi-claude-bridge",
+    {
+      "source": "npm:pi-goal",
+      "skills": []
+    },
+    {
+      "source": "npm:@dietrichgebert/ponytail",
+      "skills": [
+        "ponytail"
+      ]
+    },
+    "https://github.com/nicobailon/pi-skill-palette",
+    "../../dev/pi-extensions"
   ]
 }

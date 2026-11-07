@@ -19,9 +19,11 @@ if [[ ! -e "$agent_dir/settings.json" ]]; then
   cp "$install_dir/settings.json" "$agent_dir/settings.json"
 fi
 
-if [[ ! -e "$agent_dir/models.json" ]]; then
-  ln -s "$daily_agent_dir/models.json" "$agent_dir/models.json"
-fi
+for shared_file in models.json keybindings.json; do
+  if [[ ! -e "$agent_dir/$shared_file" ]]; then
+    ln -s "$daily_agent_dir/$shared_file" "$agent_dir/$shared_file"
+  fi
+done
 
 PATH="$daily_agent_dir/bin:$PATH" \
   PI_CODING_AGENT_DIR="$agent_dir" \
