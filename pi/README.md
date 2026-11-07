@@ -109,7 +109,7 @@ Themes live in family folders under `agent/themes/`, alongside their licenses.
 The `themes: ["themes"]` setting discovers them recursively. Run `/reload` after
 theme edits; Pi’s automatic theme watcher only watches root-level files.
 
-Personal extensions (DJ, inline-skills, modes, and whimsical) belong to the separate `~/dev/pi-extensions`
+Personal extensions (DJ, modes, and whimsical) belong to the separate `~/dev/pi-extensions`
 checkout, which `agent/settings.json` loads as one collection package. Keep
 sessions, credentials, installed packages, and runtime locks out of commits.
 

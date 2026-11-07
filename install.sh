@@ -11,7 +11,7 @@ if [[ ! -e "$EXTENSIONS" && ! -L "$EXTENSIONS" ]]; then
   mkdir -p "$(dirname "$EXTENSIONS")"
   git clone https://github.com/0xABAN/pi-extensions.git "$EXTENSIONS"
 fi
-for extension in inline-skills dj modes whimsical; do
+for extension in dj modes whimsical; do
   if [[ ! -f "$EXTENSIONS/$extension/package.json" ]]; then
     echo "missing $EXTENSIONS/$extension/package.json — update the checkout before installing" >&2
     exit 1
