@@ -1,0 +1,29 @@
+#!/bin/bash
+set -euo pipefail
+
+source_path="${BASH_SOURCE[0]}"
+while [[ -L "$source_path" ]]; do
+  source_dir="$(cd "$(dirname "$source_path")" && pwd)"
+  source_path="$(readlink "$source_path")"
+  [[ "$source_path" = /* ]] || source_path="$source_dir/$source_path"
+done
+install_dir="$(cd "$(dirname "$source_path")" && pwd)"
+
+fork_dir="$HOME/dev/pi"
+agent_dir="$HOME/.pi-dev/agent"
+daily_agent_dir="$HOME/.pi/agent"
+
+mkdir -p "$agent_dir"
+
+if [[ ! -e "$agent_dir/settings.json" ]]; then
+  cp "$install_dir/settings.json" "$agent_dir/settings.json"
+fi
+
+if [[ ! -e "$agent_dir/models.json" ]]; then
+  ln -s "$daily_agent_dir/models.json" "$agent_dir/models.json"
+fi
+
+PATH="$daily_agent_dir/bin:$PATH" \
+  PI_CODING_AGENT_DIR="$agent_dir" \
+  PI_SKIP_VERSION_CHECK=1 \
+  exec "$fork_dir/pi-test.sh" "$@"

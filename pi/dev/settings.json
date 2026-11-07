@@ -1,0 +1,8 @@
+{
+  "defaultProvider": "claude-bridge",
+  "defaultModel": "claude-opus-5-5",
+  "defaultThinkingLevel": "medium",
+  "packages": [
+    "~/.pi/agent/npm/node_modules/pi-claude-bridge"
+  ]
+}
