@@ -102,6 +102,7 @@ the driver's implicit session across observation and action calls.
 | `patches/patch_support.py` | SDK discovery, exact source loading, backup/write mechanics, and counted replacements |
 | `patches/payloads/` | Renderer source grouped by `host`, `powerline`, `tui`, `todo`, `subagents`, and `intercom` |
 | `agent/themes/`, `agents/`, `skills/` | Theme data and agent instructions |
+| `agent/APPEND_SYSTEM.md` | Git commit policy, appended to Pi's system prompt |
 | `rpiv-todo/config.json` | Todo widget configuration |
 
 Themes live in family folders under `agent/themes/`, alongside their licenses.

@@ -19,7 +19,7 @@ if [[ ! -e "$agent_dir/settings.json" ]]; then
   cp "$install_dir/settings.json" "$agent_dir/settings.json"
 fi
 
-for shared_file in models.json keybindings.json; do
+for shared_file in models.json keybindings.json APPEND_SYSTEM.md; do
   if [[ ! -e "$agent_dir/$shared_file" ]]; then
     ln -s "$daily_agent_dir/$shared_file" "$agent_dir/$shared_file"
   fi

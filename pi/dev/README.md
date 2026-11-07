@@ -38,6 +38,8 @@ On first run it creates:
   Cerebras work.
 - `keybindings.json`, a link to your daily `keybindings.json`, so `pi-dev` uses
   your daily shortcuts.
+- `APPEND_SYSTEM.md`, a link to your daily `APPEND_SYSTEM.md`, so `pi-dev` gets
+  the same git commit policy.
 
 Your daily `pi`'s downloaded tools (`fd`, `rg`) are reused.
 

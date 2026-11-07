@@ -63,6 +63,7 @@ for name in \
   keybindings.json \
   subagents.json \
   agent-tool-description.md \
+  APPEND_SYSTEM.md \
   themes \
   skills \
   agents \
