@@ -292,47 +292,44 @@ GIT_LABEL_EDIT = (
 )
 
 
-# Color overlays for the imported palettes, not a second editor. Normalize these
+# Selects the Everforest palettes, the only custom Pi themes.
+EVERFOREST_THEME = '["everforest-dark-medium", "everforest-dark-hard"].includes(ctx?.ui?.theme?.name ?? "")'
+
+# Color overlays for the Everforest palettes, not a second editor. Normalize these
 # exact fragments before the frame guards; reapply only after full validation.
-MEDIUM_THEME_COLOR_EDITS = [
+THEME_COLOR_EDITS = [
     (
         'const whiteOutline = (s: string) => ansi.getFgAnsi(255, 255, 255) + s + ansi.reset;',
-        'const whiteOutline = (s: string) => ["rose-pine", "everforest-dark-medium"].includes(ctx?.ui?.theme?.name ?? "")\n'
+        f'const whiteOutline = (s: string) => {EVERFOREST_THEME}\n'
         '        ? ctx.ui.theme.fg("text", s) : ansi.getFgAnsi(255, 255, 255) + s + ansi.reset;',
         1,
     ),
     (
         'captureDraft ? getFgAnsiCode("queue") : ansi.getFgAnsi(67, 145, 135);',
-        '["rose-pine", "everforest-dark-medium"].includes(ctx?.ui?.theme?.name ?? "") ? ctx.ui.theme.getFgAnsi("accent")\n'
+        f'{EVERFOREST_THEME} ? ctx.ui.theme.getFgAnsi("accent")\n'
         '          : captureDraft ? getFgAnsiCode("queue") : ansi.getFgAnsi(67, 145, 135);',
         1,
     ),
     (
         '? ansi.getBgAnsi(95, 168, 118) + ansi.getFgAnsi(18, 19, 25) + ` ${responseTime} ` + ansi.reset',
-        '? ["rose-pine", "everforest-dark-medium"].includes(ctx?.ui?.theme?.name ?? "")\n'
+        f'? {EVERFOREST_THEME}\n'
         '            ? ctx.ui.theme.inverse(ctx.ui.theme.fg("accent", ` ${responseTime} `))\n'
         '            : ansi.getBgAnsi(95, 168, 118) + ansi.getFgAnsi(18, 19, 25) + ` ${responseTime} ` + ansi.reset',
         1,
     ),
 ]
 
-
-# Exact migration input from the earlier Rosé Pine-only overlay.
-ROSE_PINE_EDITS = [
-    (old, new.replace(
-        '["rose-pine", "everforest-dark-medium"].includes(ctx?.ui?.theme?.name ?? "")',
-        'ctx?.ui?.theme?.name === "rose-pine"',
-    ), count)
-    for old, new, count in MEDIUM_THEME_COLOR_EDITS
-]
-
-# Extend the exact predecessor without changing older themes' appearance.
-THEME_COLOR_EDITS = [
-    (old, new.replace(
-        '"everforest-dark-medium"',
-        '"everforest-dark-medium", "everforest-dark-hard"',
-    ), count)
-    for old, new, count in MEDIUM_THEME_COLOR_EDITS
+# Theme checks written by earlier overlays, which also covered the removed Rosé Pine
+# theme. Recognizing them lets an already patched install migrate in place.
+LEGACY_THEMES = (
+    '["rose-pine", "everforest-dark-medium", "everforest-dark-hard"].includes(ctx?.ui?.theme?.name ?? "")',
+    '["rose-pine", "everforest-dark-medium"].includes(ctx?.ui?.theme?.name ?? "")',
+    'ctx?.ui?.theme?.name === "rose-pine"',
+)
+LEGACY_THEME_COLOR_EDITS = [
+    (old, new.replace(EVERFOREST_THEME, legacy_theme), count)
+    for legacy_theme in LEGACY_THEMES
+    for old, new, count in THEME_COLOR_EDITS
 ]
 
 
@@ -474,7 +471,7 @@ def patch_sources(sources: dict[str, str]) -> dict[str, str]:
     # The final result restores it below, so replay leaves installed bytes intact.
     old_border, new_border = BORDER_EDIT
     index = sources["index.ts"]
-    for edit in [*THEME_COLOR_EDITS, *MEDIUM_THEME_COLOR_EDITS, *ROSE_PINE_EDITS]:
+    for edit in [*THEME_COLOR_EDITS, *LEGACY_THEME_COLOR_EDITS]:
         if edit[1] in index:
             index = replace_counted(index, [edit], "editor theme colors changed:", reverse=True)
     index = canonicalize_white_outline(index)

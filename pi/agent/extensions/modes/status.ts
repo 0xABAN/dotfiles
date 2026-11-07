@@ -1,4 +1,3 @@
-import rosePine from "../../themes/rose_pine/rose-pine.json";
 import everforest from "../../themes/everforest/everforest-dark-hard.json";
 import type { AgentMode } from "./utils.ts";
 
@@ -44,15 +43,11 @@ export function formatModeStatus(mode: AgentMode, thinkingLevel?: string, themeN
 			? [196, 160, 230] // pastel purple (plan)
 			: [173, 210, 203]; // pale teal (build, #add2cb)
 
-	// Reuse each imported palette while preserving the older themes' gradient.
-	const rose = rosePine.vars;
+	// Reuse the Everforest palette; Pi's built-in themes keep the default gradient.
 	// Hard and Medium share their foreground/accent colors.
 	const forest = everforest.vars;
 	let hexStops: string[] | undefined;
-	if (themeName === "rose-pine") {
-		const accent = mode === "learn" ? rose.gold : mode === "plan" ? rose.iris : rose.foam;
-		hexStops = [rose.text, accent, rose.rose];
-	} else if (themeName === "everforest-dark-medium" || themeName === "everforest-dark-hard") {
+	if (themeName === "everforest-dark-medium" || themeName === "everforest-dark-hard") {
 		const accent = mode === "learn" ? forest.blue : mode === "plan" ? forest.purple : forest.green;
 		// All mode icons start at the neutral foreground; only the accent differs.
 		hexStops = [forest.fg, accent, forest.yellow];

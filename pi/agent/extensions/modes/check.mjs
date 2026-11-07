@@ -209,7 +209,7 @@ assert.deepEqual(h.tools(), BUILD_TOOLS);
 assert.equal(h.sent.at(-1).message.customType, "plan-mode-execute");
 
 // Mode icons share one neutral color; Everforest Learn uses its muted teal accent.
-for (const theme of ["everforest-dark-hard", "everforest-dark-medium", "rose-pine", "osaka-jade"]) {
+for (const theme of ["everforest-dark-hard", "everforest-dark-medium", "dark"]) {
 	const learn = formatModeStatus("learn", "xhigh", theme);
 	const build = formatModeStatus("build", "xhigh", theme);
 	const plan = formatModeStatus("plan", "xhigh", theme);
@@ -233,9 +233,9 @@ assert.deepEqual(
 	formatModeStatus("learn", "xhigh", "everforest-dark-medium"),
 );
 assert.equal(stripColor(formatModeStatus("learn").thinking), "think:off");
-startup.ctx.ui.theme.name = "rose-pine";
+startup.ctx.ui.theme.name = "dark";
 await startup.emit("before_agent_start", promptEvent);
-assert.equal(startup.statuses.get("agent-mode"), formatModeStatus("learn", "xhigh", "rose-pine").mode);
+assert.equal(startup.statuses.get("agent-mode"), formatModeStatus("learn", "xhigh", "dark").mode);
 startup.ctx.thinkingLevel = "medium";
 await startup.emit("thinking_level_select");
 assert.equal(stripColor(startup.statuses.get("agent-thinking")), "think:med");
