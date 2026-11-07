@@ -55,6 +55,13 @@ auth stores created by reproduction extensions remain independent. The installed
 release files are not modified. Recheck this adapter when changing the pinned
 version.
 
+## Shared models
+
+`pi-clean` links normal Pi's `models.json`, or `$PI_CODING_AGENT_DIR/models.json`
+when that override is set, and starts on Cerebras `qwen-3.8-27b`. Pass `--model`
+to pick another. Commands in `models.json` run with `pi-clean`'s temporary `HOME`,
+so a keychain lookup has to name the keychain file, as the Cerebras key does.
+
 Sessions are not saved. Temporary files and settings are discarded on exit;
 shared authentication is retained. A forced kill or machine crash can leave a
 `/tmp/pi-clean.*` directory behind. Export anything you want to keep to an explicit
@@ -64,7 +71,7 @@ This is **configuration isolation, not a security sandbox**. Pi's tools and any
 explicit extension still run as your user and can access the filesystem. This
 launcher does not isolate your operating system, Node installation, or terminal.
 Your usual `pi` command, patches, and personal settings remain untouched. The
-shared auth file is the deliberate exception to configuration isolation.
+shared auth and models files are the deliberate exceptions to configuration isolation.
 
 ## Verify
 

@@ -34,6 +34,8 @@ trap 'exit 143' TERM
 # macOS aliases /tmp to /private/tmp; keep PWD and Node's cwd consistent.
 run_dir="$(cd "$run_dir" && pwd -P)"
 mkdir -p "$run_dir/home" "$run_dir/work" "$run_dir/tmp" "$run_dir/config" "$run_dir/cache" "$run_dir/agent"
+ln -s "$agent_dir/models.json" "$run_dir/agent/models.json"
+printf '{"defaultProvider":"cerebras","defaultModel":"qwen-3.8-27b"}\n' > "$run_dir/agent/settings.json"
 cd "$run_dir/work"
 
 # Keep terminal capabilities, but not API keys, NODE_OPTIONS, Pi overrides, or
