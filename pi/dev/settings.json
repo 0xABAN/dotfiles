@@ -12,12 +12,6 @@
       "source": "npm:pi-goal",
       "skills": []
     },
-    {
-      "source": "../../dev/pi-extensions/ponytail",
-      "skills": [
-        "ponytail"
-      ]
-    },
     "../../dev/pi-extensions",
     "../../dev/pi-extensions/powerline",
     "../../dev/pi-extensions/todo",

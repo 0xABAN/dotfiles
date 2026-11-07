@@ -24,12 +24,6 @@
     },
     "npm:pi-intercom",
     "https://github.com/nicobailon/pi-powerline-footer@8c9bda10fdfd2822e89334ec85f3da9f8ca49182",
-    {
-      "source": "npm:@dietrichgebert/ponytail",
-      "skills": [
-        "ponytail"
-      ]
-    },
     "https://github.com/nicobailon/pi-rewind-hook",
     "https://github.com/nicobailon/pi-skill-palette",
     "npm:pi-web-access",
