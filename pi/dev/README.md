@@ -28,7 +28,8 @@ settings never touch your daily `pi` in `~/.pi/agent`.
 On first run it creates:
 
 - `settings.json`, copied from `settings.json` here. It loads only the Claude
-  bridge, using the copy your daily `pi` installed, and sets the default model.
+  bridge, using the copy your daily `pi` installed, sets the default model, and
+  uses the Everforest theme from `pi/agent/themes`, like your daily `pi`.
   Pi edits this copy as you change settings; delete it to start over.
 - `models.json`, a link to your daily `models.json`, so custom providers such as
   Cerebras work.

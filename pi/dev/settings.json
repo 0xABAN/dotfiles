@@ -2,6 +2,10 @@
   "defaultProvider": "claude-bridge",
   "defaultModel": "claude-opus-5-5",
   "defaultThinkingLevel": "medium",
+  "theme": "everforest-dark-hard",
+  "themes": [
+    "~/dev/configs/pi/agent/themes"
+  ],
   "packages": [
     "~/.pi/agent/npm/node_modules/pi-claude-bridge"
   ]
