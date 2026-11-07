@@ -29,8 +29,8 @@ On first run it creates:
 
 - `settings.json`, copied from `settings.json` here. It loads the extensions
   from `~/dev/pi-extensions`, both your own collection and the maintained copies
-  of powerline, todo, ask-user-question, intercom and the Claude bridge, plus
-  `pi-goal`, `ponytail` and `pi-skill-palette`. Like your daily `pi`, it sets the
+  of powerline, todo, ask-user-question, intercom, the Claude bridge, ponytail
+  and the skill palette, plus `pi-goal`. Like your daily `pi`, it sets the
   default model, the Everforest theme from `pi/agent/themes`, quiet startup,
   codemode and the powerline layout. Pi edits this copy as you change settings;
   delete it to start over.

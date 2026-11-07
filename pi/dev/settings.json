@@ -13,12 +13,12 @@
       "skills": []
     },
     {
-      "source": "npm:@dietrichgebert/ponytail",
+      "source": "../../dev/pi-extensions/ponytail",
       "skills": [
         "ponytail"
       ]
     },
-    "https://github.com/nicobailon/pi-skill-palette",
+    "../../dev/pi-extensions/skill-palette",
     "../../dev/pi-extensions",
     "../../dev/pi-extensions/powerline",
     "../../dev/pi-extensions/todo",
