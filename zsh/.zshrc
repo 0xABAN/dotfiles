@@ -61,7 +61,3 @@ export NVM_DIR="$HOME/.nvm"
 
 # Rex CLI, bundled inside the app
 export PATH="/Applications/Rex Beta.app/Contents/Helpers/Rex Server.rex/Contents/MacOS:$PATH"
-
-# Machine-local secrets / overrides (not tracked). Keep this last so the
-# overrides win over everything above.
-[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local

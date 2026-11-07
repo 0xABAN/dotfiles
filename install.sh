@@ -292,5 +292,5 @@ fi
 
 echo
 echo "done. edit files under: $ROOT"
-echo "secrets: put exports in ~/.zshrc.local (sourced if present)"
+echo "secrets: store in Keychain, never exported: security add-generic-password -U -a $USER -s NAME -w"
 echo "new laptop: git clone <repo> ~/dev/dotfiles && cd ~/dev/dotfiles && ./install.sh"
