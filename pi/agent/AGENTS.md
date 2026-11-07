@@ -14,7 +14,7 @@
 ## Human readability
 
 - Write code for humans to understand and maintain. Working but unreadable code is unacceptable.
-- Document non-obvious contracts with docstrings or JSDoc; use comments to explain the reasoning behind tricky logic, invariants, and workarounds.
+- NEVER write docstrings / comments unless asked. 
 - Give code breathing room: separate logical steps with blank lines and expand cramped statements. Never sacrifice readability or useful explanations to reduce line count.
 - Before finishing, reread the change from an unfamiliar maintainer's perspective. Simplify anything that requires unnecessary mental bookkeeping; never sacrifice correctness or necessary performance for cosmetic simplicity.
 - Clean up after yourself. Remove temporary test files and code made obsolete by your changes; do not leave unused artifacts behind.
