@@ -1,7 +1,0 @@
-{
-  "disableDefaultAgents": true,
-  "fleetView": true,
-  "widgetMode": "background",
-  "schedulingEnabled": true,
-  "toolDescriptionMode": "custom"
-}
