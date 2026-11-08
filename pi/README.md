@@ -109,8 +109,8 @@ Themes live in family folders under `agent/themes/`, alongside their licenses.
 The `themes: ["themes"]` setting discovers them recursively. Run `/reload` after
 theme edits; Pi’s automatic theme watcher only watches root-level files.
 
-Personal extensions (DJ, modes, and whimsical) belong to the separate `~/dev/pi-extensions`
-checkout, which `agent/settings.json` loads as one collection package. Keep
+Our extensions belong to the separate `~/dev/pi-extensions` checkout, one
+collection package that targets the fork; `pi-dev` loads it (see `dev/`). Keep
 sessions, credentials, installed packages, and runtime locks out of commits.
 
 ## Rendering boundaries
@@ -286,7 +286,6 @@ Run the offline checks against the target SDK (fresh or already patched):
 python3 -B pi/patches/check_pi_patches.py /path/to/pi-coding-agent
 # Runtime checks require the patches to have been applied:
 node pi/patches/check_pi_runtime.mjs /path/to/pi-coding-agent
-(cd ~/dev/pi-extensions && bun modes/check.mjs)
 ```
 
 These check patch replay/refusal, launcher hashes, renderer resolution, duration

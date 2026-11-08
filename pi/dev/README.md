@@ -20,6 +20,13 @@ npm ci --ignore-scripts
 npm run hydrate:model-data
 ```
 
+The extensions in `~/dev/pi-extensions` need theirs too:
+
+```sh
+cd ~/dev/pi-extensions
+bun install
+```
+
 ## Configuration
 
 `pi-dev` keeps its own config folder, `~/.pi-dev/agent`, so its sessions and
@@ -27,13 +34,11 @@ settings never touch your daily `pi` in `~/.pi/agent`.
 
 On first run it creates:
 
-- `settings.json`, copied from `settings.json` here. It loads the extensions
-  from `~/dev/pi-extensions`, both your own collection and the maintained copies
-  of powerline, todo, ask-user-question, intercom and the Claude bridge, plus
-  `pi-goal`. Like your daily `pi`, it sets the default model, the Everforest
-  theme from `pi/agent/themes`, quiet startup, codemode and the powerline
-  layout. Pi edits this copy as you change settings;
-  delete it to start over.
+- `settings.json`, copied from `settings.json` here. It loads
+  `~/dev/pi-extensions` as one collection package, which includes the Claude
+  bridge, plus `pi-goal`. Like your daily `pi`, it sets the default model, the
+  Everforest theme from `pi/agent/themes` and codemode. Startup shows only the
+  header. Pi edits this copy as you change settings; delete it to start over.
 - `models.json`, a link to your daily `models.json`, so custom providers such as
   Cerebras work.
 - `keybindings.json`, a link to your daily `keybindings.json`, so `pi-dev` uses
