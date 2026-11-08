@@ -72,7 +72,7 @@ path outside that temporary directory before quitting.
 This is **configuration isolation, not a security sandbox**. Pi's tools and any
 explicit extension still run as your user and can access the filesystem. This
 launcher does not isolate your operating system, Node installation, or terminal.
-Your usual `pi` command, patches, and personal settings remain untouched. The
+Your usual `pi` command and personal settings remain untouched. The
 shared auth and models files are the deliberate exceptions to configuration isolation.
 
 ## Verify
