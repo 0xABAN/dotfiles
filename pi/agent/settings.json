@@ -1,88 +1,32 @@
 {
-  "lastChangelogVersion": "1.1.0",
+  "lastChangelogVersion": "1.5.0",
   "theme": "everforest-dark-hard",
-  "themes": ["themes"],
-  "quietStartup": true,
+  "themes": [
+    "themes"
+  ],
+  "quietStartup": "header",
   "defaultTools": [
     "+codemode"
   ],
   "defaultProvider": "claude-bridge",
   "defaultModel": "claude-opus-5-5",
-  "defaultThinkingLevel": "xhigh",
+  "defaultThinkingLevel": "medium",
   "enabledModels": [
-    "claude-bridge/claude-opus-5-5",
-    "openai-codex/gpt-6-astra",
-    "openai-codex/gpt-6.1-sol",
-    "openai-codex/gpt-6-luna"
+    "claude-bridge/claude-opus-5-5"
   ],
   "packages": [
-    "npm:@tintinweb/pi-subagents",
-    "npm:@juicesharp/rpiv-ask-user-question",
+    "../../dev/pi-extensions",
     {
       "source": "npm:pi-goal",
       "skills": []
     },
-    "npm:pi-intercom",
-    "https://github.com/nicobailon/pi-powerline-footer@8c9bda10fdfd2822e89334ec85f3da9f8ca49182",
-    "https://github.com/nicobailon/pi-rewind-hook",
-    "https://github.com/nicobailon/pi-skill-palette",
-    "npm:pi-web-access",
-    "npm:@juicesharp/rpiv-todo",
-    "../../dev/pi-extensions",
-    "npm:pi-claude-bridge"
+    "https://github.com/nicobailon/pi-rewind-hook"
   ],
-  "powerline": {
-    "preset": "default",
-    "placement": "below",
-    "separator": "chevron",
-    "disabledSegments": [
-      "extension_statuses",
-      "cache_read"
-    ],
-    "context": {
-      "format": "meter"
-    },
-    "cost": {
-      "subscriptionDisplay": "reported-cost"
-    },
-    "git": {
-      "showBranch": true,
-      "showStaged": false,
-      "showUnstaged": true,
-      "showUntracked": false
-    },
-    "customItems": [
-      {
-        "id": "mode",
-        "statusKey": "agent-mode",
-        "position": "left",
-        "selfColorize": true,
-        "hideWhenMissing": false
-      },
-      {
-        "id": "thinking",
-        "statusKey": "agent-thinking",
-        "position": "left",
-        "selfColorize": true,
-        "hideWhenMissing": false
-      }
-    ],
-    "layout": {
-      "left": [
-        "model",
-        "custom:thinking"
-      ],
-      "right": [
-        "cost",
-        "context_pct"
-      ],
-      "secondary": [
-        "shell_mode",
-        "queue"
-      ]
-    }
+  "rewind": {
+    "silentCheckpoints": true
   },
   "skills": [
     "!**/.agents/skills/write/**"
-  ]
+  ],
+  "deviceId": "fd106519-32e5-49ab-bceb-c301a94e9162"
 }
