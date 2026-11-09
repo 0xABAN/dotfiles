@@ -5,6 +5,7 @@ metadata:
   author: vercel
   version: "1.0.0"
   argument-hint: <file-or-pattern>
+disable-model-invocation: true
 ---
 
 # Web Interface Guidelines
