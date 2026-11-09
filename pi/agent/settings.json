@@ -21,8 +21,7 @@
     {
       "source": "npm:pi-goal",
       "skills": []
-    },
-    "https://github.com/nicobailon/pi-rewind-hook"
+    }
   ],
   "rewind": {
     "silentCheckpoints": true
