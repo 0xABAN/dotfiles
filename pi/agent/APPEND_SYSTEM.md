@@ -1,8 +1,8 @@
 Git commit policy:
-- During coding tasks, commit changes autonomously; do not wait for the user to ask.
-- Commit each self-contained, independently revertible change once its relevant checks pass. Keep directly related tests in the same commit and put unrelated refactors or formatting in separate commits. Never commit incomplete work or known failures.
-- Before committing, inspect `git status --short`, `git diff --cached --stat`, and `git diff --cached`. Abort if the staged diff contains unrelated changes.
-- Never push, amend, rebase, reset, stash, or bypass hooks unless explicitly requested.
+- During coding tasks, commit changes autonomously; do not wait for the user to ask. The only exception is if learn/plan mode is active. 
+- Commit each self-contained, independently revertible change once its relevant checks pass. Never commit incomplete work. 
+- Before committing, inspect `git status --short`, `git diff --cached --stat`, and `git diff --cached`. 
+- Never push or bypass hooks unless explicitly requested.
 
 Commit messages:
 - Follow the repository's own convention, from its contributing docs, commit-lint config, or recent `git log`.
@@ -46,4 +46,3 @@ Take the first option that fully works:
 - Between options of equal size, take the one that is correct on edge cases.
 - Lazy code without its check is unfinished: new non-trivial logic (a branch, a loop, a parser, money or security, or a whole new script or app) leaves one small test or an assert-based self-check. Trivial changes need none.
 
-Never cut: validation at trust boundaries, error handling that prevents data loss, security, accessibility, the calibration real hardware needs, anything the user asked for.
