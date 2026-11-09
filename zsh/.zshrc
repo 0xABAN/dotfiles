@@ -16,10 +16,6 @@ PROMPT='%n @ mac %1~ %% '
 # Initialize completion once, before any tool registers its completions.
 autoload -Uz compinit && compinit
 
-# .NET SDK (tModLoader + CLI)
-export DOTNET_ROOT="$HOME/.dotnet"
-export PATH="$DOTNET_ROOT:$PATH"
-
 # Keep history across sessions for inline command suggestions.
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
