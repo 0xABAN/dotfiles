@@ -12,7 +12,9 @@
   "defaultModel": "claude-opus-5-5",
   "defaultThinkingLevel": "medium",
   "enabledModels": [
-    "claude-bridge/claude-opus-5-5"
+    "claude-bridge/claude-opus-5-5",
+    "claude-bridge/claude-haiku-5-5:medium",
+    "openai-codex/gpt-6-astra:medium"
   ],
   "packages": [
     "../../dev/pi-extensions",
@@ -28,5 +30,8 @@
   "skills": [
     "!**/.agents/skills/write/**"
   ],
-  "deviceId": "fd106519-32e5-49ab-bceb-c301a94e9162"
+  "deviceId": "fd106519-32e5-49ab-bceb-c301a94e9162",
+  "extensionChangelogVersions": {
+    "{\"source\":\"https://github.com/nicobailon/pi-rewind-hook\",\"scope\":\"user\"}": "1.8.6"
+  }
 }
