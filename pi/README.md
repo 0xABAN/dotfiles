@@ -55,6 +55,24 @@ Claude bridge authenticates through Claude Code, independently of Pi's
 when Claude Code is logged out; refreshing Pi's tokens does not refresh the
 bridge's credentials.
 
+## Browser and desktop automation
+
+Vercel Labs' `agent-browser` (Chrome over CDP) and `agent-desktop` (the macOS
+accessibility tree) are global npm CLIs that Pi drives through bash. Their skills
+in `agent/skills/` are stubs that load the guide matching the installed version
+(`agent-browser skills get core`, `agent-desktop skills get desktop` and
+`platform`).
+
+```sh
+npm install -g agent-browser agent-desktop
+agent-browser install                # Chrome for Testing
+agent-desktop permissions --guide    # Accessibility, and Screen Recording for screenshots
+```
+
+Grant the permissions to the terminal app that runs Pi (Rex), and restart it
+after granting Screen Recording. npm skips the packages' postinstall scripts;
+the macOS binaries ship inside the packages, so both work without them.
+
 ## Where changes belong
 
 | Path | Responsibility |
