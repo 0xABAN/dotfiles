@@ -28,8 +28,4 @@ _autosuggest-or-complete() {
 zle -N _autosuggest-or-complete
 bindkey '^I' _autosuggest-or-complete
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] &&
-  source "/opt/homebrew/opt/nvm/nvm.sh" --no-use
-
 export PATH="/Applications/Rex Beta.app/Contents/Helpers/Rex Server.rex/Contents/MacOS:$PATH"
