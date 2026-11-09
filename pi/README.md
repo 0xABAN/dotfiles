@@ -1,7 +1,7 @@
 # Maintaining the Pi configuration
 
-This directory owns Pi configuration and the `pi` launcher.
-Run `./install.sh` from the repository root to set everything up.
+This directory owns Pi configuration and the `pi` launcher. The files in
+`agent/` are symlinked into `~/.pi/agent`, so edits here take effect directly.
 
 ## The `pi` command
 
@@ -11,9 +11,8 @@ Pi's default config folder, `~/.pi/agent`, and `settings.json` loads the
 extensions in `~/dev/pi-extensions` as one collection package, alongside
 `pi-goal` and `pi-rewind-hook`.
 
-`install.sh` clones both checkouts when they're missing, installs their
-dependencies, and links `bin/pi` to `~/.local/bin/pi`. `~/.local/bin` must come
-before any other `pi` on `PATH`. The dependency steps it runs are:
+`bin/pi` is linked to `~/.local/bin/pi`, which must come before any other `pi`
+on `PATH`. Both checkouts need their dependencies:
 
 ```sh
 cd ~/dev/pi
@@ -76,15 +75,15 @@ Enable CuaDriver in macOS Accessibility and Screen & System Audio Recording
 settings. Restart the driver if macOS requests it. Permission status must
 reflect CuaDriver's daemon, not a terminal's existing grants.
 
-The repository's `install.sh` creates and loads a per-user LaunchAgent. It
-starts `CuaDriver.app` with `serve --grant existing-profile` at login and keeps
+The per-user LaunchAgent in `launchagents/`, linked into
+`~/Library/LaunchAgents` and loaded with `launchctl bootstrap`, starts
+`CuaDriver.app` with `serve --grant existing-profile` at login and keeps
 the daemon running. This is where the existing-profile grant belongs. The tracked
 `agent/mcp.json.example` starts the MCP client with plain `cua-driver mcp`;
 ensure `~/.local/bin` is on `PATH`. Do not put `--grant` on the MCP command:
 it cannot change a daemon that's already running. For an existing installation,
 merge the plain MCP entry into `~/.pi/agent/mcp.json`, using the absolute binary
-path reported by `~/.local/bin/cua-driver mcp-config`. The dotfiles installer
-preserves this machine-local file, including its other servers and secrets.
+path reported by `~/.local/bin/cua-driver mcp-config`.
 
 Run `/reload` in Pi, then `/mcp reconnect cua-driver` and ask for the task.
 Discover tools through `codemode`; emit screenshot blocks with `image()` so
