@@ -2,6 +2,7 @@
 name: simplify
 description: Use when the user writes /simplify, asks to simplify the diff, clean up recent changes, or review changed code for reuse/simplification/efficiency/altitude cleanup. Not for correctness bugs.
 compatibility: claude-code opencode codex
+disable-model-invocation: true
 ---
 
 # Simplify
