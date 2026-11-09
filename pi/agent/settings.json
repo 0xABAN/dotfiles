@@ -17,7 +17,7 @@
     "openai-codex/gpt-6-astra:medium"
   ],
   "packages": [
-    "../../dev/pi-extensions",
+    "https://github.com/0xABAN/pi-extensions",
     {
       "source": "npm:pi-goal",
       "skills": []
