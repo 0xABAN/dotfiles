@@ -44,7 +44,6 @@ Keep machine-local server definitions and secrets in `~/.pi/agent/mcp.json`.
 The native schema uses `enabled: false`, not `disabled: true`, and does not read
 the adapter's `imports` or `settings`. Servers previously imported from OpenCode
 must have complete definitions here; changes in OpenCode no longer sync into Pi.
-The example configures only Cua Driver.
 
 Use `/mcp`, `/mcp reconnect <server>`, and `pi mcp list` for connection status.
 Within `codemode`, use `searchTools`, `describeTool`, and `describeNamespace`,
@@ -55,40 +54,6 @@ Claude bridge authenticates through Claude Code, independently of Pi's
 `/login anthropic`. Check `claude auth status` and use `claude auth login`
 when Claude Code is logged out; refreshing Pi's tokens does not refresh the
 bridge's credentials.
-
-## Computer use
-
-Computer use runs through the `cua-driver` server and Pi's native MCP support.
-Pi supplies the current model and authentication; Cua Driver supplies desktop
-observations and actions. No separate model API key is needed.
-
-Install the driver using the [official installer](https://cua.ai/docs/start-here/drive-your-first-app):
-
-```bash
-curl -fsSL https://cua.ai/driver/install.sh -o /tmp/cua-driver-install.sh
-/bin/bash /tmp/cua-driver-install.sh --no-modify-path
-~/.local/bin/cua-driver permissions grant
-~/.local/bin/cua-driver permissions status
-```
-
-Enable CuaDriver in macOS Accessibility and Screen & System Audio Recording
-settings. Restart the driver if macOS requests it. Permission status must
-reflect CuaDriver's daemon, not a terminal's existing grants.
-
-The per-user LaunchAgent in `launchagents/`, linked into
-`~/Library/LaunchAgents` and loaded with `launchctl bootstrap`, starts
-`CuaDriver.app` with `serve --grant existing-profile` at login and keeps
-the daemon running. This is where the existing-profile grant belongs. The tracked
-`agent/mcp.json.example` starts the MCP client with plain `cua-driver mcp`;
-ensure `~/.local/bin` is on `PATH`. Do not put `--grant` on the MCP command:
-it cannot change a daemon that's already running. For an existing installation,
-merge the plain MCP entry into `~/.pi/agent/mcp.json`, using the absolute binary
-path reported by `~/.local/bin/cua-driver mcp-config`.
-
-Run `/reload` in Pi, then `/mcp reconnect cua-driver` and ask for the task.
-Discover tools through `codemode`; emit screenshot blocks with `image()` so
-the current model can inspect them. A single native MCP connection preserves
-the driver's implicit session across observation and action calls.
 
 ## Where changes belong
 
