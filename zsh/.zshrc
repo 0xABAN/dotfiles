@@ -3,6 +3,7 @@ alias dev="cd ~/Projects"
 alias p="pi"
 
 alias gaa="git add --all"
+alias ga="git add"
 alias gcl="git clone"
 alias gs="git status"
 alias gcm="git commit -m"
