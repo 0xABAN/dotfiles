@@ -16,14 +16,6 @@ PROMPT='%n @ mac %1~ %% '
 # Initialize completion once, before any tool registers its completions.
 autoload -Uz compinit && compinit
 
-# Google Cloud SDK
-if [ -f "$HOME/.local/google-cloud-sdk/path.zsh.inc" ]; then
-  . "$HOME/.local/google-cloud-sdk/path.zsh.inc"
-fi
-if [ -f "$HOME/.local/google-cloud-sdk/completion.zsh.inc" ]; then
-  . "$HOME/.local/google-cloud-sdk/completion.zsh.inc"
-fi
-
 # .NET SDK (tModLoader + CLI)
 export DOTNET_ROOT="$HOME/.dotnet"
 export PATH="$DOTNET_ROOT:$PATH"
