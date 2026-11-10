@@ -34,9 +34,9 @@ local function start()
     needs_paint = false
 
     local columns, rows = vim.o.columns, vim.o.lines
-    local cell = terminal.size()
-    local width = columns * (cell.cell_width > 0 and cell.cell_width or 9)
-    local height = rows * (cell.cell_height > 0 and cell.cell_height or 18)
+    local size = terminal.size()
+    local width, height = size.width, size.height
+    if width == 0 or height == 0 then return end -- terminal didn't report its pixel size
 
     -- Keep the largest scale for this session: smaller viewports crop more,
     -- larger ones may zoom in. Uniform scaling preserves the source aspect ratio.
@@ -52,14 +52,21 @@ local function start()
     terminal.write("\27" .. "7") -- preserve Neovim's terminal cursor
     terminal.set_cursor({ 1, 0 })
     terminal.request({
-      a = "p", i = id, p = 1, C = 1, z = -1,
+      a = "p", -- place an uploaded image
+      i = id,
+      p = 1,
+      C = 1, -- leave the cursor where it is
+      z = -1, -- draw behind text
       -- Request errors for cached images, but silence a failed fresh upload
       -- so an unreadable asset cannot trigger an infinite recovery loop.
       q = uploaded and 2 or 1,
-      c = columns, r = rows,
+      -- Fill the whole editor with a centered crop of the source image.
+      c = columns,
+      r = rows,
       x = math.floor((dimensions.width - crop_width) / 2),
       y = math.floor((dimensions.height - crop_height) / 2),
-      w = crop_width, h = crop_height,
+      w = crop_width,
+      h = crop_height,
     })
     terminal.write("\27" .. "8")
   end
