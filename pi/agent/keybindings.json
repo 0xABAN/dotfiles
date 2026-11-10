@@ -1,5 +1,8 @@
 {
   "app.thinking.cycle": [],
   "app.model.cycleForward": [],
-  "app.model.cycleBackward": []
+  "app.model.cycleBackward": [],
+  "tui.altScreen.bottom": [
+    "super+down"
+  ]
 }
