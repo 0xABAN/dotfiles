@@ -4,3 +4,6 @@ rex.unbind("cmd+shift+right")
 rex.unbind("cmd+shift+up")
 rex.unbind("cmd+shift+down")
 rex.unbind("cmd+down")
+
+-- Toggle the sidebar
+rex.bind("cmd+b", "client.sidebar.toggle")
