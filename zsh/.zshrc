@@ -11,6 +11,7 @@ alias gps="git push"
 alias gpl="git pull"
 
 alias python=python3
+alias c++="c++ -std=c++23"
 
 PROMPT='%n @ mac %1~ %% '
 
