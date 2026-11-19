@@ -25,6 +25,6 @@ return {
   {
     -- Mason-installed servers are enabled automatically by AstroNvim.
     "WhoIsSethDaniel/mason-tool-installer.nvim",
-    opts = { ensure_installed = { "basedpyright", "ruff", "vtsls" } },
+    opts = { ensure_installed = { "basedpyright", "ruff", "vtsls", "verible" } },
   },
 }
