@@ -6,6 +6,9 @@ return {
       -- Not managed by Mason; uses Apple's clangd from Xcode, which knows the SDK header paths.
       servers = { "clangd" },
       config = {
+        verible = {
+          cmd = { "verible-verilog-ls", "--rules=-no-trailing-spaces" },
+        },
         basedpyright = {
           settings = {
             basedpyright = {
